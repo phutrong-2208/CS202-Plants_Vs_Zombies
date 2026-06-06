@@ -1,0 +1,14 @@
+#for build
+/build/ 
+/cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+#object files
+**.o
+**.obj
+
+#execute files
+
+**.exe
