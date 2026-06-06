@@ -1,14 +1,14 @@
-#for build
+# Build folders
 /build/ 
+.vscode/
 /cmake-build-*/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 
-#object files
+# Object files
 **.o
 **.obj
 
-#execute files
-
+# Executables
 **.exe
