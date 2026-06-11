@@ -1,4 +1,7 @@
 #include "Worlds/World.hpp"
+#include "Core/TextureManager.hpp"
+#include "string"
+
 #include "Gameplay/Plants/ShooterPlants/Peashooter.hpp"
 #include "Gameplay/Plants/SunProducePlants/Sunflower.hpp"
 #include "Gameplay/Plants/DefensivePlants/WallNut.hpp"
@@ -54,6 +57,17 @@ Rectangle World :: cellScreenRect(int row, int col) const {
 }
 
 void World :: update(float dt) {
+    dayMap.update(dt);
+    if (dayMap.isReady()) {
+        Rectangle area = dayMap.getGridArea();
+        gridX = area.x;
+        gridY = area.y;
+        cellWidth = area.width / 9.0f;
+        cellHeight = area.height / 5.0f;
+
+        grid.setCellWidth(cellWidth);
+        grid.setCellHeight(cellHeight);
+    }
     for (int r = 0; r < 5; ++r)
         for (int c = 0; c < 9; ++c)
             if (Plant* p = grid.getPlant(r, c))
@@ -62,33 +76,19 @@ void World :: update(float dt) {
 }
 
 void World :: draw() const {
+    dayMap.draw();
+    if (!dayMap.isReady()) return;
+
     Vector2 mouse = GetMousePosition();
     int hovR = -1, hovC = -1;
     screenToGrid((int)mouse.x, (int)mouse.y, hovR, hovC);
 
-    Rectangle gridRect = {gridX, gridY, 9 * cellWidth, 5 * cellHeight};
-    DrawRectangleRec(gridRect, (Color){30, 60, 30, 255});
-    DrawRectangleLinesEx(gridRect, 3, (Color){50, 100, 50, 255});
-
     for (int r = 0; r < 5; ++r) {
         for (int c = 0; c < 9; ++c) {
             Rectangle rect = cellScreenRect(r, c);
-            bool light = (r + c) % 2 == 0;
-            Color col = light ? (Color){100, 140, 80, 255} : (Color){80, 120, 60, 255};
 
             if (r == hovR && c == hovC && selectedPlantId >= 0)
-                col = (Color){60, 200, 40, 255};
-            else if (r == hovR && c == hovC)
-                col = (Color){140, 180, 100, 255};
-
-            DrawRectangleRec(rect, col);
-            DrawRectangleLinesEx(rect, 1, (Color){50, 90, 40, 255});
-
-            if (r == hovR && c == hovC && selectedPlantId >= 0) {
                 DrawRectangleLinesEx(rect, 3, LIME);
-                DrawText("+", (int)(rect.x + rect.width / 2 - 8),
-                         (int)(rect.y + rect.height / 2 - 12), 28, LIME);
-            }
 
             Plant* p = grid.getPlant(r, c);
             if (p) {
@@ -106,9 +106,10 @@ void World :: draw() const {
     for (int i = 0; i < NUM_PLANTS; ++i) {
         float bx = barX + (float)i * 90.0f;
         float by = gridY - 30.0f;
-        Color bg = (i == selectedPlantId) ? (Color){100, 220, 80, 255} : (Color){180, 200, 150, 255};
-        DrawRectangle((int)bx, (int)by, 85, 24, bg);
-        DrawText(plantNames[i], (int)bx + 4, (int)by + 4, 14, (i == selectedPlantId) ? (Color){20, 50, 20, 255} : (Color){40, 60, 30, 255});
+        Color bgCol = (i == selectedPlantId) ? (Color){100, 220, 80, 200} : (Color){180, 200, 150, 200};
+        DrawRectangle((int)bx, (int)by, 85, 24, bgCol);
+        DrawText(plantNames[i], (int)bx + 4, (int)by + 4, 14,
+                 (i == selectedPlantId) ? (Color){20, 50, 20, 255} : (Color){40, 60, 30, 255});
     }
 }
 

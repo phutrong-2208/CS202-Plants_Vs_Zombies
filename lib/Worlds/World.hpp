@@ -2,9 +2,11 @@
 #define WORLD_HPP
 
 #include "Worlds/Grid.hpp"
+#include "Worlds/DayMap.hpp"
 
 class World {
 private:
+    DayMap dayMap;
     Grid grid;
     float gridX, gridY, cellWidth, cellHeight;
     int selectedPlantId;
@@ -12,7 +14,7 @@ private:
     static const char* plantNames[];
     static const int NUM_PLANTS;
 
-    std::unique_ptr<Plant> createPlant(int id, Vector2 pos);
+    std :: unique_ptr<Plant> createPlant(int id, Vector2 pos);
 
     bool screenToGrid(int sx, int sy, int& row, int& col) const;
     Rectangle cellScreenRect(int row, int col) const;

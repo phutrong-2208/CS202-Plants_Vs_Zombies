@@ -1,11 +1,17 @@
 #include "raylib.h"
+
+#include "Core/TextureManager.hpp"
 #include "Worlds/World.hpp"
 
+TextureManager file;
+
 int main() {
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(800, 600, "Plants Vs Zombies");
-    MaximizeWindow();
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
+    
+    InitWindow(1200, 900, "Plants Vs Zombies");
     SetTargetFPS(60);
+
+    file.LoadResource();
 
     int w = GetScreenWidth();
     int h = GetScreenHeight();
@@ -20,12 +26,12 @@ int main() {
         world.update(GetFrameTime());
 
         BeginDrawing();
-        ClearBackground((Color){50, 60, 40, 255});
         world.draw();
         DrawFPS(10, 10);
         EndDrawing();
     }
 
     CloseWindow();
+    file.UnloadResource();
     return 0;
 }

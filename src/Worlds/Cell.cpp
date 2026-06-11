@@ -18,7 +18,7 @@ bool Cell :: placePlant(std::unique_ptr<Plant> newPlant) {
     if (plant) {
         return false;
     }
-    plant = std::move(newPlant);
+    plant = std :: move(newPlant);
     return true;
 }
 
