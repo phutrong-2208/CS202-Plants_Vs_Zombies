@@ -9,7 +9,7 @@ public:
 
     DayMap(); 
     void update(float dt) override; //update the state of map 
-    void draw() const override;
+    void draw(TextureManager* file) const override;
     Rectangle getGridArea() const override;
 
 private:

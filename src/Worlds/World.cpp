@@ -1,11 +1,4 @@
-#include "Worlds/World.hpp"
-#include "Core/TextureManager.hpp"
-#include "string"
-
-#include "Gameplay/Plants/ShooterPlants/Peashooter.hpp"
-#include "Gameplay/Plants/SunProducePlants/Sunflower.hpp"
-#include "Gameplay/Plants/DefensivePlants/WallNut.hpp"
-#include "Gameplay/Plants/ShooterPlants/SnowPea.hpp"
+#include <Worlds/World.hpp>
 
 const char* World :: plantNames[] = {
     "Peashooter",
@@ -27,6 +20,13 @@ World :: World(int screenWidth, int screenHeight)
     grid.setCellHeight(cellHeight);
     gridX = margin;
     gridY = topBar;
+
+    file = new TextureManager();
+    file -> LoadResource();
+}
+World::~World() {
+    file -> UnloadResource();
+    delete file;
 }
 
 std::unique_ptr<Plant> World :: createPlant(int id, Vector2 pos) {
@@ -39,13 +39,13 @@ std::unique_ptr<Plant> World :: createPlant(int id, Vector2 pos) {
     }
 }
 
-bool World :: screenToGrid(int sx, int sy, int& row, int& col) const {
-    float cx = (float)(sx - (int)gridX);
-    float cy = (float)(sy - (int)gridY);
+bool World :: screenToGrid(float sx, float sy, int& row, int& col) const {
+    float cx = sx - gridX;
+    float cy = sy - gridY;
     if (cx < 0 || cy < 0) return false;
     col = (int)(cx / cellWidth);
     row = (int)(cy / cellHeight);
-    return (row >= 0 && row < 5 && col >= 0 && col < 9);
+    return (row >= 0 && row < NUM_ROWS && col >= 0 && col < NUM_COLS);
 }
 
 Rectangle World :: cellScreenRect(int row, int col) const {
@@ -62,29 +62,29 @@ void World :: update(float dt) {
         Rectangle area = dayMap.getGridArea();
         gridX = area.x;
         gridY = area.y;
-        cellWidth = area.width / 9.0f;
-        cellHeight = area.height / 5.0f;
+        cellWidth = area.width / NUM_COLS;
+        cellHeight = area.height / NUM_ROWS;
 
         grid.setCellWidth(cellWidth);
         grid.setCellHeight(cellHeight);
     }
-    for (int r = 0; r < 5; ++r)
-        for (int c = 0; c < 9; ++c)
+    for (int r = 0; r < NUM_ROWS; ++r)
+        for (int c = 0; c < NUM_COLS; ++c)
             if (Plant* p = grid.getPlant(r, c))
                 if (p -> isDead())
                     grid.removePlant(r, c);
 }
 
 void World :: draw() const {
-    dayMap.draw();
+    dayMap.draw(file);
     if (!dayMap.isReady()) return;
 
     Vector2 mouse = GetMousePosition();
     int hovR = -1, hovC = -1;
     screenToGrid((int)mouse.x, (int)mouse.y, hovR, hovC);
 
-    for (int r = 0; r < 5; ++r) {
-        for (int c = 0; c < 9; ++c) {
+    for (int r = 0; r < NUM_ROWS; ++r) {
+        for (int c = 0; c < NUM_COLS; ++c) {
             Rectangle rect = cellScreenRect(r, c);
 
             if (r == hovR && c == hovC && selectedPlantId >= 0)
@@ -113,21 +113,21 @@ void World :: draw() const {
     }
 }
 
-void World :: onMouseClick(int sx, int sy) {
+void World :: onMouseClick(Vector2 position) {
     float barWidth = NUM_PLANTS * 90.0f;
     float barX = gridX + (9 * cellWidth - barWidth) / 2.0f;
     for (int i = 0; i < NUM_PLANTS; ++i) {
         float bx = barX + (float)i * 90.0f;
         float by = gridY - 30.0f;
-        if (sx >= bx && sx <= bx + 85 && sy >= by && sy <= by + 22) {
+        if (position.x >= bx && position.x <= bx + 85 && position.y >= by && position.y <= by + 22) {
             selectedPlantId = (selectedPlantId == i) ? -1 : i;
             return;
         }
     }
 
     int r, c;
-    if (!screenToGrid(sx, sy, r, c) || selectedPlantId < 0) return;
+    if (!screenToGrid(position.x, position.y, r, c) || selectedPlantId < 0) return;
 
     if (!grid.getPlant(r, c))
-        grid.placePlant(r, c, createPlant(selectedPlantId, Vector2{(float)sx, (float)sy}));
+        grid.placePlant(r, c, createPlant(selectedPlantId, position));
 }

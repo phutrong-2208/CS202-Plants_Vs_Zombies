@@ -1,22 +1,18 @@
 #ifndef TEXTURE_MANAGER_HPP
 #define TEXTURE_MANAGER_HPP
 
-#include "raylib.h"
-#include "unordered_map"
-#include "string"
+#include <Common.hpp>
 
 class TextureManager{
 public:
-    std :: unordered_map<std :: string, Texture2D> texture;
-    std :: unordered_map<std :: string, Sound> sound;
-    std :: unordered_map<std :: string, Music> music;
-    std :: unordered_map<std :: string, Font> font;
+    std :: map<std :: string, Texture2D> texture;
+    std :: map<std :: string, Sound> sound;
+    std :: map<std :: string, Music> music;
+    std :: map<std :: string, Font> font;
 public:
     TextureManager();
     void LoadResource(void);
     void UnloadResource(void);
 };
-
-extern TextureManager file;
 
 #endif  

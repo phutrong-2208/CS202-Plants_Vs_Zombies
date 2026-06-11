@@ -1,7 +1,7 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 
-#include "raylib.h"
+#include <Core/TextureManager.hpp>
 
 class Map {
 public:
@@ -10,7 +10,7 @@ public:
     virtual ~Map() = default;
 
     virtual void update(float dt);
-    virtual void draw() const = 0;
+    virtual void draw(TextureManager* file) const = 0;
 
     bool isReady() const;
     virtual Rectangle getGridArea() const;

@@ -1,5 +1,4 @@
-#include "Worlds/DayMap.hpp"
-#include "Core/TextureManager.hpp"
+#include <Worlds/DayMap.hpp>
 
 DayMap :: DayMap() : phase(Phase :: PAN_RIGHT), phaseTimer(0.0f), phaseDuration(2.0f){
     crop = {210, 0, 800, 600};
@@ -35,8 +34,8 @@ Rectangle DayMap :: getGridArea() const {
             lawnSrc.width * scaleX, lawnSrc.height * scaleY};
 }
 
-void DayMap :: draw() const {
-    Texture2D bg = file.texture["background1"];
+void DayMap :: draw(TextureManager* file) const {
+    Texture2D bg = file -> texture["background1"];
     if (bg.id == 0) return;
 
     float maxCropX = (float)bg.width - crop.width;
