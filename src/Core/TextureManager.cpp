@@ -1,19 +1,14 @@
 #include "Core/TextureManager.hpp"
 
-
-TextureManager :: TextureManager(){
-    texture.clear();
-    sound.clear();
-    music.clear();
-    font.clear();
+void TextureManager :: addPackage(const std :: string& name, std :: unique_ptr<TexturePackage> package){
+    packs[name] = std :: move(package);
 }
-void TextureManager :: LoadResource(void){
-    texture["background1"] = LoadTexture("../assets/texture/Maps/Day/background1.jpg");
-    if(texture["background1"].id == 0) {
-        TraceLog(LOG_ERROR, "Cannot load background1.jpg file");
+TexturePackage* TextureManager :: getPackage(const std :: string& name){
+    auto it = packs.find(name);
+    if(it != packs.end()){
+        return it -> second.get();
     }
-}   
-
-void TextureManager :: UnloadResource(void){
-    UnloadTexture(texture["background1"]);
-}   
+    else{
+        return nullptr;
+    }
+}
