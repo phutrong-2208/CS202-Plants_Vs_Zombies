@@ -22,10 +22,10 @@ World :: World(int screenWidth, int screenHeight)
     gridY = topBar;
 
     file = new TextureManager();
-    file -> LoadResource();
+    // file -> LoadResource();
 }
 World::~World() {
-    file -> UnloadResource();
+    // file -> UnloadResource();
     delete file;
 }
 

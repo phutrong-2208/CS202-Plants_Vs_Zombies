@@ -35,30 +35,30 @@ Rectangle DayMap :: getGridArea() const {
 }
 
 void DayMap :: draw(TextureManager* file) const {
-    Texture2D bg = file -> texture["background1"];
-    if (bg.id == 0) return;
+    // Texture2D bg = file -> texture["background1"];
+    // if (bg.id == 0) return;
 
-    float maxCropX = (float)bg.width - crop.width;
+    // float maxCropX = (float)bg.width - crop.width;
 
-    float t = phaseTimer / phaseDuration;
-    if (t > 1.0f) t = 1.0f;
-    float eased = 1.0f - (1.0f - t) * (1.0f - t);
+    // float t = phaseTimer / phaseDuration;
+    // if (t > 1.0f) t = 1.0f;
+    // float eased = 1.0f - (1.0f - t) * (1.0f - t);
 
-    Rectangle src = crop;
-    if (phase == Phase :: PAN_RIGHT) {
-        src.x = eased * maxCropX;
-    } else if (phase == Phase :: PAN_LEFT) {
-        src.x = (1.0f - eased) * maxCropX + eased * crop.x;
-    }
+    // Rectangle src = crop;
+    // if (phase == Phase :: PAN_RIGHT) {
+    //     src.x = eased * maxCropX;
+    // } else if (phase == Phase :: PAN_LEFT) {
+    //     src.x = (1.0f - eased) * maxCropX + eased * crop.x;
+    // }
 
-    int sw = GetScreenWidth();
-    int sh = GetScreenHeight();
-    float scale = ((float)sw / crop.width < (float)sh / crop.height)
-                  ? (float)sw / crop.width : (float)sh / crop.height;
-    float dstW = crop.width * scale;
-    float dstH = crop.height * scale;
-    float dstX = (sw - dstW) / 2.0f;
-    float dstY = (sh - dstH) / 2.0f;
+    // int sw = GetScreenWidth();
+    // int sh = GetScreenHeight();
+    // float scale = ((float)sw / crop.width < (float)sh / crop.height)
+    //               ? (float)sw / crop.width : (float)sh / crop.height;
+    // float dstW = crop.width * scale;
+    // float dstH = crop.height * scale;
+    // float dstX = (sw - dstW) / 2.0f;
+    // float dstY = (sh - dstH) / 2.0f;
 
-    DrawTexturePro(bg, src, {dstX, dstY, dstW, dstH}, {0, 0}, 0, WHITE);
+    // DrawTexturePro(bg, src, {dstX, dstY, dstW, dstH}, {0, 0}, 0, WHITE);
 }
