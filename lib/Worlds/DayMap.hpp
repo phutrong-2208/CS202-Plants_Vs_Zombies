@@ -7,10 +7,11 @@ class DayMap : public Map {
 public:
     enum class Phase { PAN_RIGHT, PAN_LEFT, DONE }; // represent the initial phase after starting the game
 
-    DayMap(); 
+    DayMap();
+    ~DayMap(); 
     void update(float dt) override; //update the state of map 
-    void draw(TextureManager* file) const override;
-    Rectangle getGridArea() const override;
+    void draw() const override;
+    // Rectangle getGridArea() const override;
 
 private:
     Phase phase;
@@ -18,6 +19,8 @@ private:
     float phaseDuration;
     Rectangle crop;
     Rectangle lawnSrc;
+
+    Texture2D background;
 };
 
 #endif

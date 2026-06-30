@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/build")
-
+add_compile_definitions(PROJECT_DIR="${CMAKE_SOURCE_DIR}/")
 include(FetchContent)
 FetchContent_Declare(
     raylib

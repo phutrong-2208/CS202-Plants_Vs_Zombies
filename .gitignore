@@ -1,6 +1,7 @@
 # Build folders
 /build/ 
 .vscode/
+.cache/
 /cmake-build-*/
 CMakeFiles/
 CMakeCache.txt

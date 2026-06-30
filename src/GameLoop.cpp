@@ -2,8 +2,7 @@
 
 
 void GameLoop::loadAssets(void) {
-    std :: string path = GetApplicationDirectory();
-    std :: string dir = path + "../assets/texture/Plants/SunFlower";
+    std :: string dir = std::string(PROJECT_DIR) + "assets/texture/Plants/SunFlower";
     std :: unique_ptr<TexturePackage> SunFlower = std :: make_unique<TexturePackage>();
 
     SunFlower -> AddTexture("SUNFLOWER_BLINK1",       dir + "/SunFlower_blink1.png");
@@ -37,7 +36,6 @@ void GameLoop::loadAssets(void) {
     SunFlower -> AddTexture("SUNFLOWER_TOPPETALS",    dir + "/SunFlower_toppetals.png");
 
     textureManager -> addPackage("SunFlower", std :: move(SunFlower));
-
 }
 
 void GameLoop::initGame() {
@@ -54,7 +52,7 @@ void GameLoop::initGame() {
 
 
     auto parser = std::make_unique<ReanimParser>();
-    parser->loadFromFile("../assets/texture/Plants/SunFlower/SunFlower.reanim");
+    parser->loadFromFile("assets/texture/Plants/SunFlower/SunFlower.reanim");
     animationManager->addClip("idle", parser.release());
     animationManager->play("idle");
 }
@@ -83,8 +81,9 @@ void GameLoop::runGame() {
 
     BeginDrawing();
     ClearBackground(BLACK);
-    // world -> draw();
-    animationManager->draw({400, 300}, *textureManager, "SunFlower", 200.0f);
+    world -> draw();
+    // animationManager->draw({400, 300}, *textureManager, "SunFlower", 200.0f);
+    // std::cerr << GetMousePosition().x << ' ' << GetMousePosition().y << '\n';
     DrawFPS(10, 10);
     EndDrawing();
 }

@@ -21,6 +21,7 @@ private:
 
 public:
     AnimationManager();
+    ~AnimationManager();
 
     void addClip(const std :: string& name, ReanimParser* parser);
 

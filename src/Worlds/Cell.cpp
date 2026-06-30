@@ -1,18 +1,18 @@
 #include "Worlds/Cell.hpp"
 
-Cell :: Cell() : plant(nullptr), bounds{-1, -1, -1, -1}{}
+Cell :: Cell() : plant(nullptr) {}
 
 bool Cell :: isOccupied() const {
     return plant != nullptr;
 }
 
-Rectangle Cell :: getBounds() const {
-    return bounds;
-}
+// Rectangle Cell :: getBounds() const {
+//     return bounds;
+// }
 
-void Cell :: setBounds(Rectangle newBounds) {
-    bounds = newBounds;
-}
+// void Cell :: setBounds(Rectangle newBounds) {
+//     bounds = newBounds;
+// }
 
 bool Cell :: placePlant(std::unique_ptr<Plant> newPlant) {
     if (plant) {
@@ -27,5 +27,5 @@ Plant* Cell :: getPlant() const {
 }
 
 void Cell :: removePlant() {
-    plant.reset();
+    plant.reset(nullptr);
 }

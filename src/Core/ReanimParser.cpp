@@ -26,8 +26,7 @@ std::string ReanimParser :: getTagContent(const std :: string& src, const std ::
 }
 
 bool ReanimParser::loadFromFile(const std::string& path){
-    std :: string base = GetApplicationDirectory();
-    std :: string fullPath = base + path;
+    std :: string fullPath = PROJECT_DIR + path;
     std :: ifstream f(fullPath);
 
     if (!f.is_open()){

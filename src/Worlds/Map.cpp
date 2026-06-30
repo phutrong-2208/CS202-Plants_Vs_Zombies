@@ -13,9 +13,9 @@ bool Map :: isReady() const {
     return state == State :: READY;
 }
 
-Rectangle Map :: getGridArea() const {
-    return {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()};
-}
+// Rectangle Map :: getGridArea() const {
+//     return {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()};
+// }
 
 float Map :: getSlideProgress() const {
     float t = slideTimer / slideDuration;

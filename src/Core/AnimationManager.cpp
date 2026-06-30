@@ -1,7 +1,11 @@
 #include "Core/AnimationManager.hpp"
 #include <rlgl.h> 
 AnimationManager::AnimationManager() : currentClip(-1), currentTime(0.0f), speed(1.0f), looping(true) {}
-
+AnimationManager::~AnimationManager() {
+    for (Clip& clip : clipList) {
+        delete clip.animation;
+    }
+}
 void AnimationManager::addClip(const std::string& name, ReanimParser* parser) {
     clipList.push_back({name, parser});
 }

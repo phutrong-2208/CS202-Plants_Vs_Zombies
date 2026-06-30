@@ -13,14 +13,21 @@ class World {
 private:
     DayMap dayMap;
     Grid grid;
-    float gridX, gridY, cellWidth, cellHeight;
-    int selectedPlantId;
 
-    TextureManager* file = nullptr;
+    // Original PopCap viewport
+    float GRID_START_X = 40.0f;  
+    float GRID_START_Y = 80.0f;  
+    static float CELL_WIDTH[], CELL_HEIGHT[];
+    float HORIZONTAL_SCALE, VERTICAL_SCALE;
+    float GRID_WIDTH, GRID_HEIGHT;
+    const float VIRTUAL_WIDTH = 800.0f, VIRTUAL_HEIGHT = 600.0f;
+
+    // float gridX, gridY, cellWidth, cellHeight;
+    int selectedPlantId;
 
     static const char* plantNames[];
     static const int NUM_PLANTS;
-    const int NUM_ROWS = 5, NUM_COLS = 9;
+    static const int NUM_ROWS = 5, NUM_COLS = 9;
 
     std :: unique_ptr<Plant> createPlant(int id, Vector2 pos);
 
