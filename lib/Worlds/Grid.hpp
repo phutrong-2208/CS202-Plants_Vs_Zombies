@@ -2,7 +2,7 @@
 #define GRID_HPP
 #include "Cell.hpp"
 
-class Plant;   // forward declaration — sufficient for unique_ptr parameter
+// class Plant;   // forward declaration — sufficient for unique_ptr parameter
 
 class Grid {
 private:
@@ -11,8 +11,9 @@ private:
 
     Cell garden[NUM_ROWS][NUM_COLS];
 public:
-    Grid() = default;
-
+    void updateTime(float deltaSeconds);
+    void draw();
+    
     bool placePlant(int row, int col, std :: unique_ptr<Plant> plant);
     void removePlant(int row, int col);
     Plant* getPlant(int row, int col) const;

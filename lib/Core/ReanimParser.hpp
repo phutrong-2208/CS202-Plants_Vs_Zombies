@@ -1,8 +1,7 @@
 #ifndef REANIMPARSER_HPP
 #define REANIMPARSER_HPP
 
-#include "Common.hpp"
-
+#include <Common.hpp>
 
 struct Frame{
     float snap;
@@ -48,9 +47,6 @@ public:
 
     const ReanimTrack * getTrack(int index) const;
     const ReanimTrack * getTrack(const std :: string& name) const;
-
-    // Frame getInterpolatedFrame(const ReanimTrack& track, float time) const;
-    // std :: string getTextureKey(const Frame& frame) const;
 };
 
 #endif

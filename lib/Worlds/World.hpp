@@ -1,6 +1,9 @@
 #ifndef WORLD_HPP
 #define WORLD_HPP
 
+#include <Core/TextureManager.hpp>  
+#include <Core/AnimationManager.hpp>
+
 #include <Worlds/Grid.hpp>
 #include <Worlds/DayMap.hpp>
 
@@ -29,18 +32,21 @@ private:
     static const int NUM_PLANTS;
     static const int NUM_ROWS = 5, NUM_COLS = 9;
 
-    std :: unique_ptr<Plant> createPlant(int id, Vector2 pos);
+    TextureManager* textureManager = nullptr;
+    AnimationManager* animationManager = nullptr;
 
+    std :: unique_ptr<Plant> createPlant(int row, int col, const std::string& plantID);
     bool screenToGrid(float sx, float sy, int& row, int& col) const;
     Rectangle cellScreenRect(int row, int col) const;
 
+    void loadAssets();
 public:
     World() = default;
     ~World();
     World(int screenWidth, int screenHeight);
 
     void update(float dt);
-    void draw() const;
+    void draw();
     void onMouseClick(Vector2 position);
 
     int selectedId() const { return selectedPlantId; }

@@ -16,6 +16,15 @@ bool Cell :: isOccupied() const {
 //     bounds = newBounds;
 // }
 
+void Cell::updateTime(float deltaSeconds) {
+    if (plant == nullptr) return;
+    plant -> updateTime(deltaSeconds);
+}
+void Cell::draw() {
+    if (plant == nullptr) return;
+    plant -> draw();
+}
+
 bool Cell :: placePlant(std::unique_ptr<Plant> newPlant) {
     if (plant) {
         return false;

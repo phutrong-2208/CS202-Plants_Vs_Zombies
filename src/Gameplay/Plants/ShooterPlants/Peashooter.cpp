@@ -1,5 +1,5 @@
 #include "Gameplay/Plants/ShooterPlants/Peashooter.hpp"
 
-Peashooter::Peashooter(Vector2 pos)
-    : Plant(pos, 100, 100)
+Peashooter::Peashooter(Rectangle hitbox)
+    : Plant(hitbox, 100, 100)
 {}

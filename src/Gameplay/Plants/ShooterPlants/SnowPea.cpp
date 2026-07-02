@@ -1,5 +1,5 @@
 #include "Gameplay/Plants/ShooterPlants/SnowPea.hpp"
 
-SnowPea::SnowPea(Vector2 pos)
-    : Plant(pos, 100, 175)
+SnowPea::SnowPea(Rectangle hitbox)
+    : Plant(hitbox, 100, 175)
 {}

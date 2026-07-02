@@ -17,6 +17,46 @@ float World::CELL_HEIGHT[] = {
     100, 100, 100, 90, 100
 };
 
+void World::loadAssets() {
+    std :: string dir = std::string(PROJECT_DIR) + "assets/texture/Plants/SunFlower";
+    std :: unique_ptr<TexturePackage> SunFlower = std :: make_unique<TexturePackage>();
+
+    SunFlower -> AddTexture("SUNFLOWER_BLINK1",       dir + "/SunFlower_blink1.png");
+    SunFlower -> AddTexture("SUNFLOWER_BLINK2",       dir + "/SunFlower_blink2.png");
+    SunFlower -> AddTexture("SUNFLOWER_BOTTOMPETALS", dir + "/SunFlower_bottompetals.png");
+    SunFlower -> AddTexture("SUNFLOWER_HEAD",         dir + "/SunFlower_head.png");
+    SunFlower -> AddTexture("SUNFLOWER_HEAD_SING1",   dir + "/SunFlower_head_sing1.png");
+    SunFlower -> AddTexture("SUNFLOWER_HEAD_SING2",   dir + "/SunFlower_head_sing2.png");
+    SunFlower -> AddTexture("SUNFLOWER_HEAD_SING3",   dir + "/SunFlower_head_sing3.png");
+    SunFlower -> AddTexture("SUNFLOWER_HEAD_SING4",   dir + "/SunFlower_head_sing4.png");
+    SunFlower -> AddTexture("SUNFLOWER_HEAD_SING5",   dir + "/SunFlower_head_sing5.png");
+    SunFlower -> AddTexture("SUNFLOWER_HEAD_WINK",    dir + "/SunFlower_head_wink.png");
+    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL1",   dir + "/SunFlower_leftpetal1.png");
+    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL2",   dir + "/SunFlower_leftpetal2.png");
+    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL3",   dir + "/SunFlower_leftpetal3.png");
+    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL4",   dir + "/SunFlower_leftpetal4.png");
+    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL5",   dir + "/SunFlower_leftpetal5.png");
+    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL6",   dir + "/SunFlower_leftpetal6.png");
+    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL7",   dir + "/SunFlower_leftpetal7.png");
+    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL8",   dir + "/SunFlower_leftpetal8.png");
+    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL1",  dir + "/SunFlower_rightpetal1.png");
+    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL2",  dir + "/SunFlower_rightpetal2.png");
+    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL3",  dir + "/SunFlower_rightpetal3.png");
+    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL4",  dir + "/SunFlower_rightpetal4.png");
+    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL5",  dir + "/SunFlower_rightpetal5.png");
+    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL6",  dir + "/SunFlower_rightpetal6.png");
+    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL7",  dir + "/SunFlower_rightpetal7.png");
+    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL8",  dir + "/SunFlower_rightpetal8.png");
+    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL9",  dir + "/SunFlower_rightpetal9.png");
+    SunFlower -> AddTexture("SUNFLOWER_DOUBLE_PETALS", dir + "/SunFlower_double_petals.png");
+    SunFlower -> AddTexture("SUNFLOWER_TOPPETALS",    dir + "/SunFlower_toppetals.png");
+
+    textureManager -> addPackage("Sunflower", std :: move(SunFlower));
+
+    auto parser = std::make_unique<ReanimParser>();
+    parser->loadFromFile("assets/texture/Plants/SunFlower/SunFlower.reanim");
+    animationManager -> addAnimationData("SunflowerAnim", std::move(parser));
+}
 World :: World(int screenWidth, int screenHeight)
     : selectedPlantId(-1)
 {
@@ -35,6 +75,10 @@ World :: World(int screenWidth, int screenHeight)
         GRID_HEIGHT += num;
     }
 
+    textureManager = new TextureManager();
+    animationManager = new AnimationManager();
+
+    loadAssets();
     // float margin = 40.0f;
     // float topBar = 60.0f;
     // CELL_WIDTH = (screenWidth - 2 * margin) / NUM_COLS;
@@ -45,16 +89,32 @@ World :: World(int screenWidth, int screenHeight)
     // GRID_START_Y = topBar;
 }
 World::~World() {
+    delete textureManager;
+    delete animationManager;
 }
 
-std::unique_ptr<Plant> World :: createPlant(int id, Vector2 pos) {
-    switch (id) {
-        case 0: return std :: make_unique<Peashooter>(pos);
-        case 1: return std :: make_unique<Sunflower>(pos);
-        case 2: return std :: make_unique<WallNut>(pos);
-        case 3: return std :: make_unique<SnowPea>(pos);
-        default: return nullptr;
+std::unique_ptr<Plant> World :: createPlant(int row, int col, const std::string& plantID) {
+    if (row < 0 || row >= NUM_ROWS || col < 0 || col >= NUM_COLS) return nullptr;
+
+    if (plantID == "Sunflower") {
+        std::unique_ptr <Plant> plantPtr = std :: make_unique<Sunflower>(cellScreenRect(row, col));
+
+        ReanimInstance plantReanim;
+        plantReanim.setTexturePackage(textureManager -> getPackage("Sunflower"));
+        plantReanim.setAnimation(animationManager -> getAnimationData("SunflowerAnim"));
+        plantPtr -> setReanimInstance(plantReanim);
+
+        return std::move(plantPtr);
     }
+    
+    return nullptr; 
+    // switch (plantID) {
+    //     case 0: return std :: make_unique<Peashooter>(cellScreenRect(row, col));
+    //     case 1: return std :: make_unique<Sunflower>(cellScreenRect(row, col));
+    //     case 2: return std :: make_unique<WallNut>(cellScreenRect(row, col));
+    //     case 3: return std :: make_unique<SnowPea>(cellScreenRect(row, col));
+    //     default: return nullptr;
+    // }
 }
 
 bool World :: screenToGrid(float sx, float sy, int& row, int& col) const {
@@ -95,6 +155,7 @@ Rectangle World :: cellScreenRect(int row, int col) const {
 
 void World :: update(float dt) {
     dayMap.update(dt);
+    if (dayMap.isReady() == false) return;
     // if (dayMap.isReady()) {
         // Rectangle area = dayMap.getGridArea();
         
@@ -108,17 +169,16 @@ void World :: update(float dt) {
         // grid.setCellWidth(CELL_WIDTH);
         // grid.setCellHeight(CELL_HEIGHT);
     // }
-    for (int r = 0; r < NUM_ROWS; ++r)
-        for (int c = 0; c < NUM_COLS; ++c)
-            if (Plant* p = grid.getPlant(r, c))
-                if (p -> isDead())
-                    grid.removePlant(r, c);
+
+    grid.updateTime(dt);
 }
 
-void World :: draw() const {
+void World :: draw() {
     dayMap.draw();
-    if (!dayMap.isReady()) return;
+    if (dayMap.isReady() == false) return;
 
+    grid.draw();
+    
     Vector2 mouse = GetMousePosition();
     int hovR, hovC;
     screenToGrid(mouse.x, mouse.y, hovR, hovC);
@@ -130,14 +190,14 @@ void World :: draw() const {
             if (r == hovR && c == hovC && selectedPlantId >= 0)
                 DrawRectangleLinesEx(rect, 3, LIME);
 
-            Plant* p = grid.getPlant(r, c);
-            if (p) {
-                DrawCircle((int)(rect.x + rect.width / 2),
-                           (int)(rect.y + rect.height / 2),
-                           rect.width * 0.22f, (Color){80, 200, 80, 255});
-                DrawText("P", (int)(rect.x + rect.width / 2 - 7),
-                         (int)(rect.y + rect.height / 2 - 10), 20, (Color){20, 80, 20, 255});
-            }
+            // Plant* p = grid.getPlant(r, c);
+            // if (p) {
+            //     DrawCircle((int)(rect.x + rect.width / 2),
+            //                (int)(rect.y + rect.height / 2),
+            //                rect.width * 0.22f, (Color){80, 200, 80, 255});
+            //     DrawText("P", (int)(rect.x + rect.width / 2 - 7),
+            //              (int)(rect.y + rect.height / 2 - 10), 20, (Color){20, 80, 20, 255});
+            // }
         }
     }
 
@@ -169,5 +229,5 @@ void World :: onMouseClick(Vector2 position) {
     if (!screenToGrid(position.x, position.y, r, c) || selectedPlantId < 0) return;
 
     if (!grid.getPlant(r, c))
-        grid.placePlant(r, c, createPlant(selectedPlantId, position));
+        grid.placePlant(r, c, createPlant(r, c, plantNames[selectedPlantId]));
 }

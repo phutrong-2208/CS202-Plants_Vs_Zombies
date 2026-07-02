@@ -2,7 +2,6 @@
 #define TEXTURE_PACKAGE_HPP
 
 #include "Common.hpp"
-#include "raylib.h"
 
 class TexturePackage{
 private:

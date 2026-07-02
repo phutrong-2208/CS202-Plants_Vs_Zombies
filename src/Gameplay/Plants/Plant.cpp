@@ -1,9 +1,19 @@
 #include "Gameplay/Plants/Plant.hpp"
 
-Plant :: Plant(Vector2 pos, int hp, int cost){
-    position = pos;
+Plant :: Plant(Rectangle territory, int hp, int cost){
+    hitbox = territory;
     health = hp;
     sunCost = cost;
+}
+
+void Plant::updateTime(float deltaSeconds) {
+    animation.updateTime(deltaSeconds);
+}
+void Plant::draw() {
+    animation.draw(hitbox);   
+}
+void Plant::setReanimInstance(ReanimInstance anim) {
+    animation = anim;
 }
 
 
@@ -15,10 +25,6 @@ void Plant :: receiveDamage(int damage){
 bool Plant :: isDead(void) const {
     if(health == 0) return 1;
     return 0;
-}
-
-Vector2 Plant :: getPosition(void) const {
-    return position;
 }
 
 int Plant :: getHealth(void) const {

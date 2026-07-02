@@ -5,7 +5,7 @@
 
 class Sunflower : public Plant {
 public:
-    Sunflower(Vector2 pos);
+    Sunflower(Rectangle hitbox);
 };
 
 #endif

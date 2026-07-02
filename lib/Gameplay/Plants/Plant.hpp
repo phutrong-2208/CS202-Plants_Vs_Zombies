@@ -1,22 +1,23 @@
 #ifndef PLANT_HPP
 #define PLANT_HPP
 
-#include "raylib.h"
+#include <Gameplay/Animation/ReanimInstance.hpp>
 
 class Plant {
 protected:
-    Vector2 position;
     int health;
     int sunCost;
-
+    Rectangle hitbox;
+    ReanimInstance animation;
 public:
-    Plant(Vector2 pos, int hp, int cost);
-    virtual ~Plant() = default;
-
+    Plant(Rectangle territory, int hp, int cost);
     void receiveDamage(int damage);
 
+    void updateTime(float deltaSeconds);
+    void setReanimInstance(ReanimInstance anim);
+    void draw();
+    
     bool isDead() const;
-    Vector2 getPosition() const;
     int getHealth() const;
     int getCost() const;
 };

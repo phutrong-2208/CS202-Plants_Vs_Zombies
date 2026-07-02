@@ -6,17 +6,16 @@
 
 class Cell {
 private:
-    std :: unique_ptr<Plant> plant;
-    // Rectangle bounds;
-
+    std :: unique_ptr<Plant> plant = nullptr;
 public:
     Cell();
     ~Cell();
 
     bool isOccupied() const;
-    // Rectangle getBounds() const;
-    // void setBounds(Rectangle newBounds);
 
+    void updateTime(float deltaSeconds);
+    void draw();
+    
     bool placePlant(std::unique_ptr<Plant> newPlant);
     Plant* getPlant() const;
     void removePlant();

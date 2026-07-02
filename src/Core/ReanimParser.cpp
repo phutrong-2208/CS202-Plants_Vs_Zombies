@@ -244,9 +244,6 @@ float ReanimParser :: getLoopStartTime(void) const {
     }
     return bestSnap;
 }
-
-
 int ReanimParser :: getTrackCount(void) const {
     return (int)trackList.size();
 }
-
