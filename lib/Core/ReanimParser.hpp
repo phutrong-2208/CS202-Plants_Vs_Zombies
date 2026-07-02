@@ -12,29 +12,34 @@ struct Frame{
     float alpha; // opacity
     std :: string imageName;
 
-    Frame(){
-        snap = 0;
-        newX = newY = 0;
-        skewX = skewY = 0;
-        scaleX = scaleY = 1;
-        alpha = 1;
-        imageName = "";
-    }
+    Frame();
+    std::string getTextureKey() const;
 };
 
-struct ReanimTrack{
+class ReanimTrack{
+private:
     std :: string name;
-    std :: vector<Frame> transforms;             
+    std :: vector<Frame> transforms;   
+public:
+    void setTrackName(const std::string& trackName);
+    std::string getTrackName() const;
+
+    void pushFrame(const Frame& newFrame);
+    const std::vector <Frame>& getFullTrack() const;
+    int getFrameCount() const;
+    float getDuration() const;
+
+    Frame getInterpolatedFrame(float time) const;
 };
     
 class ReanimParser{
 private:
     float fps;  
     std :: vector<ReanimTrack> trackList;
-public:
+
     std :: string getTagContent(const std :: string &src, const std :: string& nameTag, size_t&pos);
     //getTagContent to find the tag with name "nameTag" <nameTag> ... <\nameTag> from src
-    
+public:
     bool loadFromFile(const std :: string& path); //parser process
 
     float getDuration() const;
@@ -44,8 +49,8 @@ public:
     const ReanimTrack * getTrack(int index) const;
     const ReanimTrack * getTrack(const std :: string& name) const;
 
-    Frame getInterpolatedFrame(const ReanimTrack& track, float time) const;
-    std :: string getTextureKey(const Frame& frame) const;
+    // Frame getInterpolatedFrame(const ReanimTrack& track, float time) const;
+    // std :: string getTextureKey(const Frame& frame) const;
 };
 
 #endif

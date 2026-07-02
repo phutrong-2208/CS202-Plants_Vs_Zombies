@@ -63,18 +63,19 @@ void AnimationManager :: draw(Vector2 position, TextureManager& texture, const s
 
     for (int i = 0; i < trackCount; ++i) {
         const ReanimTrack* track = parser.getTrack(i);
-        if (!track) continue;
+        if (track == nullptr) continue;
 
-        Frame frame = parser.getInterpolatedFrame(*track, currentTime);
-
+        Frame frame = track -> getInterpolatedFrame(currentTime);
+        
         if (frame.alpha <= 0.0f) {
-            const Frame restFrame = parser.getInterpolatedFrame(*track, loopStart);
+            const Frame restFrame = track -> getInterpolatedFrame(loopStart);
+
             if (restFrame.alpha <= 0.0f) continue; 
             frame = restFrame;  
         }
 
-        Texture2D* tex = pack -> GetTexture(parser.getTextureKey(frame));
-        if (!tex) continue;
+        Texture2D* tex = pack -> GetTexture(frame.getTextureKey());
+        if (tex == nullptr) continue;
 
         const float kx = frame.skewX * DEG2RAD;
         const float ky = frame.skewY * DEG2RAD;

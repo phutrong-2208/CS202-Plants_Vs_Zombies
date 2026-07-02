@@ -1,5 +1,80 @@
 #include "Core/ReanimParser.hpp"
 
+///////////////////////////////////
+///     FRAME CONSTRUCTION      ///
+///////////////////////////////////
+Frame::Frame(){
+    snap = 0;
+    newX = newY = 0;
+    skewX = skewY = 0;
+    scaleX = scaleY = 1;
+    alpha = 1;
+    imageName = "";
+}
+
+std::string Frame::getTextureKey() const {
+    if(imageName.find("IMAGE_REANIM_") == 0){
+        return imageName.substr(13);
+    }
+    return imageName;
+}
+
+///////////////////////////////////////
+///     REANIMTRACK CONSTRUCTION    ///
+///////////////////////////////////////
+void ReanimTrack::setTrackName(const std::string& trackName) {
+    name = trackName;
+}
+std::string ReanimTrack::getTrackName() const {
+    return name;
+}
+
+void ReanimTrack::pushFrame(const Frame& newFrame) {
+    transforms.push_back(newFrame);
+}
+const std::vector <Frame>& ReanimTrack::getFullTrack() const {
+    return transforms;
+}
+int ReanimTrack::getFrameCount() const {
+    return (int) transforms.size();
+}
+float ReanimTrack::getDuration() const {
+    return getFrameCount() == 0 ? 0.0f : transforms.back().snap;
+}
+
+Frame ReanimTrack :: getInterpolatedFrame(float time) const{
+    const std::vector <Frame>& frames = transforms;
+    if(frames.empty()) return {};
+    if(time <= frames[0].snap) return frames[0];
+    if(time >= frames.back().snap) return frames.back();
+
+    for (int i = 0; i < (int)frames.size() - 1; ++i){
+        if(time >= frames[i].snap and time < frames[i + 1].snap){
+            float alpha = (time - frames[i].snap) / (frames[i + 1].snap - frames[i].snap);
+
+            Frame newFrame;
+            newFrame.snap   = time;
+            newFrame.newX   = Lerp(frames[i].newX, frames[i + 1].newX, alpha);
+            newFrame.newY   = Lerp(frames[i].newY, frames[i + 1].newY, alpha);
+            newFrame.skewX  = Lerp(frames[i].skewX, frames[i + 1].skewX, alpha);
+            newFrame.skewY  = Lerp(frames[i].skewY, frames[i + 1].skewY, alpha);
+            newFrame.scaleX = Lerp(frames[i].scaleX, frames[i + 1].scaleX, alpha);
+            newFrame.scaleY = Lerp(frames[i].scaleY, frames[i + 1].scaleY, alpha);
+            
+            newFrame.alpha     = frames[i].alpha;
+            newFrame.imageName = frames[i].imageName;
+            
+            return newFrame;
+        }
+    }
+
+    return frames.back();
+}
+
+
+////////////////////////////////////////
+///     REANIMPARSER CONSTRUCTION    ///
+////////////////////////////////////////
 std::string ReanimParser :: getTagContent(const std :: string& src, const std :: string& nameTag, size_t& pos){
     std :: string open = "<" + nameTag;
     size_t start = src.find(open, pos);
@@ -57,7 +132,7 @@ bool ReanimParser::loadFromFile(const std::string& path){
 
         size_t trackPos = 0;
 
-        track.name = getTagContent(trackInStr, "name", trackPos);
+        track.setTrackName(getTagContent(trackInStr, "name", trackPos));
 
         Frame frameOfTrack{};
         size_t frameIndex = 0;
@@ -110,11 +185,11 @@ bool ReanimParser::loadFromFile(const std::string& path){
             }
 
             frameOfTrack.snap = static_cast<float>(frameIndex) / fps;
-            track.transforms.push_back(frameOfTrack);
+            track.pushFrame(frameOfTrack);
             frameIndex++;
         }
 
-        if (!track.transforms.empty()){
+        if (track.getFrameCount() > 0){
             trackList.push_back(track);
         }
     }
@@ -128,55 +203,18 @@ const ReanimTrack* ReanimParser :: getTrack (int index) const {
 
 const ReanimTrack* ReanimParser :: getTrack(const std :: string& name) const {
     for (auto& t : trackList){
-        if(t.name == name) return &t;
+        if(t.getTrackName() == name) return &t;
     }
     return nullptr;
 }
 
-Frame ReanimParser :: getInterpolatedFrame(const ReanimTrack& track, float time) const{
-    const auto& frames = track.transforms;
-    if(frames.empty()) return {};
-    if(time <= frames[0].snap) return frames[0];
-    if(time >= frames.back().snap) return frames.back();
-
-    for (int i = 0; i < (int)frames.size() - 1; ++i){
-        if(time >= frames[i].snap and time < frames[i + 1].snap){
-            float t = (time - frames[i].snap) / (frames[i + 1].snap - frames[i].snap);
-
-            Frame newFrame;
-            newFrame.snap   = time;
-            newFrame.newX   = frames[i].newX   + (frames[i + 1].newX   - frames[i].newX)   * t;
-            newFrame.newY   = frames[i].newY   + (frames[i + 1].newY   - frames[i].newY)   * t;
-            newFrame.skewX  = frames[i].skewX  + (frames[i + 1].skewX  - frames[i].skewX)  * t;
-            newFrame.skewY  = frames[i].skewY  + (frames[i + 1].skewY  - frames[i].skewY)  * t;
-            newFrame.scaleX = frames[i].scaleX + (frames[i + 1].scaleX - frames[i].scaleX) * t;
-            newFrame.scaleY = frames[i].scaleY + (frames[i + 1].scaleY - frames[i].scaleY) * t;
-            
-            newFrame.alpha     = frames[i].alpha;
-            newFrame.imageName = frames[i].imageName;
-            
-            return newFrame;
-        }
-    }
-
-    return frames.back();
-}
-
-std :: string ReanimParser :: getTextureKey(const Frame& frame) const{
-    if(frame.imageName.find("IMAGE_REANIM_") == 0){
-        return frame.imageName.substr(13);
-    }
-    return frame.imageName;
-}   
-
 float ReanimParser :: getDuration(void) const{
-    float dur = 0;
-    for (auto& t : trackList){
-        if(!t.transforms.empty() and t.transforms.back().snap > dur){
-            dur = t.transforms.back().snap;
-        }
+    float maxDuration = 0.0f;
+    for (const ReanimTrack& track : trackList) {
+        maxDuration = std::max(maxDuration, track.getDuration());
     }
-    return dur;
+
+    return maxDuration;
 }
 
 // Find the most common snap (mode) of the first visible frame of each track.
@@ -184,8 +222,9 @@ float ReanimParser :: getDuration(void) const{
 // Avoids the case where a single track becomes visible earlier than the rest (e.g., anim_blink).
 float ReanimParser :: getLoopStartTime(void) const {
     std :: map<float, int> snapCount;
-    for (auto& t : trackList) {
-        for (auto& f : t.transforms) {
+    for (const ReanimTrack& track : trackList) {
+        const std::vector <Frame>& allTransforms = track.getFullTrack();
+        for (const Frame& f : allTransforms) {
             if (f.alpha > 0.0f) {
                 snapCount[f.snap]++;
                 break; // only take the first visible frame of each track

@@ -11,6 +11,7 @@ private:
 
 public:
     Cell();
+    ~Cell();
 
     bool isOccupied() const;
     // Rectangle getBounds() const;

@@ -1,7 +1,9 @@
 #include "Worlds/Cell.hpp"
 
 Cell :: Cell() : plant(nullptr) {}
-
+Cell::~Cell() {
+    plant.reset(nullptr);
+}
 bool Cell :: isOccupied() const {
     return plant != nullptr;
 }

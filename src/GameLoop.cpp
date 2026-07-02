@@ -82,8 +82,7 @@ void GameLoop::runGame() {
     BeginDrawing();
     ClearBackground(BLACK);
     world -> draw();
-    // animationManager->draw({400, 300}, *textureManager, "SunFlower", 200.0f);
-    // std::cerr << GetMousePosition().x << ' ' << GetMousePosition().y << '\n';
+    animationManager->draw({400, 300}, *textureManager, "SunFlower", 200.0f);
     DrawFPS(10, 10);
     EndDrawing();
 }
