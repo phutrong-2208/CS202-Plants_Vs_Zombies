@@ -43,7 +43,7 @@ void ReanimInstance::draw(Rectangle hitbox) {
     // const float loopStart = parser.getLoopStartTime();
     // const float scale     = scaleRatio / 100.0f;
 
-    const float scale = 1.0f;
+    const float scale = 1.5f;
     const float loopStart = rawAnim -> getLoopStartTime();
     const int   trackCount = rawAnim -> getTrackCount();
 

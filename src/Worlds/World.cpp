@@ -1,5 +1,5 @@
 #include <Worlds/World.hpp>
-
+#include <filesystem>
 const char* World :: plantNames[] = {
     "Peashooter",
     "Sunflower",
@@ -21,35 +21,17 @@ void World::loadAssets() {
     std :: string dir = std::string(PROJECT_DIR) + "assets/texture/Plants/SunFlower";
     std :: unique_ptr<TexturePackage> SunFlower = std :: make_unique<TexturePackage>();
 
-    SunFlower -> AddTexture("SUNFLOWER_BLINK1",       dir + "/SunFlower_blink1.png");
-    SunFlower -> AddTexture("SUNFLOWER_BLINK2",       dir + "/SunFlower_blink2.png");
-    SunFlower -> AddTexture("SUNFLOWER_BOTTOMPETALS", dir + "/SunFlower_bottompetals.png");
-    SunFlower -> AddTexture("SUNFLOWER_HEAD",         dir + "/SunFlower_head.png");
-    SunFlower -> AddTexture("SUNFLOWER_HEAD_SING1",   dir + "/SunFlower_head_sing1.png");
-    SunFlower -> AddTexture("SUNFLOWER_HEAD_SING2",   dir + "/SunFlower_head_sing2.png");
-    SunFlower -> AddTexture("SUNFLOWER_HEAD_SING3",   dir + "/SunFlower_head_sing3.png");
-    SunFlower -> AddTexture("SUNFLOWER_HEAD_SING4",   dir + "/SunFlower_head_sing4.png");
-    SunFlower -> AddTexture("SUNFLOWER_HEAD_SING5",   dir + "/SunFlower_head_sing5.png");
-    SunFlower -> AddTexture("SUNFLOWER_HEAD_WINK",    dir + "/SunFlower_head_wink.png");
-    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL1",   dir + "/SunFlower_leftpetal1.png");
-    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL2",   dir + "/SunFlower_leftpetal2.png");
-    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL3",   dir + "/SunFlower_leftpetal3.png");
-    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL4",   dir + "/SunFlower_leftpetal4.png");
-    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL5",   dir + "/SunFlower_leftpetal5.png");
-    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL6",   dir + "/SunFlower_leftpetal6.png");
-    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL7",   dir + "/SunFlower_leftpetal7.png");
-    SunFlower -> AddTexture("SUNFLOWER_LEFTPETAL8",   dir + "/SunFlower_leftpetal8.png");
-    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL1",  dir + "/SunFlower_rightpetal1.png");
-    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL2",  dir + "/SunFlower_rightpetal2.png");
-    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL3",  dir + "/SunFlower_rightpetal3.png");
-    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL4",  dir + "/SunFlower_rightpetal4.png");
-    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL5",  dir + "/SunFlower_rightpetal5.png");
-    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL6",  dir + "/SunFlower_rightpetal6.png");
-    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL7",  dir + "/SunFlower_rightpetal7.png");
-    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL8",  dir + "/SunFlower_rightpetal8.png");
-    SunFlower -> AddTexture("SUNFLOWER_RIGHTPETAL9",  dir + "/SunFlower_rightpetal9.png");
-    SunFlower -> AddTexture("SUNFLOWER_DOUBLE_PETALS", dir + "/SunFlower_double_petals.png");
-    SunFlower -> AddTexture("SUNFLOWER_TOPPETALS",    dir + "/SunFlower_toppetals.png");
+    for (const auto& entry : std::filesystem::directory_iterator(dir)) {
+        std::string fileName = entry.path().filename().string();
+        if (fileName.find(".png") == std::string::npos) continue;
+
+        fileName.erase(fileName.find(".png"), 4);
+        for (char& c : fileName) {
+            if (islower(c)) c = toupper(c);
+        }
+
+        SunFlower -> AddTexture(fileName, entry.path().string());
+    }
 
     textureManager -> addPackage("Sunflower", std :: move(SunFlower));
 
