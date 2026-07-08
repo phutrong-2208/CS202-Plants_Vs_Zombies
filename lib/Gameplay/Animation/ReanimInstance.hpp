@@ -3,23 +3,44 @@
 
 #include <Core/ReanimParser.hpp>
 #include <Core/TextureManager.hpp>
+#include <string>
 
 class ReanimInstance {
 private:
     float currentTime = 0.0f;
-    float speed = 1.0f;
-    bool looping = true;
-    ReanimParser* rawAnim = nullptr;
+    float speed       = 1.0f;
+    bool  looping     = true;
+
+    // ---------------------------------------------------------------
+    // Clip range — the sub-section of the timeline currently playing.
+    //   clipLoopStart : where the clock rewinds when looping
+    //   clipEnd       : when the clock wraps / clamps
+    // Both are set by playClip().  If no clip has been selected,
+    // updateTime falls back to [0, totalDuration].
+    // ---------------------------------------------------------------
+    float clipLoopStart = -1.0f;  // -1 = "no clip set"
+    float clipEnd       =  0.0f;
+
+    ReanimParser*   rawAnim    = nullptr;
     TexturePackage* rawTexPack = nullptr;
+
 public:
+    // Setup
     void setAnimation(ReanimParser* Anim);
     void setTexturePackage(TexturePackage* TexPack);
 
-    void updateTime(float deltaSeconds);
-    void setSpeed(float newSpeed);
-    void setLoopToggle(bool isTrue);
+    // ---------------------------------------------------------------
+    // Clip selection — call once after setAnimation().
+    // clipName is without the "anim_" prefix, e.g. "idle", "shooting".
+    // Returns false if the clip was not found (keeps previous state).
+    // ---------------------------------------------------------------
+    bool playClip(const std :: string& clipName);
+
+    void  updateTime(float deltaSeconds);
+    void  setSpeed(float newSpeed);
+    void  setLoopToggle(bool isTrue);
     float getCurrentTime() const;
-    bool isLooping() const;
+    bool  isLooping() const;
 
     void draw(Rectangle hitbox);
 };

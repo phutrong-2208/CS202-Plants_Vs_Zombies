@@ -1,8 +1,8 @@
 #include <Worlds/World.hpp>
 #include <filesystem>
 const char* World :: plantNames[] = {
-    "Peashooter",
-    "Sunflower",
+    "PeaShooter",
+    "SunFlower",
     "Wall-nut",
     "Snow Pea",
 };
@@ -18,29 +18,57 @@ float World::CELL_HEIGHT[] = {
 };
 
 void World::loadAssets() {
-    std :: string dir = std::string(PROJECT_DIR) + "assets/texture/Plants/SunFlower";
-    std :: unique_ptr<TexturePackage> SunFlower = std :: make_unique<TexturePackage>();
-
-    for (const auto& entry : std::filesystem::directory_iterator(dir)) {
-        std::string fileName = entry.path().filename().string();
-        if (fileName.find(".png") == std::string::npos) continue;
-
-        fileName.erase(fileName.find(".png"), 4);
-        for (char& c : fileName) {
-            if (islower(c)) c = toupper(c);
+    std :: string dir = std :: string (PROJECT_DIR) + "assets/texture";
+    for (const auto& category : std :: filesystem :: directory_iterator(dir)){ 
+        
+        if(!category.is_directory()){
+            continue;
         }
+        //iterator Zombies, Plants, Projectiles, Maps, ...
 
-        SunFlower -> AddTexture(fileName, entry.path().string());
+        for(const auto& entity : std :: filesystem :: directory_iterator(category.path())){
+            if(!entity.is_directory()) continue;
+            std :: string entityName = entity.path().filename().string();
+            std :: cout << entityName << '\n';
+            std :: unique_ptr<TexturePackage> Entity = std :: make_unique<TexturePackage>();
+            bool hasTexture = false;
+            for (const auto& entry : std :: filesystem:: recursive_directory_iterator(entity.path())){
+                if(entry.is_directory()) continue;
+
+                std :: string fileName = entry.path().filename().string();  
+
+                
+                if(fileName.find(".png") != std :: string :: npos) {
+                    fileName.erase(fileName.find(".png"), 4);
+                    for(char& c : fileName) {
+                        if(islower(c)) c = toupper(c);
+                    }
+                    Entity -> AddTexture(fileName, entry.path().string());  
+                    hasTexture = true;
+                }
+
+                if(fileName.find(".reanim") != std :: string :: npos){
+                    auto parser = std :: make_unique<ReanimParser>();
+                    parser -> loadFromFile(entry.path().string());
+
+                    // Use the filename stem (not the folder name) as the key.
+                    // This distinguishes PeaShooter.reanim ("PeaShooterAnim") from
+                    // PeaShooterSingle.reanim ("PeaShooterSingleAnim") which live in
+                    // the same entity folder and would otherwise overwrite each other.
+                    std :: string stem = fileName.substr(0, fileName.find(".reanim"));
+                    std :: string dataName = stem + "Anim";
+                    animationManager -> addAnimationData(dataName, std :: move(parser));
+                }
+            }
+            if (hasTexture) {
+                textureManager -> addPackage(entityName, std::move(Entity));
+            }
+        }
     }
-
-    textureManager -> addPackage("Sunflower", std :: move(SunFlower));
-
-    auto parser = std::make_unique<ReanimParser>();
-    parser->loadFromFile("assets/texture/Plants/SunFlower/SunFlower.reanim");
-    animationManager -> addAnimationData("SunflowerAnim", std::move(parser));
+    TraceLog(LOG_INFO, "All assets loaded successfully !");
 }
 World :: World(int screenWidth, int screenHeight)
-    : selectedPlantId(-1)
+: selectedPlantId(-1)
 {
     HORIZONTAL_SCALE = GetScreenWidth() / VIRTUAL_WIDTH;
     VERTICAL_SCALE = GetScreenHeight() / VIRTUAL_HEIGHT;
@@ -75,15 +103,27 @@ World::~World() {
     delete animationManager;
 }
 
-std::unique_ptr<Plant> World :: createPlant(int row, int col, const std::string& plantID) {
+std::unique_ptr<Plant> World :: createPlant(int row, int col, const std::string& plantID) { // need to optimize in the future 
     if (row < 0 || row >= NUM_ROWS || col < 0 || col >= NUM_COLS) return nullptr;
 
-    if (plantID == "Sunflower") {
+    if (plantID == "SunFlower") {
         std::unique_ptr <Plant> plantPtr = std :: make_unique<Sunflower>(cellScreenRect(row, col));
 
         ReanimInstance plantReanim;
-        plantReanim.setTexturePackage(textureManager -> getPackage("Sunflower"));
-        plantReanim.setAnimation(animationManager -> getAnimationData("SunflowerAnim"));
+        plantReanim.setTexturePackage(textureManager -> getPackage("SunFlower"));
+        plantReanim.setAnimation(animationManager -> getAnimationData("SunFlowerAnim"));
+        plantReanim.playClip("idle"); 
+        plantPtr -> setReanimInstance(plantReanim);
+
+        return std::move(plantPtr);
+    }
+    else if(plantID == "PeaShooter"){
+        std::unique_ptr<Plant> plantPtr = std :: make_unique<Peashooter>(cellScreenRect(row, col));
+
+        ReanimInstance plantReanim;
+        plantReanim.setTexturePackage(textureManager -> getPackage("PeaShooter"));
+        plantReanim.setAnimation(animationManager -> getAnimationData("PeaShooterSingleAnim"));
+        plantReanim.playClip("full_idle"); // Bỏ qua đoạn Sprout, dùng full_idle cho cả đầu và thân
         plantPtr -> setReanimInstance(plantReanim);
 
         return std::move(plantPtr);
