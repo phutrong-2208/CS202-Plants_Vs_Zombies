@@ -123,7 +123,7 @@ std::unique_ptr<Plant> World :: createPlant(int row, int col, const std::string&
         ReanimInstance plantReanim;
         plantReanim.setTexturePackage(textureManager -> getPackage("PeaShooter"));
         plantReanim.setAnimation(animationManager -> getAnimationData("PeaShooterSingleAnim"));
-        plantReanim.playClip("full_idle"); // Bỏ qua đoạn Sprout, dùng full_idle cho cả đầu và thân
+        plantReanim.playClip("full_idle");
         plantPtr -> setReanimInstance(plantReanim);
 
         return std::move(plantPtr);

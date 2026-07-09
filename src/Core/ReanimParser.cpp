@@ -208,19 +208,17 @@ bool ReanimParser::loadFromFile(const std::string& path) {
     return !trackList.empty();
 }
 
-// -----------------------------------------------------------------
 // buildClips — reads tracks whose name starts with "anim_" and uses
-// their f=-1/f=0 pattern to define named clip ranges.
+// their f = -1/f = 0 pattern to define named clip ranges.
 //
 //   first frame with alpha > 0  -> clipStart / loopStart
 //   first frame with alpha <= 0 after that → clipEnd
-// -----------------------------------------------------------------
 void ReanimParser :: buildClips() {
     clipList.clear();
-    const std :: string PREFIX = "image_anim_";
+    const std :: string PREFIX = "anim_";
     for (const ReanimTrack& track : trackList) {
         const std :: string& tname = track.getTrackName();
-        // Only process control tracks (name starts with "image_anim_")
+        // Only process control tracks (name starts with "anim_")
         if (tname.rfind(PREFIX, 0) != 0) continue;
 
         const std::vector<Frame>& frames = track.getFullTrack();
@@ -249,7 +247,7 @@ void ReanimParser :: buildClips() {
             }
         }
 
-        // Clip that runs to the end of track without an explicit f=-1
+        // Clip that runs to the end of track without an explicit f = -1
         if (inVisible) {
             AnimClip clip;
             clip.name      = clipName;

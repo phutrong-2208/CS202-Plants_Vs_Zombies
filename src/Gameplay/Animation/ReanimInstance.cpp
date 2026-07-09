@@ -128,10 +128,10 @@ void ReanimInstance::draw(Rectangle hitbox) {
         const float kx = frame.skewX * DEG2RAD;
         const float ky = frame.skewY * DEG2RAD;
 
-        const float a  =  frame.scaleX * cosf(ky) * scale;
-        const float b_ =  frame.scaleX * sinf(ky) * scale;
-        const float c  = -frame.scaleY * sinf(kx) * scale;
-        const float d  =  frame.scaleY * cosf(kx) * scale;
+        const float a  =  frame.scaleX * cosf(kx) * scale;
+        const float b_ =  frame.scaleX * sinf(kx) * scale;
+        const float c  = -frame.scaleY * sinf(ky) * scale;
+        const float d  =  frame.scaleY * cosf(ky) * scale;
         const float tx =  hitbox.x + frame.newX * scale;
         const float ty =  hitbox.y + frame.newY * scale;
 
