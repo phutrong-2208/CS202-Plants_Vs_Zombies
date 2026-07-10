@@ -44,7 +44,7 @@ public:
     int getFrameCount() const;
     float getDuration() const;
 
-    Frame getInterpolatedFrame(float time) const;
+    Frame getInterpolatedFrame(float time, float startTime, float endTime) const;
 };
     
 class ReanimParser{

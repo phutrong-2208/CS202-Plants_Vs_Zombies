@@ -42,47 +42,51 @@ float ReanimTrack::getDuration() const {
     return getFrameCount() == 0 ? 0.0f : transforms.back().snap;
 }
 
-Frame ReanimTrack::getInterpolatedFrame(float time) const {
+Frame ReanimTrack::getInterpolatedFrame(float time, float startTime, float endTime) const {
     const std::vector<Frame>& frames = transforms;
-    if (frames.empty()) return {};
+    if (frames.empty() || startTime > endTime) return {};
 
-    // Helper: find the nearest non-empty imageName at or before index idx.
-    // In Reanim, a missing <i> tag means "keep the previous frame's image".
-    auto inheritImage = [&](Frame f, int idx) -> Frame {
-        if (!f.imageName.empty()) return f;
-        for (int k = idx; k >= 0; --k) {
-            if (!frames[k].imageName.empty()) {
-                f.imageName = frames[k].imageName;
-                return f;
-            }
-        }
-        return f; // still empty; caller will skip via nullptr texture lookup
-    };
+    // --- find the bracketing frame indices for [startTime, endTime - 1/fps] ---
+    // Use a linear scan so we're robust to non-uniform snap spacing.
+    int startSegment = 0, endSegment = (int)frames.size() - 1;
+    for (int k = 0; k < (int)frames.size(); ++k) {
+        if (frames[k].snap <= startTime) startSegment = k;
+        if (frames[k].snap <= endTime)   endSegment   = k;
+    }
 
-    if (time <= frames[0].snap) return inheritImage(frames[0], 0);
-    if (time >= frames.back().snap) return inheritImage(frames.back(), (int)frames.size() - 1);
+    if (time <= startTime) return frames[startSegment];
+    if (time >= endTime) return frames[endSegment];
 
-    for (int i = 0; i < (int)frames.size() - 1; ++i) {
-        if (time >= frames[i].snap && time < frames[i + 1].snap) {
-            float t = (time - frames[i].snap) / (frames[i + 1].snap - frames[i].snap);
 
-            Frame newFrame;
-            newFrame.snap   = time;
-            newFrame.newX   = Lerp(frames[i].newX,   frames[i + 1].newX,   t);
-            newFrame.newY   = Lerp(frames[i].newY,   frames[i + 1].newY,   t);
-            newFrame.skewX  = Lerp(frames[i].skewX,  frames[i + 1].skewX,  t);
-            newFrame.skewY  = Lerp(frames[i].skewY,  frames[i + 1].skewY,  t);
-            newFrame.scaleX = Lerp(frames[i].scaleX, frames[i + 1].scaleX, t);
-            newFrame.scaleY = Lerp(frames[i].scaleY, frames[i + 1].scaleY, t);
-            newFrame.alpha = frames[i].alpha;
-
-            newFrame.imageName = frames[i].imageName;
-
-            return inheritImage(newFrame, i);
+    // Find the two frames that bracket `time`
+    int pos = startSegment;
+    for (int k = startSegment; k < endSegment; ++k) {
+        if (frames[k].snap <= time && time < frames[k + 1].snap) {
+            pos = k;
+            break;
         }
     }
 
-    return inheritImage(frames.back(), (int)frames.size() - 1);
+    // Step mode when texture changes between the two keyframes
+    float segLen = frames[pos + 1].snap - frames[pos].snap;
+    float rate   = (segLen > 0.0f) ? (time - frames[pos].snap) / segLen : 0.0f;
+
+    if (frames[pos].imageName != frames[pos + 1].imageName) {
+        return rate < 0.5f ? frames[pos] : frames[pos + 1];
+    }
+    
+    Frame newFrame;
+    newFrame.snap   = time;
+    newFrame.newX   = Lerp(frames[pos].newX,   frames[pos + 1].newX,   rate);
+    newFrame.newY   = Lerp(frames[pos].newY,   frames[pos + 1].newY,   rate);
+    newFrame.skewX  = Lerp(frames[pos].skewX,  frames[pos + 1].skewX,  rate);
+    newFrame.skewY  = Lerp(frames[pos].skewY,  frames[pos + 1].skewY,  rate);
+    newFrame.scaleX = Lerp(frames[pos].scaleX, frames[pos + 1].scaleX, rate);
+    newFrame.scaleY = Lerp(frames[pos].scaleY, frames[pos + 1].scaleY, rate);
+    newFrame.alpha  = Lerp(frames[pos].alpha,  frames[pos + 1].alpha,  rate);
+
+    newFrame.imageName = frames[pos].imageName;
+    return newFrame;
 }
 
 
@@ -242,7 +246,7 @@ void ReanimParser :: buildClips() {
                 clip.name      = clipName;
                 clip.startTime = visStart;
                 clip.loopStart = visStart;
-                clip.endTime   = fr.snap;
+                clip.endTime   = frames[i - 1].snap;
                 clipList.push_back(clip);
             }
         }

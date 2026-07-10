@@ -5,7 +5,7 @@ const char* World :: plantNames[] = {
     "SunFlower",
     "Repeater",
     "SnowPea",
-    "WallNut"
+    "WallNut",
 };
 
 const int World :: NUM_PLANTS = sizeof(plantNames) / sizeof(plantNames[0]);
@@ -90,14 +90,6 @@ World :: World(int screenWidth, int screenHeight)
     animationManager = new AnimationManager();
 
     loadAssets();
-    // float margin = 40.0f;
-    // float topBar = 60.0f;
-    // CELL_WIDTH = (screenWidth - 2 * margin) / NUM_COLS;
-    // CELL_HEIGHT = (screenHeight - topBar - margin) / NUM_ROWS;
-    // grid.setCellWidth(CELL_WIDTH);
-    // grid.setCellHeight(CELL_HEIGHT);
-    // GRID_START_X = margin;
-    // GRID_START_Y = topBar;
 }
 World::~World() {
     delete textureManager;
@@ -212,19 +204,6 @@ Rectangle World :: cellScreenRect(int row, int col) const {
 void World :: update(float dt) {
     dayMap.update(dt);
     if (dayMap.isReady() == false) return;
-    // if (dayMap.isReady()) {
-        // Rectangle area = dayMap.getGridArea();
-        
-        // GRID_START_X = area.x;
-        // GRID_START_Y = area.y;
-        // CELL_WIDTH = area.width / NUM_COLS;
-        // CELL_HEIGHT = area.height / NUM_ROWS;
-
-        // std::cerr << GRID_START_X << ' ' << GRID_START_Y << ' ' << CELL_WIDTH << ' ' << CELL_HEIGHT << std::endl;
-
-        // grid.setCellWidth(CELL_WIDTH);
-        // grid.setCellHeight(CELL_HEIGHT);
-    // }
 
     grid.updateTime(dt);
 }
@@ -245,15 +224,6 @@ void World :: draw() {
 
             if (r == hovR && c == hovC && selectedPlantId >= 0)
                 DrawRectangleLinesEx(rect, 3, LIME);
-
-            // Plant* p = grid.getPlant(r, c);
-            // if (p) {
-            //     DrawCircle((int)(rect.x + rect.width / 2),
-            //                (int)(rect.y + rect.height / 2),
-            //                rect.width * 0.22f, (Color){80, 200, 80, 255});
-            //     DrawText("P", (int)(rect.x + rect.width / 2 - 7),
-            //              (int)(rect.y + rect.height / 2 - 10), 20, (Color){20, 80, 20, 255});
-            // }
         }
     }
 
