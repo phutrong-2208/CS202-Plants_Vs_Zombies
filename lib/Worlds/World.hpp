@@ -11,6 +11,7 @@
 #include "Gameplay/Plants/SunProducePlants/Sunflower.hpp"
 #include "Gameplay/Plants/DefensivePlants/WallNut.hpp"
 #include "Gameplay/Plants/ShooterPlants/SnowPea.hpp"
+#include "Gameplay/Plants/ShooterPlants/Repeater.hpp"
 
 class World {
 private:

@@ -3,8 +3,9 @@
 const char* World :: plantNames[] = {
     "PeaShooter",
     "SunFlower",
-    "Wall-nut",
-    "Snow Pea",
+    "Repeater",
+    "SnowPea",
+    "WallNut"
 };
 
 const int World :: NUM_PLANTS = sizeof(plantNames) / sizeof(plantNames[0]);
@@ -124,6 +125,39 @@ std::unique_ptr<Plant> World :: createPlant(int row, int col, const std::string&
         plantReanim.setTexturePackage(textureManager -> getPackage("PeaShooter"));
         plantReanim.setAnimation(animationManager -> getAnimationData("PeaShooterSingleAnim"));
         plantReanim.playClip("full_idle");
+        plantPtr -> setReanimInstance(plantReanim);
+
+        return std::move(plantPtr);
+    }
+    else if(plantID == "SnowPea"){
+        std::unique_ptr<Plant> plantPtr = std :: make_unique<SnowPea>(cellScreenRect(row, col));
+
+        ReanimInstance plantReanim;
+        plantReanim.setTexturePackage(textureManager -> getPackage("SnowPea"));
+        plantReanim.setAnimation(animationManager -> getAnimationData("SnowPeaAnim"));
+        plantReanim.playClip("full_idle");
+        plantPtr -> setReanimInstance(plantReanim);
+
+        return std::move(plantPtr);
+    }
+    else if(plantID == "Repeater"){
+        std::unique_ptr<Plant> plantPtr = std :: make_unique<Repeater>(cellScreenRect(row, col));
+
+        ReanimInstance plantReanim;
+        plantReanim.setTexturePackage(textureManager -> getPackage("Repeater"));
+        plantReanim.setAnimation(animationManager -> getAnimationData("PeaShooterAnim"));
+        plantReanim.playClip("full_idle");
+        plantPtr -> setReanimInstance(plantReanim);
+
+        return std::move(plantPtr);
+    }
+    else if(plantID == "WallNut"){
+        std::unique_ptr<Plant> plantPtr = std :: make_unique<Repeater>(cellScreenRect(row, col));
+
+        ReanimInstance plantReanim;
+        plantReanim.setTexturePackage(textureManager -> getPackage("WallNut"));
+        plantReanim.setAnimation(animationManager -> getAnimationData("WallNutAnim"));
+        plantReanim.playClip("idle");
         plantPtr -> setReanimInstance(plantReanim);
 
         return std::move(plantPtr);

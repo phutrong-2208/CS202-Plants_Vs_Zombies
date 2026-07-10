@@ -74,7 +74,7 @@ Frame ReanimTrack::getInterpolatedFrame(float time) const {
             newFrame.skewY  = Lerp(frames[i].skewY,  frames[i + 1].skewY,  t);
             newFrame.scaleX = Lerp(frames[i].scaleX, frames[i + 1].scaleX, t);
             newFrame.scaleY = Lerp(frames[i].scaleY, frames[i + 1].scaleY, t);
-            newFrame.alpha = Lerp(frames[i].alpha, frames[i + 1].alpha, t);
+            newFrame.alpha = frames[i].alpha;
 
             newFrame.imageName = frames[i].imageName;
 
