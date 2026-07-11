@@ -20,9 +20,9 @@ void Cell::updateTime(float deltaSeconds) {
     if (plant == nullptr) return;
     plant -> updateTime(deltaSeconds);
 }
-void Cell::draw() {
+void Cell::draw(Rectangle hitbox) {
     if (plant == nullptr) return;
-    plant -> draw();
+    plant -> draw(hitbox);
 }
 
 bool Cell :: placePlant(std::unique_ptr<Plant> newPlant) {

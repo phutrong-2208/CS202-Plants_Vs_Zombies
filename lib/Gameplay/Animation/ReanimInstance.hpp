@@ -10,6 +10,7 @@ private:
     float currentTime = 0.0f;
     float speed       = 1.0f;
     bool  looping     = true;
+    float scalar      = 1.0f;
 
     // ---------------------------------------------------------------
     // Clip range — the sub-section of the timeline currently playing.
@@ -28,6 +29,7 @@ public:
     // Setup
     void setAnimation(ReanimParser* Anim);
     void setTexturePackage(TexturePackage* TexPack);
+    void setTextureScalar(float scaleFactor);
 
     // ---------------------------------------------------------------
     // Clip selection — call once after setAnimation().

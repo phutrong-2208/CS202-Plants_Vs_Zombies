@@ -5,7 +5,7 @@
 
 class Sunflower : public Plant {
 public:
-    Sunflower(Rectangle hitbox);
+    Sunflower();
 };
 
 #endif

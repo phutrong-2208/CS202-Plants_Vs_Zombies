@@ -5,7 +5,7 @@
 
 class SnowPea : public Plant {
 public:
-    SnowPea(Rectangle hitbox);
+    SnowPea();
 };
 
 #endif

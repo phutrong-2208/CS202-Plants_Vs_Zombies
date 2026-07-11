@@ -5,7 +5,7 @@
 
 class Repeater : public Plant {
 public:
-    Repeater(Rectangle hitbox);
+    Repeater();
 };
 
 #endif

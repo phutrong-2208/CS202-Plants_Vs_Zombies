@@ -11,6 +11,10 @@ void ReanimInstance::setAnimation(ReanimParser* Anim) {
 void ReanimInstance::setTexturePackage(TexturePackage* TexPack) {
     rawTexPack = TexPack;
 }
+
+void ReanimInstance::setTextureScalar(float scaleFactor) {
+    scalar = scaleFactor;
+}
 // Clip selection (optional — call this when you want to play a specific
 // named animation segment, e.g. "shooting", "die".
 // For the default idle loop, do NOT call playClip — just let the full
@@ -89,38 +93,14 @@ void ReanimInstance::draw(Rectangle hitbox) {
     // at currentTime.  When a clip is active we use its loopStart; otherwise
     // we use the file-wide heuristic (most common first-visible snap).
     const float loopStart = (clipLoopStart >= 0.0f) ? clipLoopStart : rawAnim->getLoopStartTime();
-    const float scale      = 1.5f;
     const int   trackCount = rawAnim->getTrackCount();
 
     for (int i = 0; i < trackCount; ++i) {
         const ReanimTrack* track = rawAnim->getTrack(i);
         if (track == nullptr) continue;
 
-        Frame frame = track->getInterpolatedFrame(currentTime);
-
-
-        if (frame.alpha <= 0.0f) {
-            const Frame restFrame = track->getInterpolatedFrame(loopStart);
-            if (restFrame.alpha > 0.0f) {
-                frame = restFrame;
-            } else {
-                const std::vector<Frame>& allFrames = track->getFullTrack();
-                // Event track: last frame hidden -> intended to be invisible now.
-                if (allFrames.back().alpha <= 0.0f) {
-                    continue;
-                }
-                // Persistent track: scan for first visible frame as rest pose.
-                bool found = false;
-                for (const Frame& raw : allFrames) {
-                    if (raw.alpha > 0.0f && !raw.imageName.empty()) {
-                        frame = track -> getInterpolatedFrame(raw.snap);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) continue;
-            }
-        }
+        Frame frame = track -> getInterpolatedFrame(currentTime, loopStart, clipEnd);
+        if (frame.alpha <= 0.0f) continue;
 
         Texture2D* currentTex = rawTexPack->GetTexture(frame.getTextureKey());
         if (currentTex == nullptr) continue;
@@ -128,12 +108,12 @@ void ReanimInstance::draw(Rectangle hitbox) {
         const float kx = frame.skewX * DEG2RAD;
         const float ky = frame.skewY * DEG2RAD;
 
-        const float a  =  frame.scaleX * cosf(kx) * scale;
-        const float b_ =  frame.scaleX * sinf(kx) * scale;
-        const float c  = -frame.scaleY * sinf(ky) * scale;
-        const float d  =  frame.scaleY * cosf(ky) * scale;
-        const float tx =  hitbox.x + frame.newX * scale;
-        const float ty =  hitbox.y + frame.newY * scale;
+        const float a  =  frame.scaleX * cosf(kx) * scalar;
+        const float b_ =  frame.scaleX * sinf(kx) * scalar;
+        const float c  = -frame.scaleY * sinf(ky) * scalar;
+        const float d  =  frame.scaleY * cosf(ky) * scalar;
+        const float tx =  hitbox.x + frame.newX * scalar;
+        const float ty =  hitbox.y + frame.newY * scalar;
 
         // Column-major (OpenGL / rlgl):
         // | a   c   0  tx |

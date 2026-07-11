@@ -1,7 +1,6 @@
 #include "Gameplay/Plants/Plant.hpp"
 
-Plant :: Plant(Rectangle territory, int hp, int cost){
-    hitbox = territory;
+Plant :: Plant(int hp, int cost){
     health = hp;
     sunCost = cost;
 }
@@ -9,7 +8,7 @@ Plant :: Plant(Rectangle territory, int hp, int cost){
 void Plant::updateTime(float deltaSeconds) {
     animation.updateTime(deltaSeconds);
 }
-void Plant::draw() {
+void Plant::draw(Rectangle hitbox) {
     animation.draw(hitbox);   
 }
 void Plant::setReanimInstance(ReanimInstance anim) {

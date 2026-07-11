@@ -14,7 +14,7 @@ public:
     bool isOccupied() const;
 
     void updateTime(float deltaSeconds);
-    void draw();
+    void draw(Rectangle hitbox);
     
     bool placePlant(std::unique_ptr<Plant> newPlant);
     Plant* getPlant() const;

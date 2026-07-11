@@ -5,7 +5,7 @@
 
 class WallNut : public Plant {
 public:
-    WallNut(Rectangle hitbox);
+    WallNut();
 };
 
 #endif

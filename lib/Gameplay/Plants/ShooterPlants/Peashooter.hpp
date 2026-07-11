@@ -5,7 +5,7 @@
 
 class Peashooter : public Plant {
 public:
-    Peashooter(Rectangle hitbox);
+    Peashooter();
 };
 
 #endif

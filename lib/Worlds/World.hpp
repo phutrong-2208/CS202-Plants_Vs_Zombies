@@ -1,22 +1,18 @@
 #ifndef WORLD_HPP
 #define WORLD_HPP
 
-#include <Core/TextureManager.hpp>  
-#include <Core/AnimationManager.hpp>
+#include <Core/AssetManager.hpp>
 
 #include <Worlds/Grid.hpp>
 #include <Worlds/DayMap.hpp>
 
-#include "Gameplay/Plants/ShooterPlants/Peashooter.hpp"
-#include "Gameplay/Plants/SunProducePlants/Sunflower.hpp"
-#include "Gameplay/Plants/DefensivePlants/WallNut.hpp"
-#include "Gameplay/Plants/ShooterPlants/SnowPea.hpp"
-#include "Gameplay/Plants/ShooterPlants/Repeater.hpp"
+#include <Gameplay/Plants/Plant.hpp>
 
 class World {
 private:
     DayMap dayMap;
     Grid grid;
+    PlantFactory plantFactory;
 
     // Original PopCap viewport
     float GRID_START_X = 40.0f;  
@@ -26,24 +22,16 @@ private:
     float GRID_WIDTH, GRID_HEIGHT;
     const float VIRTUAL_WIDTH = 800.0f, VIRTUAL_HEIGHT = 600.0f;
 
-    // float gridX, gridY, cellWidth, cellHeight;
     int selectedPlantId;
 
-    static const char* plantNames[];
+    // static const char* plantNames[];
     static const int NUM_PLANTS;
-    static const int NUM_ROWS = 5, NUM_COLS = 9;
+    // static const int NUM_ROWS = 5, NUM_COLS = 9;
 
-    TextureManager* textureManager = nullptr;
-    AnimationManager* animationManager = nullptr;
-
-    std :: unique_ptr<Plant> createPlant(int row, int col, const std::string& plantID);
-    bool screenToGrid(float sx, float sy, int& row, int& col) const;
-    Rectangle cellScreenRect(int row, int col) const;
-
-    void loadAssets();
+    std::unique_ptr <AssetManager> assetManager = nullptr;
 public:
     World() = default;
-    ~World();
+    ~World() = default;
     World(int screenWidth, int screenHeight);
 
     void update(float dt);
