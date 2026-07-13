@@ -3,9 +3,7 @@
 
 #include "raylib.h"
 #include "raymath.h"
-#include <chrono>
-#include <random>
-
+#include <cmath>
 
 #include <unordered_map>
 #include <algorithm>
@@ -14,13 +12,11 @@
 #include <vector>
 #include <array>
 #include <map>
-#include <cmath>
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <cstring>
 #include <memory>
-
-#include <filesystem>
 
 #endif

@@ -1,19 +1,12 @@
 #include <GameLoop.hpp>
 
-
-// void GameLoop::loadAssets(void) {
-    
-// }
-
 void GameLoop::initGame() {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(1200, 900, "Plants Vs Zombies");
     SetTargetFPS(60);
 
-    world = new World(GetScreenWidth(), GetScreenHeight());
-    inputManager = new InputManager();
-
-    // loadAssets();
+    world = std::make_unique<World>(GetScreenWidth(), GetScreenHeight());
+    inputManager = std::make_unique<InputManager>();
 }
 
 bool GameLoop::isRunning() {
@@ -32,7 +25,7 @@ void GameLoop::runGame() {
 
         if (inputEvent.inputType == RawInputEvent::InputType::LEFT_MOUSE_CLICKED) {
             world -> onMouseClick(inputEvent.position);
-        }
+        }   
     }
 
     world -> update(GetFrameTime());
@@ -46,8 +39,8 @@ void GameLoop::runGame() {
 }
 
 void GameLoop::closeGame() {
-    delete world;
-    delete inputManager;
+    world.reset();
+    inputManager.reset();
 
     CloseWindow();
 }

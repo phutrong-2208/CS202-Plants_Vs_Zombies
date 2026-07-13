@@ -8,15 +8,13 @@
 
 class GameLoop {
 private:
-    World* world = nullptr;
-    InputManager* inputManager = nullptr;
+    std::unique_ptr<World> world = nullptr;
+    std::unique_ptr<InputManager> inputManager = nullptr;
 public:
     void initGame();
     bool isRunning();
     void runGame();
     void closeGame();
-    
-    // void loadAssets();
 };  
 
 

@@ -1,4 +1,5 @@
 #include <Core/AssetManager.hpp>
+#include <filesystem>
 
 void AssetManager::loadAssets() {
     std :: string assetDir = std :: string (PROJECT_DIR) + "assets/texture";
