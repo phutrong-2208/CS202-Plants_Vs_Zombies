@@ -1,27 +1,39 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 
-#include <Core/TextureManager.hpp>
+#include <Common.hpp>
 
 class Map {
 public:
-    enum class State { SLIDING, READY };
+    enum class State {SLIDING, CHOOSE_PLANTS, READY, PAUSED};
 
-    virtual ~Map() = default;
+    virtual ~Map();
 
     virtual void update(float dt);
-    virtual void draw() const = 0;
+    virtual void draw() const;
+    void drawBackground() const;
 
     bool isReady() const;
     // virtual Rectangle getGridArea() const;
 
 protected:
-    State state = State::SLIDING;
-    float slideTimer = 0.0f;
-    float slideDuration = 3.0f;
-    float focusX = 0.5f;
+    enum class SlidePhase {PAN_RIGHT, PAN_LEFT};
 
+    State state = State :: SLIDING;
+    State stateBeforePause = State :: READY;
+    SlidePhase slidePhase = SlidePhase :: PAN_RIGHT;
+    float slideTimer = 0.0f;
+    float slideDuration = 2.0f;
+    float focusX = 0.5f;
+    Rectangle crop = {0, 0, 800, 600};
+    Rectangle lawnSrc = {0, 0, 800, 600};
+    Texture2D background = {};
+    bool hasBackground = false;
+
+    void loadBackground(const std::string& path, Rectangle cropRect, Rectangle lawnRect);
     float getSlideProgress() const;
+    float getSlidingCropX() const;
+    Rectangle getViewportDest() const;
 };
 
 #endif

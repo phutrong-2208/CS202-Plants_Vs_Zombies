@@ -29,6 +29,7 @@ enum PlantType : int {
     REPEATER,
     SNOWPEA,
     WALLNUT,
+    CACTUS,
     PLANT_COUNT
 };
 

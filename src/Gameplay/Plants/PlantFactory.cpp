@@ -1,9 +1,14 @@
 #include <Gameplay/Plants/Plant.hpp>
+
+
+//Shooter Plants
 #include "Gameplay/Plants/ShooterPlants/Peashooter.hpp"
 #include "Gameplay/Plants/SunProducePlants/Sunflower.hpp"
 #include "Gameplay/Plants/DefensivePlants/WallNut.hpp"
 #include "Gameplay/Plants/ShooterPlants/SnowPea.hpp"
 #include "Gameplay/Plants/ShooterPlants/Repeater.hpp"
+#include "Gameplay/Plants/ShooterPlants/Cactus.hpp"
+
 
 void PlantFactory::setTextureManager(TextureManager* manager) {
     textureManager = manager;
@@ -65,6 +70,15 @@ std::unique_ptr <Plant> PlantFactory::createPlant(PlantType pType) {
 
             plantPtr -> setReanimInstance(
                 createReanim(1.5f, "WallNut", "WallNutAnim", "idle")
+            );
+
+            return plantPtr;
+        }
+        case CACTUS:{
+            std::unique_ptr<Plant> plantPtr = std :: make_unique<Cactus>();
+            
+            plantPtr -> setReanimInstance(
+                createReanim(1.5f, "Cactus", "CactusAnim", "idle")
             );
 
             return plantPtr;
