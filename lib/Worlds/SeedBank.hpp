@@ -7,7 +7,9 @@
 // This class is for containing plants
 class SeedBank {
 private:
-    TexturePackage* texturePackage = nullptr;
+    TexturePackage* chooserPackage = nullptr;
+    TexturePackage* packetPackage = nullptr;
+
     std::vector<PlantType> slots;
     int selectedSlot = -1;
 
@@ -18,6 +20,7 @@ public:
     SeedBank();
 
     void setTexturePackage(TexturePackage* package);
+    void setPacketPackage(TexturePackage* package);
     void setSlots(const std::vector<PlantType>& selectedPlants);
 
     void draw() const;

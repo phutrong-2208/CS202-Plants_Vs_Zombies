@@ -11,12 +11,12 @@ namespace {
 
     static const char* plantName(PlantType type) {
         switch (type) {
-            case PEASHOOTER: return "PEA";
-            case SUNFLOWER: return "SUN";
-            case REPEATER: return "REP";
-            case SNOWPEA: return "SNOW";
-            case WALLNUT: return "NUT";
-            case CACTUS: return "CAC";
+            case PEASHOOTER: return "PEASHOOTER";
+            case SUNFLOWER: return "SUNFLOWER";
+            case REPEATER: return "REPEATER";
+            case SNOWPEA: return "SNOWPEA";
+            case WALLNUT: return "WALLNUT";
+            case CACTUS: return "CACTUS";
             default: return "?";
         }
     }
@@ -27,7 +27,11 @@ SeedBank :: SeedBank() {
 }
 
 void SeedBank :: setTexturePackage(TexturePackage* package) {
-    texturePackage = package;
+    chooserPackage = package;
+}
+
+void SeedBank :: setPacketPackage(TexturePackage* package) {
+    packetPackage = package;
 }
 
 void SeedBank :: setSlots(const std::vector<PlantType>& selectedPlants) {
@@ -36,8 +40,8 @@ void SeedBank :: setSlots(const std::vector<PlantType>& selectedPlants) {
 }
 
 void SeedBank :: draw() const {
-    Texture2D* seedBank = texturePackage ? texturePackage -> GetTexture("SEEDBANK") : nullptr;
-    Texture2D* seedPacket = texturePackage ? texturePackage -> GetTexture("SEEDPACKET_LARGER") : nullptr;
+    Texture2D* seedBank = chooserPackage ? chooserPackage -> GetTexture("SEEDBANK") : nullptr;
+    Texture2D* seedPacket = chooserPackage ? chooserPackage -> GetTexture("SEEDPACKET_LARGER") : nullptr;
 
     if (seedBank) {
         // DrawTexturePro(*seedBank, BANK_X, BANK_Y, WHITE);
@@ -52,18 +56,22 @@ void SeedBank :: draw() const {
         Rectangle slotRect = getSlotRect(i);
         Color tint = (i == selectedSlot) ? (Color){210, 255, 170, 255} : WHITE;
 
-        if (seedPacket) {
+        Texture2D* targetPacket = packetPackage ? packetPackage -> GetTexture(plantName(slots[i])) : nullptr;
+        if (targetPacket) {
+            DrawTexturePro(*targetPacket, {0, 0, (float)targetPacket -> width, (float)targetPacket -> height},
+            slotRect, {0, 0}, 0, tint);
+        } else if (seedPacket) {
             DrawTexturePro(*seedPacket, {0, 0, (float)seedPacket -> width, (float)seedPacket -> height},
             slotRect, {0, 0}, 0, tint);
         } else {
             DrawRectangleRec(slotRect, (Color){190, 174, 112, 245});
+            DrawText(plantName(slots[i]), slotRect.x + 6, slotRect.y + 46, 10, (Color){40, 60, 30, 255});
         }
 
         if (i == selectedSlot) {
             DrawRectangleLinesEx(slotRect, 3, LIME);
         }
 
-        DrawText(plantName(slots[i]), slotRect.x + 6, slotRect.y + 46, 10, (Color){40, 60, 30, 255});
     }
 }
 

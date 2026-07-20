@@ -6,7 +6,8 @@ World :: World(int screenWidth, int screenHeight)
     assetManager = std::make_unique <AssetManager> ();
     plantFactory.setTextureManager(assetManager -> getTextureManager());
     plantFactory.setAnimationManager(assetManager -> getAnimationManager());
-    seedBank.setTexturePackage(assetManager -> getTextureManager() -> getPackage("PlantChooser"));
+    seedBank.setTexturePackage(assetManager -> getTextureManager() -> getPackage("PlantChooser")); // in Misc folder
+    seedBank.setPacketPackage(assetManager -> getTextureManager() -> getPackage("PlantSeedPackets")); // in Misc folder 
 }
 
 void World :: update(float dt) {
