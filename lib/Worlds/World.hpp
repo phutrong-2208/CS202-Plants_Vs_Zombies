@@ -6,6 +6,7 @@
 #include <Worlds/Grid.hpp>
 #include <Worlds/Map.hpp>
 #include <Worlds/DayMap.hpp>
+#include <Gameplay/Plants/PlantFactory.hpp>
 
 
 class World {

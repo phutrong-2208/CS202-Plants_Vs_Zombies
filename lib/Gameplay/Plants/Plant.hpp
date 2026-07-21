@@ -5,24 +5,6 @@
 #include <Core/AnimationManager.hpp>
 #include <Gameplay/Animation/ReanimInstance.hpp>
 
-class Plant {
-protected:
-    int health;
-    int sunCost;
-    ReanimInstance animation;
-public:
-    Plant(int hp, int cost);
-    void receiveDamage(int damage);
-
-    void updateTime(float deltaSeconds);
-    void setReanimInstance(ReanimInstance anim);
-    void draw(Rectangle hitbox);
-    
-    bool isDead() const;
-    int getHealth() const;
-    int getCost() const;
-};
-
 enum PlantType : int {
     PEASHOOTER,
     SUNFLOWER,
@@ -33,16 +15,61 @@ enum PlantType : int {
     PLANT_COUNT
 };
 
-class PlantFactory {
+class PlantData {
 private:
-    TextureManager* textureManager;
-    AnimationManager* animationManager;
-public:
-    void setTextureManager(TextureManager* manager);
-    void setAnimationManager(AnimationManager* manager);
+    float baseHealth = 100.0f;
+    float baseDamage = 10.0f, buffDamage = 20.0f;
+    int sunCost = 100;
+    float projectileCooldown = 0.0f;
+    float projectileRange = 0.0f;
 
-    ReanimInstance createReanim(float scalar, const std::string& packageName, const std::string& animName, const std::string& clipLoopName);
-    std::unique_ptr <Plant> createPlant(PlantType pType);
+    // Reanim metadata
+    float reanimScalar = 1.5f;
+    std::string reanimPackage;
+    std::string reanimAnim;
+    std::string reanimClip;
+public:
+    PlantData() = default;
+    PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float projectileCooldown, float projectileRange);
+      
+    float getBaseHealth() const;
+    float getDamage(bool buffed) const;
+    int getSunCost() const;
+    float getProjectileCooldown() const;
+    float getProjectileRange() const;
+
+    float getReanimScalar() const;
+    const std::string& getReanimPackage() const;
+    const std::string& getReanimAnim() const;
+    const std::string& getReanimClip() const;
+
+    void setReanimScalar(float scalar);
+    void setReanimPackage(const std::string& package);
+    void setReanimAnim(const std::string& anim);
+    void setReanimClip(const std::string& clip);
+};
+
+class Plant {
+protected:
+    int health = 0;
+    float cooldownTimer = 0.0f;
+    PlantData* plantData = nullptr;
+    ReanimInstance animation;
+
+    void plantSetup();
+public:
+    Plant() = default;
+    virtual ~Plant() = default;
+    void receiveDamage(int damage);
+
+    void updateTime(float deltaSeconds);
+    void setReanimInstance(ReanimInstance anim);
+    void setPlantData(PlantData* pData);
+    void draw(Rectangle hitbox);
+    
+    bool isDead() const;
+    int getHealth() const;
+    int getCost() const;
 };
 
 #endif

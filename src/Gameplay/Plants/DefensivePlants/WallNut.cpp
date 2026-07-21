@@ -1,5 +1,3 @@
 #include "Gameplay/Plants/DefensivePlants/WallNut.hpp"
 
-WallNut::WallNut()
-    : Plant(400, 50)
-{}
+WallNut::WallNut() = default;

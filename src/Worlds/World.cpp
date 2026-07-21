@@ -6,6 +6,7 @@ World :: World(int screenWidth, int screenHeight, AssetManager* assetManager)
     if (assetManager) {
         plantFactory.setTextureManager(assetManager -> getTextureManager());
         plantFactory.setAnimationManager(assetManager -> getAnimationManager());
+        plantFactory.loadPlantMechanics();
     }
 }
 
