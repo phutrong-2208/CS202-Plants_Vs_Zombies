@@ -19,14 +19,17 @@ void Map :: loadBackground(const std :: string& path, Rectangle cropRect, Rectan
 
 void Map :: update(float dt) {
     if (state != State :: SLIDING) return;
-    slideTimer += dt;
+    float safeDt = std :: min(dt, 0.05f); //prevent loading parallel with assets loading, 
+    //without safeDt, right sliding phase will be skipped
+    slideTimer += safeDt;
     if (slideTimer >= slideDuration) {
-        slideTimer = slideDuration;
         if (slidePhase == SlidePhase :: PAN_RIGHT) {
+            state = State :: CHOOSE_PLANTS;
             slidePhase = SlidePhase :: PAN_LEFT;
-            slideTimer = 0.0f;
+            slideTimer = slideDuration;
         } else {
             state = State :: READY;
+            slideTimer = slideDuration;
         }
     }
 }
@@ -41,6 +44,8 @@ void Map :: drawBackground() const {
     Rectangle src = crop;
     if (state == State :: SLIDING) {
         src.x = getSlidingCropX();
+    } else if (state == State :: CHOOSE_PLANTS) {
+        src.x = (float)background.width - crop.width;
     }
 
     DrawTexturePro(background, src, getViewportDest(), {0, 0}, 0, WHITE);
@@ -48,6 +53,22 @@ void Map :: drawBackground() const {
 
 bool Map :: isReady() const {
     return state == State :: READY;
+}
+
+Map::State Map :: getState() const {
+    return state;
+}
+
+bool Map :: isChoosingPlants() const {
+    return state == State :: CHOOSE_PLANTS;
+}
+
+void Map :: finishChoosingPlants() {
+    if (state == State :: CHOOSE_PLANTS) {
+        state = State :: SLIDING;
+        slidePhase = SlidePhase :: PAN_LEFT;
+        slideTimer = 0.0f;
+    }
 }
 
 // Rectangle Map :: getGridArea() const {

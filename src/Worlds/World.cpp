@@ -50,3 +50,13 @@ bool World :: tryPlacePlant(Vector2 position, PlantType plantType) {
 bool World :: isReady() const {
     return map && map -> isReady();
 }
+
+bool World :: isChoosingPlants() const {
+    return map && map -> isChoosingPlants();
+}
+
+void World :: finishChoosingPlants() {
+    if (map) {
+        map -> finishChoosingPlants();
+    }
+}

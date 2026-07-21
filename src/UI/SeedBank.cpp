@@ -23,7 +23,7 @@ namespace {
 }
 
 SeedBank :: SeedBank() {
-    slots = {PEASHOOTER, SUNFLOWER, REPEATER, SNOWPEA, WALLNUT, CACTUS};
+    slots = {};
 }
 
 void SeedBank :: setTexturePackage(TexturePackage* package) {

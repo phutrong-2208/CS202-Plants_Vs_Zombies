@@ -4,12 +4,14 @@
 #include <Core/AssetManager.hpp>
 #include <Screens/Screen.hpp>
 #include <Worlds/World.hpp>
+#include <UI/ChoosePlants.hpp>
 #include <UI/SeedBank.hpp>
 
 class GameplayScreen : public Screen {
 private:
     std::unique_ptr<AssetManager> assetManager = nullptr;
     std::unique_ptr<World> world = nullptr;
+    ChoosePlants choosePlants;
     SeedBank seedBank;
 
 public:

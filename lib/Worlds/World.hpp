@@ -24,6 +24,8 @@ public:
     void drawPlacementPreview(int selectedPlantId) const;
     bool tryPlacePlant(Vector2 position, PlantType plantType);
     bool isReady() const;
+    bool isChoosingPlants() const;
+    void finishChoosingPlants();
 
 };
 
