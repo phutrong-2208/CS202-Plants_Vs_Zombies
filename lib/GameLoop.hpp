@@ -4,11 +4,11 @@
 #include <Common.hpp>
 #include <Core/InputManager.hpp>
 
-#include <Worlds/World.hpp>
+#include <Screens/Screen.hpp>
 
 class GameLoop {
 private:
-    std::unique_ptr<World> world = nullptr;
+    std::unique_ptr<Screen> activeScreen = nullptr;
     std::unique_ptr<InputManager> inputManager = nullptr;
 public:
     void initGame();

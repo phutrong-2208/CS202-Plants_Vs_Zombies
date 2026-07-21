@@ -1,11 +1,12 @@
 #include <GameLoop.hpp>
+#include <Screens/GameplayScreen.hpp>
 
 void GameLoop::initGame() {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(1200, 900, "Plants Vs Zombies");
     SetTargetFPS(60);
 
-    world = std::make_unique<World>(GetScreenWidth(), GetScreenHeight());
+    activeScreen = std::make_unique<GameplayScreen>(GetScreenWidth(), GetScreenHeight()); //will be replaced later 
     inputManager = std::make_unique<InputManager>();
 }
 
@@ -22,24 +23,27 @@ void GameLoop::runGame() {
     inputManager -> update();
     while (inputManager -> hasEvents()) {
         RawInputEvent inputEvent = inputManager -> pollEvent();
-
-        if (inputEvent.inputType == RawInputEvent::InputType::LEFT_MOUSE_CLICKED) {
-            world -> onMouseClick(inputEvent.position);
-        }   
+        if (activeScreen) {
+            activeScreen -> handleInput(inputEvent);
+        }
     }
 
-    world -> update(GetFrameTime());
+    if (activeScreen) {
+        activeScreen -> update(GetFrameTime());
+    }
 
     BeginDrawing();
         ClearBackground(BLACK);
-        world -> draw();
+        if (activeScreen) {
+            activeScreen -> draw();
+        }
 
         DrawFPS(10, 10);
     EndDrawing();
 }
 
 void GameLoop::closeGame() {
-    world.reset();
+    activeScreen.reset();
     inputManager.reset();
 
     CloseWindow();

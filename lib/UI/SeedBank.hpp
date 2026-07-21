@@ -4,7 +4,7 @@
 #include <Common.hpp>
 #include <Core/TexturePackage.hpp>
 #include <Gameplay/Plants/Plant.hpp>
-// This class is for containing plants
+
 class SeedBank {
 private:
     TexturePackage* chooserPackage = nullptr;
@@ -13,7 +13,7 @@ private:
     std::vector<PlantType> slots;
     int selectedSlot = -1;
 
-    Rectangle getSlotRect(int slotIndex) const; //get the Rectangle of the current slot
+    Rectangle getSlotRect(int slotIndex) const;
     bool pointInRect(Vector2 position, Rectangle rect) const;
 
 public:

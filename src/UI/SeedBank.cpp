@@ -1,4 +1,4 @@
-#include <Worlds/SeedBank.hpp>
+#include <UI/SeedBank.hpp>
 
 namespace {
     constexpr float BANK_X = 10.0f;
@@ -44,7 +44,6 @@ void SeedBank :: draw() const {
     Texture2D* seedPacket = chooserPackage ? chooserPackage -> GetTexture("SEEDPACKET_LARGER") : nullptr;
 
     if (seedBank) {
-        // DrawTexturePro(*seedBank, BANK_X, BANK_Y, WHITE);
         Rectangle src = {0.0f, 0.0f, (float)seedBank -> width, (float)seedBank -> height};
         Rectangle dst = {BANK_X, BANK_Y, 541, 110};
         DrawTexturePro(*seedBank, src, dst, {0, 0}, 0, WHITE);
@@ -71,7 +70,6 @@ void SeedBank :: draw() const {
         if (i == selectedSlot) {
             DrawRectangleLinesEx(slotRect, 3, LIME);
         }
-
     }
 }
 
