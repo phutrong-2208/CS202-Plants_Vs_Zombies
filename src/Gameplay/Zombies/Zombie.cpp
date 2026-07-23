@@ -1,59 +1,59 @@
 #include "Gameplay/Zombies/Zombie.hpp"
 
-Zombie :: Zombie(Rectangle hitbox, int hp, float moveSpeed, int damage)
-: health(hp), speed(moveSpeed), attackDamage(damage), attacking(false), hitbox(hitbox)
-{}
+ZombieData::ZombieData(int health, float speed, int damage)
+    : baseHealth(health), moveSpeed(speed), attackDamage(damage) {}
 
-void Zombie :: updateTime(float dt) {
-    animation.updateTime(dt);
+int ZombieData::getBaseHealth() const { return baseHealth; }
+float ZombieData::getMoveSpeed() const { return moveSpeed; }
+int ZombieData::getAttackDamage() const { return attackDamage; }
+float ZombieData::getReanimScalar() const { return reanimScalar; }
+const std::string& ZombieData::getReanimPackage() const { return reanimPackage; }
+const std::string& ZombieData::getReanimAnim() const { return reanimAnim; }
+const std::string& ZombieData::getReanimClip() const { return reanimClip; }
 
-    if (!attacking) {
-        hitbox.x -= speed * dt;
+void ZombieData::setBaseHealth(int health) { baseHealth = health; }
+void ZombieData::setMoveSpeed(float speed) { moveSpeed = speed; }
+void ZombieData::setAttackDamage(int damage) { attackDamage = damage; }
+void ZombieData::setReanimScalar(float scalar) { reanimScalar = scalar; }
+void ZombieData::setReanimPackage(const std::string& package) { reanimPackage = package; }
+void ZombieData::setReanimAnim(const std::string& animation) { reanimAnim = animation; }
+void ZombieData::setReanimClip(const std::string& clip) { reanimClip = clip; }
+
+void Zombie::zombieSetup() {
+    if(!zombieData) {
+        health = attackDamage = 0;
+        speed = 0.0f;
+        return;
     }
+
+    health = zombieData->getBaseHealth();
+    speed = zombieData->getMoveSpeed();
+    attackDamage = zombieData->getAttackDamage();
 }
 
-void Zombie :: setReanimInstance(ReanimInstance anim) {
-    animation = anim;
+void Zombie::setZombieData(ZombieData* data) {
+    zombieData = data;
+    zombieSetup();
 }
 
-void Zombie :: draw(void) {
-    animation.draw(hitbox);
+void Zombie::updateTime(float dt) {
+    animation.updateTime(dt);
+    if(!attacking) hitbox.x -= speed * dt;
 }
 
-void Zombie :: receiveDamage(int damage){
-    health -= damage;
-    if(health < 0) health = 0;
+void Zombie::setReanimInstance(ReanimInstance anim) { animation = anim; }
+void Zombie::draw() { animation.draw(hitbox); }
+
+void Zombie::receiveDamage(int damage) {
+    health = std::max(0, health - damage);
 }
 
-bool Zombie :: isDead(void) const {
-    if(health == 0) return 1;
-    return 0;
-}
+bool Zombie::isDead() const { return health == 0; }
+int Zombie::getHealth() const { return health; }
+float Zombie::getSpeed() const { return speed; }
+int Zombie::getAttackDamage() const { return attackDamage; }
+Rectangle Zombie::getHitbox() const { return hitbox; }
 
-int Zombie :: getHealth(void) const {
-    return health;
-}
-
-float Zombie :: getSpeed(void) const {
-    return speed;
-}
-
-int Zombie :: getAttackDamage(void) const {
-    return attackDamage;
-}
-
-Rectangle Zombie :: getHitbox(void) const {
-    return hitbox;
-}
-
-void Zombie :: setHitbox(Rectangle newHitbox) {
-    hitbox = newHitbox;
-}
-
-void Zombie :: setAttacking(bool isAttacking) {
-    attacking = isAttacking;
-}
-
-bool Zombie :: isAttacking(void) const {
-    return attacking;
-}
+void Zombie::setHitbox(Rectangle newHitbox) { hitbox = newHitbox; }
+void Zombie::setAttacking(bool isAttacking) { attacking = isAttacking; }
+bool Zombie::isAttacking() const { return attacking; }

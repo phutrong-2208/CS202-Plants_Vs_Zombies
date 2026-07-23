@@ -4,9 +4,27 @@ World :: World(int screenWidth, int screenHeight, AssetManager* assetManager)
 {
     map = std::make_unique <DayMap> ();
     if (assetManager) {
-        plantFactory.setTextureManager(assetManager -> getTextureManager());
+        TextureManager* textureManager = assetManager -> getTextureManager();
+
+        plantFactory.setTextureManager(textureManager);
         plantFactory.setAnimationManager(assetManager -> getAnimationManager());
         plantFactory.loadPlantMechanics();
+
+        zombieFactory.setTextureManager(textureManager);
+        zombieFactory.setAnimationManager(assetManager -> getAnimationManager());
+        zombieFactory.loadZombieMechanics();
+
+        zombieManager.addZombie(zombieFactory.createZombie(
+            NORMAL_ZOMBIE, Rectangle{650.0f, 250.0f, 50.0f, 100.0f}
+        )); 
+
+        if (textureManager) {
+            projectileTexturePackage = textureManager -> getPackage("Projectile");
+        }
+
+        if (!projectileTexturePackage) {
+            TraceLog(LOG_WARNING, "Projectile texture package was not found");
+        }
     }
 }
 
@@ -16,7 +34,9 @@ void World :: update(float dt) {
     map -> update(dt);
     if (isReady() == false) return;
 
-    grid.updateTime(dt);
+    grid.updateTime(dt, projectileManager, zombieManager);
+    projectileManager.update(dt);
+    zombieManager.update(dt);
 }
 
 void World :: draw() {
@@ -26,6 +46,8 @@ void World :: draw() {
     if (isReady() == false) return;
 
     grid.draw();
+    projectileManager.simulate();
+    zombieManager.draw();
 }
 
 void World :: drawPlacementPreview(int selectedPlantId) const {

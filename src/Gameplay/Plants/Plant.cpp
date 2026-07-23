@@ -60,6 +60,16 @@ void Plant::plantSetup() {
 
 void Plant::updateTime(float deltaSeconds) {
     animation.updateTime(deltaSeconds);
+
+    if(cooldownTimer > 0.0f){
+        cooldownTimer -= deltaSeconds;
+    }
+}
+void Plant::setBounds(Rectangle newBounds) {
+    bounds = newBounds;
+}
+Rectangle Plant::getBounds() const {
+    return bounds;
 }
 void Plant::draw(Rectangle hitbox) {
     animation.draw(hitbox);   
@@ -71,6 +81,9 @@ void Plant::setPlantData(PlantData* pData) {
     plantData = pData;
 
     plantSetup();
+}
+bool Plant :: hasTarget(const ZombieManager& zombieManager) const {
+    return false;
 }
 
 

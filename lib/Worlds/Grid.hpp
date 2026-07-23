@@ -23,7 +23,11 @@ public:
     std::pair <int, int> getCellID(Vector2 position) const;
     Rectangle getCellRect(int row, int col) const;
 
-    void updateTime(float deltaSeconds);
+    void updateTime(
+        float deltaSeconds,
+        ProjectileManager& projectileManager,
+        const ZombieManager& zombieManager
+    );
     void draw();
     
     bool placePlant(int row, int col, std :: unique_ptr<Plant> plant);

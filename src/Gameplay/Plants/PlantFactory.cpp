@@ -215,5 +215,18 @@ std::unique_ptr <Plant> PlantFactory::createPlant(PlantType pType) {
         );
     }
 
+    ///THIS JUST FOR TESTING, WOULD BE DELETED WHEN THE STRUCTURE IS DONE
+    if (pType == PEASHOOTER && textureManager) {
+        auto* peashooter = static_cast<Peashooter*>(plantPtr.get());
+        TexturePackage* projectilePackage =
+            textureManager->getPackage("Projectile");
+
+        if (projectilePackage) {
+            peashooter->setProjectileTexture(
+                projectilePackage->GetTexture("PROJECTILEPEA")
+            );
+        }
+    }
+
     return plantPtr;
 }

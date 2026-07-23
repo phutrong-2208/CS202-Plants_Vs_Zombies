@@ -7,6 +7,17 @@
 #include <Worlds/Map.hpp>
 #include <Worlds/DayMap.hpp>
 #include <Gameplay/Plants/PlantFactory.hpp>
+#include <Gameplay/Zombies/ZombieFactory.hpp>
+#include <Gameplay/Zombies/ZombieManager.hpp>
+
+//Projectiles
+
+#include "Gameplay/Projectile/ProjectileManager.hpp"
+#include "Gameplay/Projectile/Projectile.hpp"
+#include "Gameplay/Projectile/PeaProjectile.hpp"
+#include "Gameplay/Projectile/SnowPeaProjectile.hpp"
+#include "Gameplay/Projectile/CactusProjectile.hpp"
+#include "Gameplay/Projectile/StarProjectile.hpp"
 
 
 class World {
@@ -14,6 +25,10 @@ private:
     std::unique_ptr <Map> map = nullptr;
     Grid grid;
     PlantFactory plantFactory;
+    ZombieFactory zombieFactory;
+    ZombieManager zombieManager;
+    ProjectileManager projectileManager;
+    TexturePackage* projectileTexturePackage = nullptr;
     // static const int NUM_ROWS = 5, NUM_COLS = 9;
 public:
     World() = default;

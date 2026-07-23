@@ -33,7 +33,7 @@ protected:
     Texture2D background = {};
     bool hasBackground = false;
 
-    void loadBackground(const std::string& path, Rectangle cropRect, Rectangle lawnRect);
+    void loadBackground(const std :: string& path, Rectangle cropRect, Rectangle lawnRect);
     float getSlideProgress() const;
     float getSlidingCropX() const;
     Rectangle getViewportDest() const;

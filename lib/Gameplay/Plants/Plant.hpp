@@ -4,6 +4,9 @@
 #include <Core/TextureManager.hpp>
 #include <Core/AnimationManager.hpp>
 #include <Gameplay/Animation/ReanimInstance.hpp>
+#include <Gameplay/Zombies/ZombieManager.hpp>
+
+class ProjectileManager;
 
 enum PlantType : int {
     PEASHOOTER,
@@ -55,6 +58,7 @@ protected:
     float cooldownTimer = 0.0f;
     PlantData* plantData = nullptr;
     ReanimInstance animation;
+    Rectangle bounds = {0.0f, 0.0f, 0.0f, 0.0f};
 
     void plantSetup();
 public:
@@ -62,7 +66,15 @@ public:
     virtual ~Plant() = default;
     void receiveDamage(int damage);
 
+    virtual void attack(
+        ProjectileManager& projectileManager,
+        const ZombieManager& zombieManager
+    ) {}
+    virtual bool hasTarget(const ZombieManager& zombieManager) const;
+
     void updateTime(float deltaSeconds);
+    void setBounds(Rectangle newBounds);
+    Rectangle getBounds() const;
     void setReanimInstance(ReanimInstance anim);
     void setPlantData(PlantData* pData);
     void draw(Rectangle hitbox);

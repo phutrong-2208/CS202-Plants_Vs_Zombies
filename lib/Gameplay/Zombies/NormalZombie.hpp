@@ -5,7 +5,7 @@
 
 class NormalZombie : public Zombie {
 public:
-    NormalZombie(Rectangle hitbox);
+    NormalZombie() = default;
 };
 
 #endif

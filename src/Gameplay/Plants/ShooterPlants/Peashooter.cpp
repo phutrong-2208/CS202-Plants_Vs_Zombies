@@ -1,3 +1,50 @@
 #include "Gameplay/Plants/ShooterPlants/Peashooter.hpp"
+#include "Gameplay/Projectile/PeaProjectile.hpp"
+#include "Gameplay/Projectile/ProjectileManager.hpp"
 
-Peashooter::Peashooter() = default;
+Peashooter :: Peashooter() = default;
+
+void Peashooter :: setProjectileTexture(Texture2D* texture) {
+    peaTexture = texture;
+}
+
+Vector2 Peashooter :: getProjectileSpawnPosition() const {
+    // PeashooterSingle.reanim mouth track, including its 1.5 render scalar.
+    return {bounds.x + 108.0f, bounds.y + 45.0f};
+}
+
+bool Peashooter :: hasTarget(const ZombieManager& zombieManager) const {
+    if(!plantData) return false;
+
+    const Vector2 spawnPosition = getProjectileSpawnPosition();
+    const Rectangle sensor = {
+        spawnPosition.x,
+        bounds.y,
+        plantData -> getProjectileRange(),
+        bounds.height
+    };
+
+    return zombieManager.hasZombieInArea(sensor);
+}
+
+void Peashooter :: attack(
+    ProjectileManager& projectileManager,
+    const ZombieManager& zombieManager
+) {
+    if(!plantData || !peaTexture) return;
+    if(cooldownTimer > 0.0f) return;
+    if(!hasTarget(zombieManager)) return;
+
+    projectileManager.addNew(
+        std :: make_unique<PeaProjectile>(
+            getProjectileSpawnPosition(),
+            Vector2{300.0f, 0.0f},
+            static_cast<int>(plantData -> getDamage(false)),
+            12.0f,
+            plantData -> getProjectileRange(),
+            peaTexture
+        )
+    );
+
+    cooldownTimer = plantData -> getProjectileCooldown();
+}
