@@ -9,11 +9,7 @@ private:
 
 public:
   TexturePackage() = default;
-  ~TexturePackage() {
-    for (auto &x : textures) {
-      UnloadTexture(x.second);
-    }
-  }
+  ~TexturePackage() = default;
 
   // Prevent copies — GPU texture handles would double-free
   TexturePackage(const TexturePackage &) = delete;

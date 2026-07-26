@@ -1,11 +1,5 @@
 #include <Core/TextManager.hpp>
 
-TextManager :: ~TextManager() {
-    for (auto& font : fonts) {
-        UnloadFont(font.second);
-    }
-}
-
 void TextManager :: addFont(const std :: string& key, const std :: string& path) {
     std :: string fontKey = normalizeKey(key);
     if (fonts.find(fontKey) != fonts.end()) {

@@ -1,5 +1,5 @@
 #include "Gameplay/Plants/ShooterPlants/Peashooter.hpp"
-#include "Gameplay/Projectile/PeaProjectile.hpp"
+#include "Gameplay/Projectile/Projectile.hpp"
 #include "Gameplay/Projectile/ProjectileManager.hpp"
 
 Peashooter :: Peashooter() = default;
@@ -36,7 +36,7 @@ void Peashooter :: attack(
     if(!hasTarget(zombieManager)) return;
 
     projectileManager.addNew(
-        std :: make_unique<PeaProjectile>(
+        std :: make_unique<Projectile>(
             getProjectileSpawnPosition(),
             Vector2{300.0f, 0.0f},
             static_cast<int>(plantData -> getDamage(false)),

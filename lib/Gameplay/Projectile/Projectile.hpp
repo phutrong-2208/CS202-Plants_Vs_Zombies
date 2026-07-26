@@ -3,6 +3,21 @@
 
 #include "Common.hpp"
 
+class ProjectileData {
+private:
+    int damage = 0;
+    float radius = 0.0f;
+    float range = 0.0f;
+    Vector2 velocity = {0.0f, 0.0f};
+    std::string textureName = "";
+public:
+    void setDamage(int damage);
+    void setRadius(float radius);
+    void setRange(float range);
+    void setVelocity(Vector2 velocity);
+    void setTextureName(const std::string& textureName);    
+};
+
 class Projectile{
 private:
     int damage = 0;
@@ -16,7 +31,7 @@ private:
     bool despawned = false;
 public:
     Projectile() = default;
-    Projectile(Vector2 pos, Vector2 vel, int _damage, float _radius, float _range);
+    Projectile(Vector2 pos, Vector2 vel, int _damage, float _radius, float _range, Texture2D* tex);
     virtual ~Projectile() = default;
 
     void setTexture(Texture2D *newTexture);

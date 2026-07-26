@@ -1,11 +1,34 @@
 #include "Gameplay/Projectile/Projectile.hpp"
 
-Projectile :: Projectile(Vector2 pos, Vector2 vel, int _damage, float _radius, float _range): 
+///////////////////////////////
+///     PROJECTILE DATA     ///
+///////////////////////////////
+void ProjectileData::setDamage(int damage) {
+    this -> damage = damage;
+}
+void ProjectileData::setRadius(float radius) {
+    this -> radius = radius;
+}
+void ProjectileData::setRange(float range) {
+    this -> range = range;
+}
+void ProjectileData::setVelocity(Vector2 velocity) {
+    this -> velocity = velocity;
+}
+void ProjectileData::setTextureName(const std::string& textureName) {
+    this -> textureName = textureName;
+}
+
+/////////////////////////////////// 
+///     PROJECTILE MECHANICS    ///
+///////////////////////////////////
+
+Projectile :: Projectile(Vector2 pos, Vector2 vel, int _damage, float _radius, float _range, Texture2D* tex): 
     damage(std :: max(0, _damage)),
     radius(std :: max(0.0f, _radius)),
     range(std :: max(0.0f, _range)),
     position(pos),
-    velocity(vel) {}
+    velocity(vel), texture(tex) {}
 
 void Projectile :: setTexture(Texture2D* newTexture){
     texture = newTexture;
