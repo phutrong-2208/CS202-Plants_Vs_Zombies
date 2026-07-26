@@ -7,6 +7,7 @@
 
 enum ZombieType : int {
     NORMAL_ZOMBIE,
+    DANCER_ZOMBIE,
     ZOMBIE_COUNT
 };
 

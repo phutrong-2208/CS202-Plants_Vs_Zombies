@@ -1,14 +1,14 @@
 #include "Gameplay/Zombies/ZombieFactory.hpp"
-#include "Gameplay/Zombies/NormalZombie.hpp"
 
 namespace {
     const std::map<std::string, ZombieType> zombieTypeNameMap = {
-        {"NORMAL_ZOMBIE", NORMAL_ZOMBIE}
+        {"NORMAL_ZOMBIE", NORMAL_ZOMBIE},
+        {"DANCER_ZOMBIE", DANCER_ZOMBIE}
     };
 }
 
 ZombieDataset::ZombieDataset() {
-    loadFromFile(std::string(PROJECT_DIR) + "assets/data/stats/ZombieConfig.txt");
+    loadFromFile(std::string(PROJECT_DIR) + "assets/data/config/ZombieConfig.txt");
 }
 
 void ZombieDataset::loadFromFile(const std::string& filepath) {
@@ -82,7 +82,10 @@ void ZombieFactory::setAnimationManager(AnimationManager* manager) {
 void ZombieFactory::loadZombieMechanics() {
     zombieDataStorage = std::make_unique<ZombieDataset>();
     creatorMap[NORMAL_ZOMBIE] = []() {
-        return std::make_unique<NormalZombie>();
+        return std::make_unique<Zombie>();
+    };
+    creatorMap[DANCER_ZOMBIE] = []() {
+        return std::make_unique<Zombie>();
     };
 }
 

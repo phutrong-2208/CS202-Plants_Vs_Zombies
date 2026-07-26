@@ -3,28 +3,38 @@
 World :: World(int screenWidth, int screenHeight, AssetManager* assetManager)
 {
     map = std::make_unique <DayMap> ();
-    if (assetManager) {
-        TextureManager* textureManager = assetManager -> getTextureManager();
+    if (assetManager == nullptr) {
+        TraceLog(LOG_ERROR, "Asset Manager was not found");
+        return;
+    }
 
-        plantFactory.setTextureManager(textureManager);
-        plantFactory.setAnimationManager(assetManager -> getAnimationManager());
-        plantFactory.loadPlantMechanics();
+    TextureManager* textureManager = assetManager -> getTextureManager();
 
-        zombieFactory.setTextureManager(textureManager);
-        zombieFactory.setAnimationManager(assetManager -> getAnimationManager());
-        zombieFactory.loadZombieMechanics();
+    plantFactory.setTextureManager(textureManager);
+    plantFactory.setAnimationManager(assetManager -> getAnimationManager());
+    plantFactory.loadPlantMechanics();
 
-        zombieManager.addZombie(zombieFactory.createZombie(
-            NORMAL_ZOMBIE, Rectangle{650.0f, 250.0f, 50.0f, 100.0f}
+    zombieFactory.setTextureManager(textureManager);
+    zombieFactory.setAnimationManager(assetManager -> getAnimationManager());
+    zombieFactory.loadZombieMechanics();
+
+    for (int i = 0; i < 5; ++i) {
+        if (i % 2 == 0) zombieManager.addZombie(zombieFactory.createZombie(
+            NORMAL_ZOMBIE, Rectangle {grid.getCellRect(i, 8).x, grid.getCellRect(i, 8).y - 40.0f, 50.0f, 100.0f}
         )); 
 
-        if (textureManager) {
-            projectileTexturePackage = textureManager -> getPackage("Projectile");
-        }
+        if (i % 2 == 1) zombieManager.addZombie(zombieFactory.createZombie(
+            DANCER_ZOMBIE, Rectangle {grid.getCellRect(i, 8).x, grid.getCellRect(i, 8).y - 40.0f, 50.0f, 100.0f}
+        ));
+    }
+     
 
-        if (!projectileTexturePackage) {
-            TraceLog(LOG_WARNING, "Projectile texture package was not found");
-        }
+    if (textureManager) {
+        projectileTexturePackage = textureManager -> getPackage("Projectile");
+    }
+
+    if (!projectileTexturePackage) {
+        TraceLog(LOG_WARNING, "Projectile texture package was not found");
     }
 }
 

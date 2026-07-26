@@ -50,6 +50,13 @@ public:
     void setReanimPackage(const std::string& package);
     void setReanimAnim(const std::string& anim);
     void setReanimClip(const std::string& clip);
+
+    void setBaseHealth(float health);
+    void setBaseDamage(float damage);
+    void setBuffDamage(float damage);
+    void setSunCost(int cost);
+    void setProjectileCooldown(float cooldown);
+    void setProjectileRange(float range);
 };
 
 class Plant {

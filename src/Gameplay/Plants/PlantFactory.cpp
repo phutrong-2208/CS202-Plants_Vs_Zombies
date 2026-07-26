@@ -26,7 +26,7 @@ static const std::map<std::string, PlantType> plantTypeNameMap = {
 ///////////////////////////
 
 PlantDataset::PlantDataset() {
-    std::string configPath = std::string(PROJECT_DIR) + "assets/data/stats/PlantConfig.txt";
+    std::string configPath = std::string(PROJECT_DIR) + "assets/data/config/PlantConfig.txt";
     loadFromFile(configPath);
 }
 
@@ -80,63 +80,17 @@ void PlantDataset::loadFromFile(const std::string& filepath) {
         std::string value = line.substr(eqPos + 1);
 
         if (key == "HEALTH") {
-            // Use the existing constructor parameters approach via a temporary rebuild,
-            // or set fields directly. We use setters for reanim, and reconstruct for stats.
-            // For simplicity, we'll build the PlantData using a full constructor at the end.
-            // Instead, let's parse into the PlantData object field by field.
-            *currentData = PlantData(
-                std::stof(value),
-                currentData->getDamage(false),
-                currentData->getDamage(true),
-                currentData->getSunCost(),
-                currentData->getProjectileCooldown(),
-                currentData->getProjectileRange()
-            );
+            currentData->setBaseHealth(std::stof(value));
         } else if (key == "SUN_COST") {
-            *currentData = PlantData(
-                currentData->getBaseHealth(),
-                currentData->getDamage(false),
-                currentData->getDamage(true),
-                std::stoi(value),
-                currentData->getProjectileCooldown(),
-                currentData->getProjectileRange()
-            );
+            currentData->setSunCost(std::stoi(value));
         } else if (key == "BASE_DAMAGE") {
-            *currentData = PlantData(
-                currentData->getBaseHealth(),
-                std::stof(value),
-                currentData->getDamage(true),
-                currentData->getSunCost(),
-                currentData->getProjectileCooldown(),
-                currentData->getProjectileRange()
-            );
+            currentData->setBaseDamage(std::stof(value));
         } else if (key == "BUFF_DAMAGE") {
-            *currentData = PlantData(
-                currentData->getBaseHealth(),
-                currentData->getDamage(false),
-                std::stof(value),
-                currentData->getSunCost(),
-                currentData->getProjectileCooldown(),
-                currentData->getProjectileRange()
-            );
+            currentData->setBuffDamage(std::stof(value));
         } else if (key == "COOLDOWN") {
-            *currentData = PlantData(
-                currentData->getBaseHealth(),
-                currentData->getDamage(false),
-                currentData->getDamage(true),
-                currentData->getSunCost(),
-                std::stof(value),
-                currentData->getProjectileRange()
-            );
+            currentData->setProjectileCooldown(std::stof(value));
         } else if (key == "RANGE") {
-            *currentData = PlantData(
-                currentData->getBaseHealth(),
-                currentData->getDamage(false),
-                currentData->getDamage(true),
-                currentData->getSunCost(),
-                currentData->getProjectileCooldown(),
-                std::stof(value)
-            );
+            currentData->setProjectileRange(std::stof(value));
         } else if (key == "REANIM_SCALAR") {
             currentData->setReanimScalar(std::stof(value));
         } else if (key == "REANIM_PACKAGE") {

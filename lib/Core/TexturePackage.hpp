@@ -3,20 +3,24 @@
 
 #include "Common.hpp"
 
-class TexturePackage{
+class TexturePackage {
 private:
-    std :: unordered_map<std :: string, Texture2D> textures;
+  std ::unordered_map<std ::string, Texture2D> textures;
 
-public: 
-    ~TexturePackage(){
-        for(auto&x : textures){
-            UnloadTexture(x.second);
-        }
+public:
+  TexturePackage() = default;
+  ~TexturePackage() {
+    for (auto &x : textures) {
+      UnloadTexture(x.second);
     }
+  }
 
-    void AddTexture(const std :: string& name, const std :: string& path);
-    Texture2D* GetTexture(const std :: string &name);
-};  
+  // Prevent copies — GPU texture handles would double-free
+  TexturePackage(const TexturePackage &) = delete;
+  TexturePackage &operator=(const TexturePackage &) = delete;
 
+  void AddTexture(const std ::string &name, const std ::string &path);
+  Texture2D *GetTexture(const std ::string &name);
+};
 
 #endif

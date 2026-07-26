@@ -50,6 +50,13 @@ void PlantData::setReanimClip(const std::string& clip) {
     reanimClip = clip;
 }
 
+void PlantData::setBaseHealth(float health) { baseHealth = health; }
+void PlantData::setBaseDamage(float damage) { baseDamage = damage; }
+void PlantData::setBuffDamage(float damage) { buffDamage = damage; }
+void PlantData::setSunCost(int cost) { sunCost = cost; }
+void PlantData::setProjectileCooldown(float cooldown) { projectileCooldown = cooldown; }
+void PlantData::setProjectileRange(float range) { projectileRange = range; }
+
 void Plant::plantSetup() {
     if (plantData == nullptr) {
         health = cooldownTimer = 0; return;

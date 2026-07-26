@@ -11,7 +11,12 @@ private:
     std :: string normalizeKey(const std :: string& key) const;
 
 public:
+    TextManager() = default;
     ~TextManager();
+
+    // Prevent copies — font GPU handles would double-free
+    TextManager(const TextManager&) = delete;
+    TextManager& operator=(const TextManager&) = delete;
 
     void addFont(const std :: string& key, const std :: string& path);
     void addAlias(const std :: string& alias, const std :: string& key);
