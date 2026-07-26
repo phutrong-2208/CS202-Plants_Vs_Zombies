@@ -4,9 +4,8 @@
 #include <Core/TextureManager.hpp>
 #include <Core/AnimationManager.hpp>
 #include <Gameplay/Animation/ReanimInstance.hpp>
+#include <Gameplay/Projectile/ProjectileManager.hpp>
 #include <Gameplay/Zombies/ZombieManager.hpp>
-
-class ProjectileManager;
 
 enum PlantType : int {
     PEASHOOTER,

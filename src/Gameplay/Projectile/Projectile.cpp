@@ -3,14 +3,8 @@
 ///////////////////////////////
 ///     PROJECTILE DATA     ///
 ///////////////////////////////
-void ProjectileData::setDamage(int damage) {
-    this -> damage = damage;
-}
 void ProjectileData::setRadius(float radius) {
     this -> radius = radius;
-}
-void ProjectileData::setRange(float range) {
-    this -> range = range;
 }
 void ProjectileData::setVelocity(Vector2 velocity) {
     this -> velocity = velocity;
@@ -19,23 +13,44 @@ void ProjectileData::setTextureName(const std::string& textureName) {
     this -> textureName = textureName;
 }
 
+float ProjectileData::getRadius() const {
+    return radius;
+}
+Vector2 ProjectileData::getVelocity() const {
+    return velocity;
+}
+const std::string& ProjectileData::getTextureName() const {
+    return textureName;
+}
+
 /////////////////////////////////// 
 ///     PROJECTILE MECHANICS    ///
 ///////////////////////////////////
 
-Projectile :: Projectile(Vector2 pos, Vector2 vel, int _damage, float _radius, float _range, Texture2D* tex): 
-    damage(std :: max(0, _damage)),
+Projectile :: Projectile(Vector2 pos, Vector2 vel, float _damage, float _radius, float _range, Texture2D* tex): 
+    damage(std :: max(0.0f, _damage)),
     radius(std :: max(0.0f, _radius)),
     range(std :: max(0.0f, _range)),
     position(pos),
     velocity(vel), texture(tex) {}
 
+Projectile :: Projectile(Vector2 pos, ProjectileData* _projData, float _damage, float _range, Texture2D* tex)
+    : projData(_projData), damage(std :: max(0.0f, _damage)), range(std :: max(0.0f, _range)), texture(tex)
+{
+    position = pos;
+    
+    if (projData) {
+        velocity = projData -> getVelocity();
+        radius   = std :: max(0.0f, projData -> getRadius());
+    }
+}
+
 void Projectile :: setTexture(Texture2D* newTexture){
     texture = newTexture;
 }
 
-void Projectile :: setDamage(int _d){
-    damage = std :: max(0, _d);
+void Projectile :: setDamage(float _d){
+    damage = std :: max(0.0f, _d);
 }
 void Projectile :: setPosition(Vector2 newPos){
     position = newPos;
@@ -44,7 +59,7 @@ void Projectile :: setVelocity(Vector2 veloc){
     velocity = veloc;
 }
 
-int Projectile :: getDamage(void) const{
+float Projectile :: getDamage(void) const{
     return damage;
 }
 float Projectile :: getRadius(void) const{

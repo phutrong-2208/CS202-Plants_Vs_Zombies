@@ -2,7 +2,7 @@
 #define PROJECTILE_MANAGER_HPP
 
 #include "Common.hpp"
-#include "Projectile.hpp"
+#include <Gameplay/Projectile/Projectile.hpp>
 
 class ProjectileManager {
 private:

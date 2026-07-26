@@ -14,10 +14,6 @@
 
 #include "Gameplay/Projectile/ProjectileManager.hpp"
 #include "Gameplay/Projectile/Projectile.hpp"
-#include "Gameplay/Projectile/PeaProjectile.hpp"
-#include "Gameplay/Projectile/SnowPeaProjectile.hpp"
-#include "Gameplay/Projectile/CactusProjectile.hpp"
-#include "Gameplay/Projectile/StarProjectile.hpp"
 
 
 class World {
