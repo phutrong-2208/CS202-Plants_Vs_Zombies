@@ -1,6 +1,6 @@
 #include "Gameplay/Zombies/Zombie.hpp"
 
-ZombieData::ZombieData(int health, float speed, int damage)
+ZombieData::ZombieData(float health, float speed, int damage)
     : baseHealth(health), moveSpeed(speed), attackDamage(damage) {}
 
 int ZombieData::getBaseHealth() const { return baseHealth; }
@@ -11,7 +11,7 @@ const std::string& ZombieData::getReanimPackage() const { return reanimPackage; 
 const std::string& ZombieData::getReanimAnim() const { return reanimAnim; }
 const std::string& ZombieData::getReanimClip() const { return reanimClip; }
 
-void ZombieData::setBaseHealth(int health) { baseHealth = health; }
+void ZombieData::setBaseHealth(float health) { baseHealth = health; }
 void ZombieData::setMoveSpeed(float speed) { moveSpeed = speed; }
 void ZombieData::setAttackDamage(int damage) { attackDamage = damage; }
 void ZombieData::setReanimScalar(float scalar) { reanimScalar = scalar; }
@@ -44,12 +44,12 @@ void Zombie::updateTime(float dt) {
 void Zombie::setReanimInstance(ReanimInstance anim) { animation = anim; }
 void Zombie::draw() { animation.draw(hitbox); }
 
-void Zombie::receiveDamage(int damage) {
-    health = std::max(0, health - damage);
+void Zombie::receiveDamage(float damage) {
+    health = std::max(0.0f, health - damage);
 }
 
 bool Zombie::isDead() const { return health == 0; }
-int Zombie::getHealth() const { return health; }
+float Zombie::getHealth() const { return health; }
 float Zombie::getSpeed() const { return speed; }
 int Zombie::getAttackDamage() const { return attackDamage; }
 Rectangle Zombie::getHitbox() const { return hitbox; }

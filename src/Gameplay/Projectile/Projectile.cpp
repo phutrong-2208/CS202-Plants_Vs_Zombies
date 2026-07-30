@@ -33,21 +33,20 @@ const std::string& ProjectileData::getTextureName() const {
 ///     PROJECTILE MECHANICS    ///
 ///////////////////////////////////
 
-Projectile :: Projectile(Vector2 pos, Vector2 vel, float _damage, float _radius, float _range, Texture2D* tex): 
-    damage(std :: max(0.0f, _damage)),
-    radius(std :: max(0.0f, _radius)),
-    range(std :: max(0.0f, _range)),
-    position(pos),
-    velocity(vel), texture(tex) {}
+// Projectile :: Projectile(Vector2 pos, Vector2 vel, float _damage, float _radius, float _range, Texture2D* tex): 
+//     damage(std :: max(0.0f, _damage)),
+//     radius(std :: max(0.0f, _radius)),
+//     range(std :: max(0.0f, _range)),
+//     position(pos),
+//     velocity(vel), texture(tex) {}
 
 Projectile :: Projectile(Vector2 pos, ProjectileData* _projData, float _damage, float _range, Texture2D* tex)
-    : projData(_projData), damage(std :: max(0.0f, _damage)), range(std :: max(0.0f, _range)), texture(tex)
+    : projData(_projData), damage(std :: max(0.0f, _damage)), texture(tex)
 {
     position = pos;
     
     if (projData) {
         velocity = projData -> getVelocity();
-        radius   = std :: max(0.0f, projData -> getRadius());
     }
 }
 
@@ -69,15 +68,16 @@ float Projectile :: getDamage(void) const{
     return damage;
 }
 float Projectile :: getRadius(void) const{
-    return radius;
+    return projData ? projData -> getRadius() : 0.0f;
 }
 float Projectile :: getRange(void) const{
-    return range;
+    return projData ? projData -> getRange() : 0.0f;
 }
 Vector2 Projectile :: getPosition(void) const{
     return position;
 } 
 Rectangle Projectile::getHitbox(void) const {
+    float radius = getRadius();
     return Rectangle{position.x - radius, position.y - radius, 2.0f * radius, 2.0f * radius};
 }
 
@@ -105,7 +105,8 @@ void Projectile :: update(float dt){
 
     totalDistance += Vector2Length(movement);
 
-    if(totalDistance >= range){
+
+    if(totalDistance >= getRange()){
         Despawn();
     }
 }

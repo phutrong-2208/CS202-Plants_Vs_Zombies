@@ -6,6 +6,8 @@
 class Cactus : public Plant {
 public:
     Cactus();
+    PlantType getType() override;
+    Vector2 getProjectileSpawnPosition() override;
 };
 
 #endif

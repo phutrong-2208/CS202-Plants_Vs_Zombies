@@ -6,6 +6,7 @@
 class Sunflower : public Plant {
 public:
     Sunflower();
+    PlantType getType() override;
 };
 
 #endif

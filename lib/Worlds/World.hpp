@@ -9,10 +9,13 @@
 #include <Worlds/Map.hpp>
 #include <Worlds/DayMap.hpp>
 #include <Gameplay/Plants/PlantFactory.hpp>
+
+
+// Zombies
 #include <Gameplay/Zombies/ZombieFactory.hpp>
 #include <Gameplay/Zombies/ZombieManager.hpp>
 
-//Projectiles
+// Projectiles
 
 #include "Gameplay/Projectile/ProjectileManager.hpp"
 #include "Gameplay/Projectile/ProjectileFactory.hpp"
@@ -28,11 +31,11 @@ private:
     ZombieManager zombieManager;
     ProjectileManager projectileManager;
     ProjectileFactory projectileFactory;
-    // TexturePackage* projectileTexturePackage = nullptr;
-    // static const int NUM_ROWS = 5, NUM_COLS = 9;
+
 
     void addProjectile(PlantType plantType, Vector2 position, float damage) override;
     bool hasTarget(PlantType plantType, Vector2 spawnPos, Rectangle bounds) override;
+    bool touchTarget(Projectile* projectile) override;
 public:
     World() = default;
     ~World() = default;

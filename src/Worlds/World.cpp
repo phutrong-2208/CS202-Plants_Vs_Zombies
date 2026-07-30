@@ -3,20 +3,36 @@
 ///////////////////////////////
 ///     IGAMEPLAYMEDIATOR   ///
 ///////////////////////////////
+
 void World::addProjectile(PlantType plantType, Vector2 position, float damage) {
-    auto bullet = projectileFactory.createProjectile(projectileConvert.at(plantType),
-                                                   position, damage);
+    if (projectileConvert.find(plantType) == projectileConvert.end()) return;
+
+    auto bullet = projectileFactory.createProjectile(projectileConvert.at(plantType), position, damage);
     projectileManager.addProjectile(std::move(bullet));
 }
 bool World::hasTarget(PlantType plantType, Vector2 spawnPos, Rectangle bounds) {
     if (projectileConvert.find(plantType) == projectileConvert.end()) return false;
-    
+
     float range = 0.0f;
     auto projData = projectileFactory.getProjectileData(projectileConvert.at(plantType));
     if (projData) range = projData->getRange();
 
     Rectangle sensor = {spawnPos.x, bounds.y, range, bounds.height};
     return zombieManager.hasZombieInArea(sensor);
+}
+
+bool World::touchTarget(Projectile* projectile) {
+    if (projectile == nullptr) return false;
+    Rectangle hitbox = projectile -> getHitbox();
+
+    Zombie* zombie = zombieManager.getShotFirst(hitbox);
+
+    if (zombie != nullptr) {
+        zombie -> receiveDamage(projectile -> getDamage());
+        return true;
+    }
+
+    return false;
 }
 
 World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
@@ -54,6 +70,8 @@ World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
     }
 
     grid.setMediator(this);
+    projectileManager.setMediator(this);
+    zombieManager.setMediator(this);
 }
 
 void World ::update(float dt) {
@@ -69,6 +87,7 @@ void World ::update(float dt) {
     zombieManager.update(dt);
 
     grid.sendPlantAttacks();
+    projectileManager.toggleProjectiles();
 }
 
 void World ::draw() {

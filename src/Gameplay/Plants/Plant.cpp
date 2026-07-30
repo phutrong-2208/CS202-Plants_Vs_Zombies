@@ -53,11 +53,11 @@ void PlantData::setSunCost(int cost) { sunCost = cost; }
 void PlantData::setProjectileCooldown(float cooldown) { projectileCooldown = cooldown; }
 
 void Plant::plantSetup() {
+    cooldownTimer = 0.0f;
     if (plantData == nullptr) {
-        health = cooldownTimer = 0; return;
+        health = 0; return;
     }
     health = plantData -> getBaseHealth();
-    cooldownTimer = plantData -> getProjectileCooldown();
 }
 
 void Plant::updateTime(float deltaSeconds) {

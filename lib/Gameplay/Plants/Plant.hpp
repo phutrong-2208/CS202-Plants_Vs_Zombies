@@ -4,8 +4,6 @@
 #include <Core/TextureManager.hpp>
 #include <Core/AnimationManager.hpp>
 #include <Gameplay/Animation/ReanimInstance.hpp>
-#include <Gameplay/Projectile/ProjectileManager.hpp>
-#include <Gameplay/Zombies/ZombieManager.hpp>
 
 enum PlantType : int {
     PEASHOOTER,
@@ -70,12 +68,6 @@ public:
     Plant() = default;
     virtual ~Plant() = default;
     void receiveDamage(int damage);
-
-    // virtual void attack(
-    //     ProjectileManager& projectileManager,
-    //     const ZombieManager& zombieManager
-    // ) {}
-    // virtual bool hasTarget(const ZombieManager& zombieManager) const;
 
     void updateTime(float deltaSeconds);
     void resetCooldown();

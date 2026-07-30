@@ -6,7 +6,7 @@
 
 class Grid {
 private:
-    IGameplayMediator* gameplayMediator;
+    IGameplayMediator* gameplayMediator = nullptr;
     static const int NUM_ROWS = 5, NUM_COLS = 9;
 
     // Original PopCap viewport

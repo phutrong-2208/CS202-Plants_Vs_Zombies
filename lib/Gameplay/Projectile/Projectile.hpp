@@ -33,8 +33,6 @@ class Projectile {
 private:
     ProjectileData* projData = nullptr;
     float damage = 0;
-    float radius = 0.0f;
-    float range = 0.0f;
     float totalDistance = 0.0f; //total distance the projectile travelled
     Vector2 position = {0.0f, 0.0f};
     Vector2 velocity = {0.0f, 0.0f};
@@ -43,7 +41,7 @@ private:
     bool despawned = false;
 public:
     Projectile() = default;
-    Projectile(Vector2 pos, Vector2 vel, float _damage, float _radius, float _range, Texture2D* tex);
+    // Projectile(Vector2 pos, Vector2 vel, float _damage, float _radius, float _range, Texture2D* tex);
 
     // Data-driven constructor: velocity/radius from ProjectileData, damage and range from caller
     Projectile(Vector2 pos, ProjectileData* projData, float damage, float range, Texture2D* tex);
