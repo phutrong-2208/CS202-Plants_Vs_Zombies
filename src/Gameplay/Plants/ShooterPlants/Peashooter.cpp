@@ -1,10 +1,12 @@
 #include "Gameplay/Plants/ShooterPlants/Peashooter.hpp"
-#include "Gameplay/Projectile/Projectile.hpp"
-#include "Gameplay/Projectile/ProjectileManager.hpp"
 
 Peashooter ::Peashooter() = default;
 
-Vector2 Peashooter ::getProjectileSpawnPosition() const {
+PlantType Peashooter::getType() {
+    return PEASHOOTER;
+}
+
+Vector2 Peashooter ::getProjectileSpawnPosition() {
     // PeashooterSingle.reanim mouth track, including its 1.5 render scalar.
     return {bounds.x + 108.0f, bounds.y + 45.0f};
 }

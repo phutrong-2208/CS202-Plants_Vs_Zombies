@@ -57,8 +57,10 @@ public:
 
 class Plant {
 protected:
-    int health = 0;
+    float health = 0;
     float cooldownTimer = 0.0f;
+    bool buffed = false;
+
     PlantData* plantData = nullptr;
     ReanimInstance animation;
     Rectangle bounds = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -76,17 +78,23 @@ public:
     // virtual bool hasTarget(const ZombieManager& zombieManager) const;
 
     void updateTime(float deltaSeconds);
+    void resetCooldown();
 
     void setBounds(Rectangle newBounds);
     Rectangle getBounds() const;
+
+    virtual Vector2 getProjectileSpawnPosition();
+    virtual PlantType getType();
     
     void setReanimInstance(ReanimInstance anim);
     void setPlantData(PlantData* pData);
     void draw(Rectangle hitbox);
     
     bool isDead() const;
-    int getHealth() const;
+    bool isOnCooldown() const;
+    float getHealth() const;
     int getCost() const;
+    float getDamage() const;
 };
 
 #endif

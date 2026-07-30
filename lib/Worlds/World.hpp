@@ -31,7 +31,8 @@ private:
     // TexturePackage* projectileTexturePackage = nullptr;
     // static const int NUM_ROWS = 5, NUM_COLS = 9;
 
-    void addProjectile(ProjectileType projType, Vector2 position, float damage) override;
+    void addProjectile(PlantType plantType, Vector2 position, float damage) override;
+    bool hasTarget(PlantType plantType, Vector2 spawnPos, Rectangle bounds) override;
 public:
     World() = default;
     ~World() = default;

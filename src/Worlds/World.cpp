@@ -3,81 +3,94 @@
 ///////////////////////////////
 ///     IGAMEPLAYMEDIATOR   ///
 ///////////////////////////////
-void World::addProjectile(ProjectileType projType, Vector2 position, float damage) {
-    auto bullet = projectileFactory.createProjectile(projType, position, damage);
+void World::addProjectile(PlantType plantType, Vector2 position, float damage) {
+    auto bullet = projectileFactory.createProjectile(projectileConvert.at(plantType),
+                                                   position, damage);
     projectileManager.addProjectile(std::move(bullet));
 }
+bool World::hasTarget(PlantType plantType, Vector2 spawnPos, Rectangle bounds) {
+    if (projectileConvert.find(plantType) == projectileConvert.end()) return false;
+    
+    float range = 0.0f;
+    auto projData = projectileFactory.getProjectileData(projectileConvert.at(plantType));
+    if (projData) range = projData->getRange();
 
-World :: World(int screenWidth, int screenHeight, AssetManager* assetManager)
-{
-    map = std::make_unique <DayMap> ();
+    Rectangle sensor = {spawnPos.x, bounds.y, range, bounds.height};
+    return zombieManager.hasZombieInArea(sensor);
+}
+
+World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
+    map = std::make_unique<DayMap>();
     if (assetManager == nullptr) {
         TraceLog(LOG_ERROR, "Asset Manager was not found");
         return;
     }
 
-    TextureManager* textureManager = assetManager -> getTextureManager();
+    TextureManager *textureManager = assetManager->getTextureManager();
 
     plantFactory.setTextureManager(textureManager);
-    plantFactory.setAnimationManager(assetManager -> getAnimationManager());
+    plantFactory.setAnimationManager(assetManager->getAnimationManager());
     plantFactory.loadPlantMechanics();
 
     zombieFactory.setTextureManager(textureManager);
-    zombieFactory.setAnimationManager(assetManager -> getAnimationManager());
+    zombieFactory.setAnimationManager(assetManager->getAnimationManager());
     zombieFactory.loadZombieMechanics();
 
-    for (int i = 0; i < 5; ++i) {
-        if (i % 2 == 0) zombieManager.addZombie(zombieFactory.createZombie(
-            NORMAL_ZOMBIE, Rectangle {grid.getCellRect(i, 8).x, grid.getCellRect(i, 8).y - 40.0f, 50.0f, 100.0f}
-        )); 
+    projectileFactory.setProjectileTexturePackage(textureManager -> getPackage("Projectile"));
+    projectileFactory.loadProjectileMechanics();
 
-        if (i % 2 == 1) zombieManager.addZombie(zombieFactory.createZombie(
-            DANCER_ZOMBIE, Rectangle {grid.getCellRect(i, 8).x, grid.getCellRect(i, 8).y - 40.0f, 50.0f, 100.0f}
-        ));
+    for (int i = 0; i < 5; ++i) {
+        if (i % 2 == 0)
+        zombieManager.addZombie(zombieFactory.createZombie(
+            NORMAL_ZOMBIE,
+            Rectangle{grid.getCellRect(i, 8).x, grid.getCellRect(i, 8).y - 40.0f,
+                        50.0f, 100.0f}));
+
+        if (i % 2 == 1)
+        zombieManager.addZombie(zombieFactory.createZombie(
+            DANCER_ZOMBIE,
+            Rectangle{grid.getCellRect(i, 8).x, grid.getCellRect(i, 8).y - 40.0f,
+                        50.0f, 100.0f}));
     }
 
     grid.setMediator(this);
-     
-
-    // if (textureManager) {
-    //     projectileTexturePackage = textureManager -> getPackage("Projectile");
-    // }
-
-    // if (!projectileTexturePackage) {
-    //     TraceLog(LOG_WARNING, "Projectile texture package was not found");
-    // }
 }
 
-void World :: update(float dt) {
-    if (!map) return;
+void World ::update(float dt) {
+    if (!map)
+        return;
 
-    map -> update(dt);
-    if (isReady() == false) return;
+    map->update(dt);
+    if (isReady() == false)
+        return;
 
     grid.updateTime(dt);
     projectileManager.update(dt);
     zombieManager.update(dt);
 
-
     grid.sendPlantAttacks();
 }
 
-void World :: draw() {
-    if (!map) return;
+void World ::draw() {
+    if (!map)
+        return;
 
-    map -> drawBackground();
-    if (isReady() == false) return;
+    map->drawBackground();
+    if (isReady() == false)
+        return;
 
     grid.draw();
     projectileManager.simulate();
     zombieManager.draw();
 }
 
-void World :: drawPlacementPreview(int selectedPlantId) const {
-    if (!map || isReady() == false || selectedPlantId < 0) return;
+void World ::drawPlacementPreview(int selectedPlantId) const {
+    if (!map || isReady() == false || selectedPlantId < 0)
+        return;
 
     Vector2 mouse = GetMousePosition();
-    int hovR, hovC; std :: tie(hovR, hovC) = grid.getCellID(mouse);
+    int hovR, hovC;
+    std ::tie(hovR, hovC) = grid.getCellID(mouse);
 
     if (hovR != -1 && hovC != -1) {
         Rectangle rect = grid.getCellRect(hovR, hovC);
@@ -85,24 +98,23 @@ void World :: drawPlacementPreview(int selectedPlantId) const {
     }
 }
 
-bool World :: tryPlacePlant(Vector2 position, PlantType plantType) {
-    if (!map || isReady() == false) return false;
+bool World ::tryPlacePlant(Vector2 position, PlantType plantType) {
+    if (!map || isReady() == false)
+        return false;
 
-    int r, c; std :: tie(r, c) = grid.getCellID(position);
-    if (r < 0 || c < 0 || grid.getPlant(r, c)) return false;
+    int r, c;
+    std ::tie(r, c) = grid.getCellID(position);
+    if (r < 0 || c < 0 || grid.getPlant(r, c))
+        return false;
     return grid.placePlant(r, c, plantFactory.createPlant(plantType));
 }
 
-bool World :: isReady() const {
-    return map && map -> isReady();
-}
+bool World ::isReady() const { return map && map->isReady(); }
 
-bool World :: isChoosingPlants() const {
-    return map && map -> isChoosingPlants();
-}
+bool World ::isChoosingPlants() const { return map && map->isChoosingPlants(); }
 
-void World :: finishChoosingPlants() {
+void World ::finishChoosingPlants() {
     if (map) {
-        map -> finishChoosingPlants();
+        map->finishChoosingPlants();
     }
 }

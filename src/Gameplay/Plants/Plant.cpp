@@ -67,12 +67,26 @@ void Plant::updateTime(float deltaSeconds) {
         cooldownTimer -= deltaSeconds;
     }
 }
+void Plant::resetCooldown() {
+    cooldownTimer = plantData -> getProjectileCooldown();
+}
+
 void Plant::setBounds(Rectangle newBounds) {
     bounds = newBounds;
 }
 Rectangle Plant::getBounds() const {
     return bounds;
 }
+
+
+Vector2 Plant::getProjectileSpawnPosition() {
+    return {0.0f, 0.0f};
+}
+PlantType Plant::getType() {
+    return PLANT_COUNT;
+}
+
+
 void Plant::draw(Rectangle hitbox) {
     animation.draw(hitbox);   
 }
@@ -84,26 +98,26 @@ void Plant::setPlantData(PlantData* pData) {
 
     plantSetup();
 }
-// bool Plant :: hasTarget(const ZombieManager& zombieManager) const {
-//     return false;
-// }
-
 
 void Plant :: receiveDamage(int damage){
     health -= damage;
     if(health < 0) health = 0;
 }
 
-bool Plant :: isDead(void) const {
-    if(health == 0) return 1;
-    return 0;
+bool Plant :: isDead() const {
+    return health == 0;
 }
-
-int Plant :: getHealth(void) const {
+bool Plant::isOnCooldown() const {
+    return cooldownTimer > 0.0f;
+}
+float Plant :: getHealth() const {
     return health;
 }
-
-int Plant :: getCost(void) const {
+int Plant :: getCost() const {
     if (plantData) return plantData -> getSunCost();
     return 0;
+}
+float Plant::getDamage() const {
+    if (plantData) return plantData -> getDamage(buffed);
+    return 0.0f;
 }

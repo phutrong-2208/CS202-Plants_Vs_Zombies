@@ -8,7 +8,9 @@ private:
 
 public:
     Peashooter();
-    Vector2 getProjectileSpawnPosition() const;
+    
+    PlantType getType() override;
+    Vector2 getProjectileSpawnPosition() override;
 };
 
 #endif

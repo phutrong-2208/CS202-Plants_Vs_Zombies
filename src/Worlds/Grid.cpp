@@ -91,6 +91,21 @@ void Grid::sendPlantAttacks() {
         for (int col = 0; col < NUM_COLS; ++col) {
             Plant* plant = getPlant(row, col);
             if (plant == nullptr || plant -> isDead()) continue;
+
+            if (plant -> isOnCooldown()) continue;
+            if (!gameplayMediator -> hasTarget(
+                plant -> getType(), 
+                plant -> getProjectileSpawnPosition(), 
+                plant -> getBounds()
+            )) continue;
+
+            gameplayMediator -> addProjectile(
+                plant -> getType(), 
+                plant -> getProjectileSpawnPosition(), 
+                plant -> getDamage()
+            );
+
+            plant -> resetCooldown();
         }
     }
 }
