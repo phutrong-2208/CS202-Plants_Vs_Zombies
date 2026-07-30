@@ -1,12 +1,11 @@
 #include "Gameplay/Plants/Plant.hpp"
 
-PlantData::PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float projectileCooldown, float projectileRange) {
+PlantData::PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float projectileCooldown) {
     this -> baseHealth = baseHealth;
     this -> baseDamage = baseDamage;
     this -> buffDamage = buffDamage;
     this -> sunCost = sunCost;
     this -> projectileCooldown = projectileCooldown;
-    this -> projectileRange = projectileRange;
 }
 float PlantData::getBaseHealth() const {
     return baseHealth;
@@ -19,9 +18,6 @@ int PlantData::getSunCost() const {
 }
 float PlantData::getProjectileCooldown() const {
     return projectileCooldown;
-}
-float PlantData::getProjectileRange() const {
-    return projectileRange;
 }
 
 float PlantData::getReanimScalar() const {
@@ -55,7 +51,6 @@ void PlantData::setBaseDamage(float damage) { baseDamage = damage; }
 void PlantData::setBuffDamage(float damage) { buffDamage = damage; }
 void PlantData::setSunCost(int cost) { sunCost = cost; }
 void PlantData::setProjectileCooldown(float cooldown) { projectileCooldown = cooldown; }
-void PlantData::setProjectileRange(float range) { projectileRange = range; }
 
 void Plant::plantSetup() {
     if (plantData == nullptr) {
@@ -89,9 +84,9 @@ void Plant::setPlantData(PlantData* pData) {
 
     plantSetup();
 }
-bool Plant :: hasTarget(const ZombieManager& zombieManager) const {
-    return false;
-}
+// bool Plant :: hasTarget(const ZombieManager& zombieManager) const {
+//     return false;
+// }
 
 
 void Plant :: receiveDamage(int damage){

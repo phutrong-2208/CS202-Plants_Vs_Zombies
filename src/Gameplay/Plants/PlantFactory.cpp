@@ -89,8 +89,6 @@ void PlantDataset::loadFromFile(const std::string& filepath) {
             currentData->setBuffDamage(std::stof(value));
         } else if (key == "COOLDOWN") {
             currentData->setProjectileCooldown(std::stof(value));
-        } else if (key == "RANGE") {
-            currentData->setProjectileRange(std::stof(value));
         } else if (key == "REANIM_SCALAR") {
             currentData->setReanimScalar(std::stof(value));
         } else if (key == "REANIM_PACKAGE") {
@@ -170,17 +168,17 @@ std::unique_ptr <Plant> PlantFactory::createPlant(PlantType pType) {
     }
 
     ///THIS JUST FOR TESTING, WOULD BE DELETED WHEN THE STRUCTURE IS DONE
-    if (pType == PEASHOOTER && textureManager) {
-        auto* peashooter = static_cast<Peashooter*>(plantPtr.get());
-        TexturePackage* projectilePackage =
-            textureManager->getPackage("Projectile");
+    // if (pType == PEASHOOTER && textureManager) {
+    //     auto* peashooter = static_cast<Peashooter*>(plantPtr.get());
+    //     TexturePackage* projectilePackage =
+    //         textureManager->getPackage("Projectile");
 
-        if (projectilePackage) {
-            peashooter->setProjectileTexture(
-                projectilePackage->GetTexture("PROJECTILEPEA")
-            );
-        }
-    }
+    //     if (projectilePackage) {
+    //         peashooter->setProjectileTexture(
+    //             projectilePackage->GetTexture("PROJECTILEPEA")
+    //         );
+    //     }
+    // }
 
     return plantPtr;
 }

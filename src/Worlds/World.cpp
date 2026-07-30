@@ -1,5 +1,13 @@
 #include <Worlds/World.hpp>
 
+///////////////////////////////
+///     IGAMEPLAYMEDIATOR   ///
+///////////////////////////////
+void World::addProjectile(ProjectileType projType, Vector2 position, float damage) {
+    auto bullet = projectileFactory.createProjectile(projType, position, damage);
+    projectileManager.addProjectile(std::move(bullet));
+}
+
 World :: World(int screenWidth, int screenHeight, AssetManager* assetManager)
 {
     map = std::make_unique <DayMap> ();
@@ -27,15 +35,17 @@ World :: World(int screenWidth, int screenHeight, AssetManager* assetManager)
             DANCER_ZOMBIE, Rectangle {grid.getCellRect(i, 8).x, grid.getCellRect(i, 8).y - 40.0f, 50.0f, 100.0f}
         ));
     }
+
+    grid.setMediator(this);
      
 
-    if (textureManager) {
-        projectileTexturePackage = textureManager -> getPackage("Projectile");
-    }
+    // if (textureManager) {
+    //     projectileTexturePackage = textureManager -> getPackage("Projectile");
+    // }
 
-    if (!projectileTexturePackage) {
-        TraceLog(LOG_WARNING, "Projectile texture package was not found");
-    }
+    // if (!projectileTexturePackage) {
+    //     TraceLog(LOG_WARNING, "Projectile texture package was not found");
+    // }
 }
 
 void World :: update(float dt) {
@@ -44,9 +54,12 @@ void World :: update(float dt) {
     map -> update(dt);
     if (isReady() == false) return;
 
-    grid.updateTime(dt, projectileManager, zombieManager);
+    grid.updateTime(dt);
     projectileManager.update(dt);
     zombieManager.update(dt);
+
+
+    grid.sendPlantAttacks();
 }
 
 void World :: draw() {

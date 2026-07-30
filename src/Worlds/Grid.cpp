@@ -37,6 +37,10 @@ Grid::Grid() {
     }
 }
 
+void Grid::setMediator(IGameplayMediator* mediator) {
+    gameplayMediator = mediator;
+}
+
 std::pair <int, int> Grid::getCellID(Vector2 position) const {
     float sx = position.x, sy = position.y;
     if (sx < GRID_START_X || sy < GRID_START_Y) return std::make_pair(-1, -1);
@@ -65,11 +69,7 @@ Rectangle Grid::getCellRect(int row, int col) const {
     return cellRects[row][col];
 }
 
-void Grid::updateTime(
-    float deltaSeconds,
-    ProjectileManager& projectileManager,
-    const ZombieManager& zombieManager
-) {
+void Grid::updateTime(float deltaSeconds) {
     for (int row = 0; row < NUM_ROWS; ++row) {
         for (int col = 0; col < NUM_COLS; ++col) {
             garden[row][col].updateTime(deltaSeconds);
@@ -81,8 +81,16 @@ void Grid::updateTime(
                 removePlant(row, col);
                 continue;
             }
+        }
+    }
+}
+void Grid::sendPlantAttacks() {
+    if (gameplayMediator == nullptr) return;
 
-            plant -> attack(projectileManager, zombieManager);
+    for (int row = 0; row < NUM_ROWS; ++row) {
+        for (int col = 0; col < NUM_COLS; ++col) {
+            Plant* plant = getPlant(row, col);
+            if (plant == nullptr || plant -> isDead()) continue;
         }
     }
 }

@@ -6,6 +6,9 @@
 void ProjectileData::setRadius(float radius) {
     this -> radius = radius;
 }
+void ProjectileData::setRange(float range) {
+    this -> range = range;
+}
 void ProjectileData::setVelocity(Vector2 velocity) {
     this -> velocity = velocity;
 }
@@ -15,6 +18,9 @@ void ProjectileData::setTextureName(const std::string& textureName) {
 
 float ProjectileData::getRadius() const {
     return radius;
+}
+float ProjectileData::getRange() const {
+    return range;
 }
 Vector2 ProjectileData::getVelocity() const {
     return velocity;
@@ -71,6 +77,9 @@ float Projectile :: getRange(void) const{
 Vector2 Projectile :: getPosition(void) const{
     return position;
 } 
+Rectangle Projectile::getHitbox(void) const {
+    return Rectangle{position.x - radius, position.y - radius, 2.0f * radius, 2.0f * radius};
+}
 
 Vector2 Projectile :: getVelocity(void) const{
     return velocity;
@@ -105,7 +114,7 @@ void Projectile :: draw(void) const{
     if(texture == nullptr) return;
 
     Rectangle src = {0.0f, 0.0f, static_cast<float>(texture -> width), static_cast<float>(texture -> height)};
-    Rectangle dst = {position.x, position.y, radius * 2.0f, radius * 2.0f};
+    Rectangle dst = getHitbox();
 
-    DrawTexturePro(*texture, src, dst, {static_cast<float>(radius), static_cast<float>(radius)}, 0, WHITE);
+    DrawTexturePro(*texture, src, dst, Vector2{0.0f, 0.0f}, 0, WHITE);
 }

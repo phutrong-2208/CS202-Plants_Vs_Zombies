@@ -23,7 +23,6 @@ private:
     float baseDamage = 10.0f, buffDamage = 20.0f;
     int sunCost = 100;
     float projectileCooldown = 0.0f;
-    float projectileRange = 0.0f;
 
     // Reanim metadata
     float reanimScalar = 1.5f;
@@ -32,13 +31,12 @@ private:
     std::string reanimClip;
 public:
     PlantData() = default;
-    PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float projectileCooldown, float projectileRange);
+    PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float projectileCooldown);
       
     float getBaseHealth() const;
     float getDamage(bool buffed) const;
     int getSunCost() const;
     float getProjectileCooldown() const;
-    float getProjectileRange() const;
 
     float getReanimScalar() const;
     const std::string& getReanimPackage() const;
@@ -55,7 +53,6 @@ public:
     void setBuffDamage(float damage);
     void setSunCost(int cost);
     void setProjectileCooldown(float cooldown);
-    void setProjectileRange(float range);
 };
 
 class Plant {
@@ -72,15 +69,17 @@ public:
     virtual ~Plant() = default;
     void receiveDamage(int damage);
 
-    virtual void attack(
-        ProjectileManager& projectileManager,
-        const ZombieManager& zombieManager
-    ) {}
-    virtual bool hasTarget(const ZombieManager& zombieManager) const;
+    // virtual void attack(
+    //     ProjectileManager& projectileManager,
+    //     const ZombieManager& zombieManager
+    // ) {}
+    // virtual bool hasTarget(const ZombieManager& zombieManager) const;
 
     void updateTime(float deltaSeconds);
+
     void setBounds(Rectangle newBounds);
     Rectangle getBounds() const;
+    
     void setReanimInstance(ReanimInstance anim);
     void setPlantData(PlantData* pData);
     void draw(Rectangle hitbox);

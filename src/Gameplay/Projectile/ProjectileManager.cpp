@@ -2,7 +2,7 @@
 
 ProjectileManager :: ProjectileManager() = default;
 
-void ProjectileManager :: addNew(std :: unique_ptr<Projectile> projectile){
+void ProjectileManager :: addProjectile(std :: unique_ptr<Projectile> projectile){
     if(!projectile) return;
     projectiles.emplace_back(std :: move(projectile));
 }

@@ -11,7 +11,7 @@ public:
     ProjectileManager();
     ~ProjectileManager() = default;
     
-    void addNew(std :: unique_ptr<Projectile> projectile);
+    void addProjectile(std :: unique_ptr<Projectile> projectile);
     void update(float dt);
     void simulate(void) const;
 }; 

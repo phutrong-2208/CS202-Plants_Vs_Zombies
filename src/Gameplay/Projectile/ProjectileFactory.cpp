@@ -76,6 +76,8 @@ void ProjectileDataset::loadFromFile(const std::string& filepath) {
             Vector2 vel = currentData->getVelocity();
             vel.y = std::stof(value);
             currentData->setVelocity(vel);
+        } else if (key == "RANGE") {
+            currentData->setRange(std::stof(value));
         } else if (key == "TEXTURE_NAME") {
             currentData->setTextureName(value);
         }
@@ -101,7 +103,7 @@ ProjectileData* ProjectileDataset::getProjectileData(ProjectileType pType) {
 ///     PROJECTILE FACTORY        ///
 /////////////////////////////////////
 
-void ProjectileFactory::setTexturePackage(TexturePackage* package) {
+void ProjectileFactory::setProjectileTexturePackage(TexturePackage* package) {
     projTexturePackage = package;
 }
 
@@ -124,12 +126,12 @@ Texture2D* ProjectileFactory::getProjectileTexture(ProjectileType pType) {
 }
 
 std::unique_ptr<Projectile> ProjectileFactory::createProjectile(
-    ProjectileType pType, Vector2 spawnPos, float damage, float range
+    ProjectileType pType, Vector2 spawnPos, float damage
 ) {
     ProjectileData* data = getProjectileData(pType);
     if (!data) return nullptr;
 
     Texture2D* tex = getProjectileTexture(pType);
 
-    return std::make_unique<Projectile>(spawnPos, data, damage, range, tex);
+    return std::make_unique<Projectile>(spawnPos, data, damage, data->getRange(), tex);
 }

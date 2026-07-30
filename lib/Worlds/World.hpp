@@ -3,6 +3,8 @@
 
 #include <Core/AssetManager.hpp>
 
+#include <Gameplay/IGameplayMediator.hpp>
+
 #include <Worlds/Grid.hpp>
 #include <Worlds/Map.hpp>
 #include <Worlds/DayMap.hpp>
@@ -13,10 +15,11 @@
 //Projectiles
 
 #include "Gameplay/Projectile/ProjectileManager.hpp"
+#include "Gameplay/Projectile/ProjectileFactory.hpp"
 #include "Gameplay/Projectile/Projectile.hpp"
 
 
-class World {
+class World : public IGameplayMediator {
 private:
     std::unique_ptr <Map> map = nullptr;
     Grid grid;
@@ -24,8 +27,11 @@ private:
     ZombieFactory zombieFactory;
     ZombieManager zombieManager;
     ProjectileManager projectileManager;
-    TexturePackage* projectileTexturePackage = nullptr;
+    ProjectileFactory projectileFactory;
+    // TexturePackage* projectileTexturePackage = nullptr;
     // static const int NUM_ROWS = 5, NUM_COLS = 9;
+
+    void addProjectile(ProjectileType projType, Vector2 position, float damage) override;
 public:
     World() = default;
     ~World() = default;

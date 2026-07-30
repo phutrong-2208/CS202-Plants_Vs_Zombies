@@ -1,9 +1,12 @@
 #ifndef GRID_HPP
 #define GRID_HPP
+
+#include <Gameplay/IGameplayMediator.hpp>
 #include "Cell.hpp"
 
 class Grid {
 private:
+    IGameplayMediator* gameplayMediator;
     static const int NUM_ROWS = 5, NUM_COLS = 9;
 
     // Original PopCap viewport
@@ -19,15 +22,13 @@ private:
     Cell garden[NUM_ROWS][NUM_COLS];
 public:
     Grid();
+    void setMediator(IGameplayMediator* mediator);
 
     std::pair <int, int> getCellID(Vector2 position) const;
     Rectangle getCellRect(int row, int col) const;
 
-    void updateTime(
-        float deltaSeconds,
-        ProjectileManager& projectileManager,
-        const ZombieManager& zombieManager
-    );
+    void updateTime(float deltaSeconds);
+    void sendPlantAttacks();
     void draw();
     
     bool placePlant(int row, int col, std :: unique_ptr<Plant> plant);

@@ -14,19 +14,22 @@ enum ProjectileType : int {
 class ProjectileData {
 private:
     float radius = 0.0f;
+    float range = 0.0f;
     Vector2 velocity = {0.0f, 0.0f};
     std::string textureName = "";
 public:
     void setRadius(float radius);
+    void setRange(float range);
     void setVelocity(Vector2 velocity);
     void setTextureName(const std::string& textureName);    
 
     float getRadius() const;
+    float getRange() const;
     Vector2 getVelocity() const;
     const std::string& getTextureName() const;
 };
 
-class Projectile{
+class Projectile {
 private:
     ProjectileData* projData = nullptr;
     float damage = 0;
@@ -57,6 +60,7 @@ public:
     float getRadius(void) const;
     float getRange(void) const;
     Vector2 getPosition(void) const;
+    Rectangle getHitbox(void) const;
     Vector2 getVelocity(void) const;
 
     bool isDespawned(void) const;
