@@ -1,0 +1,29 @@
+#ifndef IGAMEPLAYMEDIATOR_HPP
+#define IGAMEPLAYMEDIATOR_HPP
+
+#include <Gameplay/Plants/Plant.hpp>
+#include <Gameplay/Projectile/Projectile.hpp>
+#include <Gameplay/Zombies/Zombie.hpp>
+
+static const std::map <PlantType, ProjectileType> projectileConvert = {
+    {PEASHOOTER, PROJECTILE_PEA},
+    {REPEATER,   PROJECTILE_PEA},
+    {SNOWPEA,    PROJECTILE_SNOWPEA},
+    {CACTUS,     PROJECTILE_CACTUS}
+};
+
+class IGameplayMediator {
+public:
+    virtual ~IGameplayMediator() = default;
+
+    // Plants shooting signals
+    virtual void addProjectile(PlantType plantType, Vector2 position, float damage) = 0;
+    virtual bool hasTarget(PlantType plantType, Vector2 spawnPos, Rectangle bounds) = 0;
+
+    // Projectile toggling signals
+    virtual bool touchTarget(Projectile* projectile) = 0;
+
+    // Zombie killing signals
+};
+
+#endif

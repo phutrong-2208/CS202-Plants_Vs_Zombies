@@ -19,7 +19,7 @@ private:
     std::unique_ptr <ProjectileDataset> projectileDataStorage = nullptr;
 
 public:
-    void setTexturePackage(TexturePackage* package);
+    void setProjectileTexturePackage(TexturePackage* package);
     void loadProjectileMechanics();
 
     // Get the shared ProjectileData blueprint for a given type
@@ -28,6 +28,6 @@ public:
     // Resolve the texture for a given projectile type from the texture package
     Texture2D* getProjectileTexture(ProjectileType pType);
 
-    std::unique_ptr <Projectile> createProjectile(ProjectileType pType, Vector2 spawnPos, float damage, float range);
+    std::unique_ptr <Projectile> createProjectile(ProjectileType pType, Vector2 spawnPos, float damage);
 };
 #endif

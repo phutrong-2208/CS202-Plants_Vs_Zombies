@@ -13,9 +13,9 @@ enum ZombieType : int {
 
 class ZombieData {
 private:
-    int baseHealth = 100;
+    float baseHealth = 100;
     float moveSpeed = 10.0f;
-    int attackDamage = 20;
+    float attackDamage = 20;
 
     float reanimScalar = 1.0f;
     std::string reanimPackage;
@@ -24,7 +24,7 @@ private:
 
 public:
     ZombieData() = default;
-    ZombieData(int health, float speed, int damage);
+    ZombieData(float health, float speed, int damage);
 
     int getBaseHealth() const;
     float getMoveSpeed() const;
@@ -34,7 +34,7 @@ public:
     const std::string& getReanimAnim() const;
     const std::string& getReanimClip() const;
 
-    void setBaseHealth(int health);
+    void setBaseHealth(float health);
     void setMoveSpeed(float speed);
     void setAttackDamage(int damage);
     void setReanimScalar(float scalar);
@@ -45,7 +45,7 @@ public:
 
 class Zombie {
 protected:
-    int health = 0;
+    float health = 0;
     float speed = 0.0f;
     int attackDamage = 0;
     bool attacking = false;
@@ -64,10 +64,10 @@ public:
     void setReanimInstance(ReanimInstance anim);
     void draw();
 
-    void receiveDamage(int damage);
+    void receiveDamage(float damage);
     bool isDead() const;
 
-    int getHealth() const;
+    float getHealth() const;
     float getSpeed() const;
     int getAttackDamage() const;
     Rectangle getHitbox() const;

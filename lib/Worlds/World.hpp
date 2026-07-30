@@ -3,20 +3,26 @@
 
 #include <Core/AssetManager.hpp>
 
+#include <Gameplay/IGameplayMediator.hpp>
+
 #include <Worlds/Grid.hpp>
 #include <Worlds/Map.hpp>
 #include <Worlds/DayMap.hpp>
 #include <Gameplay/Plants/PlantFactory.hpp>
+
+
+// Zombies
 #include <Gameplay/Zombies/ZombieFactory.hpp>
 #include <Gameplay/Zombies/ZombieManager.hpp>
 
-//Projectiles
+// Projectiles
 
 #include "Gameplay/Projectile/ProjectileManager.hpp"
+#include "Gameplay/Projectile/ProjectileFactory.hpp"
 #include "Gameplay/Projectile/Projectile.hpp"
 
 
-class World {
+class World : public IGameplayMediator {
 private:
     std::unique_ptr <Map> map = nullptr;
     Grid grid;
@@ -24,8 +30,12 @@ private:
     ZombieFactory zombieFactory;
     ZombieManager zombieManager;
     ProjectileManager projectileManager;
-    TexturePackage* projectileTexturePackage = nullptr;
-    // static const int NUM_ROWS = 5, NUM_COLS = 9;
+    ProjectileFactory projectileFactory;
+
+
+    void addProjectile(PlantType plantType, Vector2 position, float damage) override;
+    bool hasTarget(PlantType plantType, Vector2 spawnPos, Rectangle bounds) override;
+    bool touchTarget(Projectile* projectile) override;
 public:
     World() = default;
     ~World() = default;

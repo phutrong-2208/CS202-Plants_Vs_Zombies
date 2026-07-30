@@ -1,5 +1,8 @@
 #include "Gameplay/Zombies/ZombieManager.hpp"
 
+void ZombieManager::setMediator(IGameplayMediator* mediator) {
+    gameplayMediator = mediator;
+}
 void ZombieManager :: addZombie(std::unique_ptr<Zombie> zombie) {
     if(zombie) zombies.emplace_back(std::move(zombie));
 }
@@ -27,6 +30,30 @@ void ZombieManager :: draw() const {
     }
 }
 
+Zombie* ZombieManager::getShotFirst(Rectangle area) {
+    Zombie* target = nullptr;
+    float distance = 1e6;
+
+    for (auto& zombie : zombies) {
+        if (zombie -> isDead()) continue;
+
+        Rectangle hitbox = zombie -> getHitbox();
+        if (!CheckCollisionRecs(area, hitbox)) continue;
+
+        // Heuristic algorithm to find the nearest zombie to be hit.
+        // This assumes that the bullets are slow enough to not jump through the zombie hitboxes.
+        Vector2 areaCenter = {area.x + area.width * 0.5f, area.y + area.height * 0.5f};
+        Vector2 hitboxCenter = {hitbox.x + hitbox.width * 0.5f, hitbox.y + hitbox.height * 0.5f};
+
+        float localDist = Vector2Distance(areaCenter, hitboxCenter);
+        if (distance > localDist) {
+            distance = localDist;
+            target = zombie.get();
+        }
+    }
+
+    return target;
+}
 bool ZombieManager :: hasZombieInArea(Rectangle area) const{
     for(auto& zombie : zombies) if(!zombie -> isDead()){
         Rectangle hitbox = zombie -> getHitbox();

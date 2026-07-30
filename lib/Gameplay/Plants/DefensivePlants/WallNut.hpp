@@ -6,6 +6,7 @@
 class WallNut : public Plant {
 public:
     WallNut();
+    PlantType getType() override;
 };
 
 #endif

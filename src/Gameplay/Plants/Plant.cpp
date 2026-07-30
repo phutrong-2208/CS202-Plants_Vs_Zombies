@@ -1,12 +1,11 @@
 #include "Gameplay/Plants/Plant.hpp"
 
-PlantData::PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float projectileCooldown, float projectileRange) {
+PlantData::PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float projectileCooldown) {
     this -> baseHealth = baseHealth;
     this -> baseDamage = baseDamage;
     this -> buffDamage = buffDamage;
     this -> sunCost = sunCost;
     this -> projectileCooldown = projectileCooldown;
-    this -> projectileRange = projectileRange;
 }
 float PlantData::getBaseHealth() const {
     return baseHealth;
@@ -19,9 +18,6 @@ int PlantData::getSunCost() const {
 }
 float PlantData::getProjectileCooldown() const {
     return projectileCooldown;
-}
-float PlantData::getProjectileRange() const {
-    return projectileRange;
 }
 
 float PlantData::getReanimScalar() const {
@@ -55,14 +51,13 @@ void PlantData::setBaseDamage(float damage) { baseDamage = damage; }
 void PlantData::setBuffDamage(float damage) { buffDamage = damage; }
 void PlantData::setSunCost(int cost) { sunCost = cost; }
 void PlantData::setProjectileCooldown(float cooldown) { projectileCooldown = cooldown; }
-void PlantData::setProjectileRange(float range) { projectileRange = range; }
 
 void Plant::plantSetup() {
+    cooldownTimer = 0.0f;
     if (plantData == nullptr) {
-        health = cooldownTimer = 0; return;
+        health = 0; return;
     }
     health = plantData -> getBaseHealth();
-    cooldownTimer = plantData -> getProjectileCooldown();
 }
 
 void Plant::updateTime(float deltaSeconds) {
@@ -72,12 +67,26 @@ void Plant::updateTime(float deltaSeconds) {
         cooldownTimer -= deltaSeconds;
     }
 }
+void Plant::resetCooldown() {
+    cooldownTimer = plantData -> getProjectileCooldown();
+}
+
 void Plant::setBounds(Rectangle newBounds) {
     bounds = newBounds;
 }
 Rectangle Plant::getBounds() const {
     return bounds;
 }
+
+
+Vector2 Plant::getProjectileSpawnPosition() {
+    return {0.0f, 0.0f};
+}
+PlantType Plant::getType() {
+    return PLANT_COUNT;
+}
+
+
 void Plant::draw(Rectangle hitbox) {
     animation.draw(hitbox);   
 }
@@ -89,26 +98,26 @@ void Plant::setPlantData(PlantData* pData) {
 
     plantSetup();
 }
-bool Plant :: hasTarget(const ZombieManager& zombieManager) const {
-    return false;
-}
-
 
 void Plant :: receiveDamage(int damage){
     health -= damage;
     if(health < 0) health = 0;
 }
 
-bool Plant :: isDead(void) const {
-    if(health == 0) return 1;
-    return 0;
+bool Plant :: isDead() const {
+    return health == 0;
 }
-
-int Plant :: getHealth(void) const {
+bool Plant::isOnCooldown() const {
+    return cooldownTimer > 0.0f;
+}
+float Plant :: getHealth() const {
     return health;
 }
-
-int Plant :: getCost(void) const {
+int Plant :: getCost() const {
     if (plantData) return plantData -> getSunCost();
     return 0;
+}
+float Plant::getDamage() const {
+    if (plantData) return plantData -> getDamage(buffed);
+    return 0.0f;
 }

@@ -1,8 +1,10 @@
 #include "Gameplay/Projectile/ProjectileManager.hpp"
 
-ProjectileManager :: ProjectileManager() = default;
+void ProjectileManager::setMediator(IGameplayMediator* mediator) {
+    gameplayMediator = mediator;
+}
 
-void ProjectileManager :: addNew(std :: unique_ptr<Projectile> projectile){
+void ProjectileManager :: addProjectile(std :: unique_ptr<Projectile> projectile){
     if(!projectile) return;
     projectiles.emplace_back(std :: move(projectile));
 }
@@ -11,7 +13,16 @@ void ProjectileManager :: update(float dt){
         if(!prj -> isDespawned()){ //hasn't been despawned
             prj -> update(dt);
         }
-    }
+    }    
+}
+void ProjectileManager::toggleProjectiles() {
+    for(auto&prj : projectiles){
+        if (prj -> isDespawned()) continue;
+
+        if (gameplayMediator && gameplayMediator -> touchTarget(prj.get()))
+            prj -> Despawn();
+    }    
+    
     projectiles.erase(
         std :: remove_if(projectiles.begin(), projectiles.end(), 
             [](const std :: unique_ptr<Projectile>& prj){
@@ -19,7 +30,7 @@ void ProjectileManager :: update(float dt){
             }
         ), 
         projectiles.end()
-    );    
+    );
 }
 
 void ProjectileManager :: simulate(void) const{

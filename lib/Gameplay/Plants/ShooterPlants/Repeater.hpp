@@ -6,6 +6,8 @@
 class Repeater : public Plant {
 public:
     Repeater();
+    PlantType getType() override;
+    Vector2 getProjectileSpawnPosition() override;
 };
 
 #endif
