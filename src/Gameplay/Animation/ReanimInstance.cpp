@@ -15,6 +15,16 @@ void ReanimInstance::setTexturePackage(TexturePackage* TexPack) {
 void ReanimInstance::setTextureScalar(float scaleFactor) {
     scalar = scaleFactor;
 }
+
+void ReanimInstance::hideTrack(const std::string& trackName) {
+    hiddenTracks.insert(trackName);
+}
+
+void ReanimInstance::showOnlyTracks(const std::vector<std::string>& trackNames) {
+    visibleTracks.clear();
+    visibleTracks.insert(trackNames.begin(), trackNames.end());
+    useVisibleTrackFilter = true;
+}
 // Clip selection (optional — call this when you want to play a specific
 // named animation segment, e.g. "shooting", "die".
 // For the default idle loop, do NOT call playClip — just let the full
@@ -98,6 +108,11 @@ void ReanimInstance::draw(Rectangle hitbox) {
     for (int i = 0; i < trackCount; ++i) {
         const ReanimTrack* track = rawAnim->getTrack(i);
         if (track == nullptr) continue;
+
+        const std :: string trackName = track -> getTrackName();
+        if(hiddenTracks.find(trackName) != hiddenTracks.end()) continue;
+        if(useVisibleTrackFilter &&
+           visibleTracks.find(trackName) == visibleTracks.end()) continue;
 
         Frame frame = track -> getInterpolatedFrame(currentTime, loopStart, clipEnd);
         if (frame.alpha <= 0.0f) continue;

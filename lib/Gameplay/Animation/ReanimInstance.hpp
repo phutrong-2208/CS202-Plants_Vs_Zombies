@@ -4,6 +4,8 @@
 #include <Core/ReanimParser.hpp>
 #include <Core/TextureManager.hpp>
 #include <string>
+#include <unordered_set>
+#include <vector>
 
 class ReanimInstance {
 private:
@@ -24,12 +26,17 @@ private:
 
     ReanimParser*   rawAnim    = nullptr;
     TexturePackage* rawTexPack = nullptr;
+    std :: unordered_set<std :: string> hiddenTracks;
+    std :: unordered_set<std :: string> visibleTracks;
+    bool useVisibleTrackFilter = false;
 
 public:
     // Setup
     void setAnimation(ReanimParser* Anim);
     void setTexturePackage(TexturePackage* TexPack);
     void setTextureScalar(float scaleFactor);
+    void hideTrack(const std :: string& trackName);
+    void showOnlyTracks(const std :: vector<std :: string>& trackNames);
 
     // ---------------------------------------------------------------
     // Clip selection — call once after setAnimation().

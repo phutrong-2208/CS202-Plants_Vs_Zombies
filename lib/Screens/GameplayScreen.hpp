@@ -9,13 +9,12 @@
 
 class GameplayScreen : public Screen {
 private:
-    std::unique_ptr<AssetManager> assetManager = nullptr;
     std::unique_ptr<World> world = nullptr;
     ChoosePlants choosePlants;
     SeedBank seedBank;
 
 public:
-    GameplayScreen(int screenWidth, int screenHeight);
+    GameplayScreen(int screenWidth, int screenHeight, AssetManager* manager);
 
     void update(float dt) override;
     void draw() override;

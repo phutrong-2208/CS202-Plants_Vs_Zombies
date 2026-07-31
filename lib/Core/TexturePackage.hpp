@@ -16,6 +16,9 @@ public:
   TexturePackage &operator=(const TexturePackage &) = delete;
 
   void AddTexture(const std ::string &name, const std ::string &path);
+  void AddMaskedTexture(const std ::string &name,
+                        const std ::string &colorPath,
+                        const std ::string &maskPath);
   Texture2D *GetTexture(const std ::string &name);
 };
 

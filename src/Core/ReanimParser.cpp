@@ -1,4 +1,5 @@
 #include "Core/ReanimParser.hpp"
+#include <cctype>
 
 ///////////////////////////////////
 ///     FRAME CONSTRUCTION      ///
@@ -194,6 +195,16 @@ bool ReanimParser::loadFromFile(const std::string& path) {
             tempPos = 0;
             std::string iTag = getTagContent(tf, "i", tempPos);
             if (!iTag.empty()) {
+                iTag.erase(
+                    std::remove_if(
+                        iTag.begin(),
+                        iTag.end(),
+                        [](unsigned char character) {
+                            return std::isspace(character);
+                        }
+                    ),
+                    iTag.end()
+                );
                 frameOfTrack.imageName = iTag;
             }
 

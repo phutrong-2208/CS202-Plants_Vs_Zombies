@@ -1,8 +1,8 @@
 #include <Screens/GameplayScreen.hpp>
 
-GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight) {
-    assetManager = std::make_unique<AssetManager>();
-    world = std::make_unique<World>(screenWidth, screenHeight, assetManager.get());
+GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager* manager) {
+    setAssetManager(manager);
+    world = std::make_unique<World>(screenWidth, screenHeight, assetManager);
 
     seedBank.setTexturePackage(assetManager -> getTextureManager() -> getPackage("PlantChooser"));
     seedBank.setPacketPackage(assetManager -> getTextureManager() -> getPackage("PlantSeedPackets"));

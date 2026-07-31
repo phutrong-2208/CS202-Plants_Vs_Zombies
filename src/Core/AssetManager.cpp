@@ -28,11 +28,52 @@ void AssetManager::loadAssets() {
             for (const auto& entry : std :: filesystem:: recursive_directory_iterator(entity.path())){
                 if(entry.is_directory()) continue;
 
-                std :: string fileName = entry.path().filename().string();  
+                std :: string fileName = entry.path().filename().string();
+                const std :: string extension =
+                    toUpperKey(entry.path().extension().string());
 
-                if(fileName.find(".png") != std :: string :: npos) {
-                    fileName.erase(fileName.find(".png"), 4);
-                    Entity -> AddTexture(toUpperKey(fileName), entry.path().string());
+                if(extension == ".PNG" ||
+                   extension == ".JPG" ||
+                   extension == ".JPEG") {
+                    const std :: filesystem :: path texturePath = entry.path();
+                    const std :: string stem = texturePath.stem().string();
+
+                    // Files named Foo_.png are alpha masks for Foo.jpg.
+                    // They must not be registered as independent textures.
+                    if(extension == ".PNG" &&
+                       !stem.empty() &&
+                       stem.back() == '_') {
+                        const std :: string colorStem =
+                            stem.substr(0, stem.size() - 1);
+                        const auto jpgPath =
+                            texturePath.parent_path() / (colorStem + ".jpg");
+                        const auto jpegPath =
+                            texturePath.parent_path() / (colorStem + ".jpeg");
+
+                        if(std :: filesystem :: exists(jpgPath) ||
+                           std :: filesystem :: exists(jpegPath)) {
+                            continue;
+                        }
+                    }
+
+                    const std :: string textureKey = toUpperKey(stem);
+
+                    if(extension == ".JPG" || extension == ".JPEG") {
+                        const auto maskPath =
+                            texturePath.parent_path() / (stem + "_.png");
+
+                        if(std :: filesystem :: exists(maskPath)) {
+                            Entity -> AddMaskedTexture(
+                                textureKey,
+                                texturePath.string(),
+                                maskPath.string()
+                            );
+                            hasTexture = true;
+                            continue;
+                        }
+                    }
+
+                    Entity -> AddTexture(textureKey, texturePath.string());
                     hasTexture = true;
                 }
 

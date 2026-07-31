@@ -1,14 +1,18 @@
 #include <GameLoop.hpp>
 #include <Screens/GameplayScreen.hpp>
+#include <Screens/MainMenuScreen.hpp>
+
 
 void GameLoop::initGame() {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(1200, 900, "Plants Vs Zombies");
     SetTargetFPS(60);
 
-    activeScreen = std::make_unique<GameplayScreen>(GetScreenWidth(), GetScreenHeight()); //will be replaced later 
+    assetManager = std::make_unique<AssetManager>();
+    activeScreen = std::make_unique<MainMenuScreen>(GetScreenWidth(), GetScreenHeight(), assetManager.get()); //will be replaced later 
     inputManager = std::make_unique<InputManager>();
 }
+
 
 bool GameLoop::isRunning() {
     return !WindowShouldClose();
