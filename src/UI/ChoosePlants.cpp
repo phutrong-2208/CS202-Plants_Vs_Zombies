@@ -24,21 +24,10 @@ namespace {
 
     const std::string UI_FONT = "LUCKIEST_GUY";
 
-    static const char* plantTextureKey(PlantType type) {
-        switch (type) {
-            case PEASHOOTER: return "PEASHOOTER";
-            case SUNFLOWER: return "SUNFLOWER";
-            case REPEATER: return "REPEATER";
-            case SNOWPEA: return "SNOWPEA";
-            case WALLNUT: return "WALLNUT";
-            case CACTUS: return "CACTUS";
-            default: return "?";
-        }
-    }
 }
 
 ChoosePlants :: ChoosePlants() {
-    availablePlants = {PEASHOOTER, SUNFLOWER, REPEATER, SNOWPEA, WALLNUT, CACTUS};
+    availablePlants = getAllPlantTypes();
 }
 
 void ChoosePlants :: setChooserPackage(TexturePackage* package) {
@@ -108,7 +97,7 @@ void ChoosePlants :: draw() const {
     for (int i = 0; i < (int)availablePlants.size(); ++i) {
         Rectangle rect = getAvailableRect(i);
         PlantType plant = availablePlants[i];
-        Texture2D* packet = packetPackage ? packetPackage -> GetTexture(plantTextureKey(plant)) : nullptr;
+        Texture2D* packet = packetPackage ? packetPackage -> GetTexture(getPlantTextureKey(plant)) : nullptr;
         Color tint = isSelected(plant) ? (Color){180, 180, 180, 255} : WHITE;
 
         if (packet) {
@@ -116,7 +105,7 @@ void ChoosePlants :: draw() const {
             rect, {0, 0}, 0, tint);
         } else {
             DrawRectangleRounded(rect, 0.06f, 6, (Color){185, 169, 111, 245});
-            DrawText(plantTextureKey(plant), (int)rect.x + 6, (int)rect.y + 45, 10, (Color){40, 60, 30, 255});
+            DrawText(getPlantTextureKey(plant), (int)rect.x + 6, (int)rect.y + 45, 10, (Color){40, 60, 30, 255});
         }
 
         if (isSelected(plant)) {

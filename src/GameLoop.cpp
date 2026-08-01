@@ -9,7 +9,7 @@ void GameLoop::initGame() {
     SetTargetFPS(60);
 
     assetManager = std::make_unique<AssetManager>();
-    activeScreen = std::make_unique<MainMenuScreen>(GetScreenWidth(), GetScreenHeight(), assetManager.get()); //will be replaced later 
+    activeScreen = std::make_unique<GameplayScreen>(GetScreenWidth(), GetScreenHeight(), assetManager.get()); //will be replaced later 
     inputManager = std::make_unique<InputManager>();
 }
 

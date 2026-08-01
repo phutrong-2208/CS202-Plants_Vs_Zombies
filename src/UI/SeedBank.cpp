@@ -9,17 +9,6 @@ namespace {
     constexpr float SLOT_HEIGHT = 92.0f;
     constexpr float SLOT_GAP = 4.0f;
 
-    static const char* plantName(PlantType type) {
-        switch (type) {
-            case PEASHOOTER: return "PEASHOOTER";
-            case SUNFLOWER: return "SUNFLOWER";
-            case REPEATER: return "REPEATER";
-            case SNOWPEA: return "SNOWPEA";
-            case WALLNUT: return "WALLNUT";
-            case CACTUS: return "CACTUS";
-            default: return "?";
-        }
-    }
 }
 
 SeedBank :: SeedBank() {
@@ -55,7 +44,7 @@ void SeedBank :: draw() const {
         Rectangle slotRect = getSlotRect(i);
         Color tint = (i == selectedSlot) ? (Color){210, 255, 170, 255} : WHITE;
 
-        Texture2D* targetPacket = packetPackage ? packetPackage -> GetTexture(plantName(slots[i])) : nullptr;
+        Texture2D* targetPacket = packetPackage ? packetPackage -> GetTexture(getPlantTextureKey(slots[i])) : nullptr;
         if (targetPacket) {
             DrawTexturePro(*targetPacket, {0, 0, (float)targetPacket -> width, (float)targetPacket -> height},
             slotRect, {0, 0}, 0, tint);
@@ -64,7 +53,7 @@ void SeedBank :: draw() const {
             slotRect, {0, 0}, 0, tint);
         } else {
             DrawRectangleRec(slotRect, (Color){190, 174, 112, 245});
-            DrawText(plantName(slots[i]), slotRect.x + 6, slotRect.y + 46, 10, (Color){40, 60, 30, 255});
+            DrawText(getPlantTextureKey(slots[i]), slotRect.x + 6, slotRect.y + 46, 10, (Color){40, 60, 30, 255});
         }
 
         if (i == selectedSlot) {

@@ -1,5 +1,42 @@
 #include "Gameplay/Plants/Plant.hpp"
 
+const char* getPlantTextureKey(PlantType type) {
+    static const char* keys[] = {
+        "PEASHOOTER", "SUNFLOWER", "CHERRYBOMB", "WALLNUT",
+        "POTATOMINE", "SNOWPEA", "CHOMPER", "REPEATER",
+        "PUFFSHROOM", "SUNSHROOM", "FUMESHROOM", "GRAVEBUSTER",
+        "HYPNOSHROOM", "SCAREDYSHROOM", "ICESHROOM", "DOOMSHROOM",
+        "LILYPAD", "SQUASH", "THREEPEATER", "TANGLEKELP",
+        "JALAPENO", "CALTROP", "TORCHWOOD", "TALLNUT",
+        "SEASHROOM", "PLANTERN", "CACTUS", "BLOVER",
+        "SPLITPEA", "STARFRUIT", "PUMPKIN", "MAGNETSHROOM",
+        "CABBAGEPULT", "CORNPULT", "COFFEEBEAN", "GARLIC",
+        "UMBRELLALEAF", "MARIGOLD", "MELONPULT", "GATLINGPEA",
+        "TWINSUNFLOWER", "GLOOMSHROOM", "CATTAIL", "SPIKEROCK",
+        "GOLDMAGNET", "WINTERMELON", "COBCANNON", "IMITATER"
+    };
+
+    const int index = static_cast<int>(type);
+    if(index < 0 || index >= static_cast<int>(PLANT_COUNT)) return "?";
+    return keys[index];
+}
+
+const std :: vector<PlantType>& getAllPlantTypes() {
+    static const std :: vector<PlantType> plants = {
+        PEASHOOTER, SUNFLOWER, CHERRYBOMB, WALLNUT, POTATOMINE,
+        SNOWPEA, CHOMPER, REPEATER, PUFFSHROOM, SUNSHROOM,
+        FUMESHROOM, GRAVEBUSTER, HYPNOSHROOM, SCAREDYSHROOM,
+        ICESHROOM, DOOMSHROOM, LILYPAD, SQUASH, THREEPEATER,
+        TANGLEKELP, JALAPENO, CALTROP, TORCHWOOD, TALLNUT,
+        SEASHROOM, PLANTERN, CACTUS, BLOVER, SPLITPEA, STARFRUIT,
+        PUMPKIN, MAGNETSHROOM, CABBAGEPULT, CORNPULT, COFFEEBEAN,
+        GARLIC, UMBRELLALEAF, MARIGOLD, MELONPULT, GATLINGPEA,
+        TWINSUNFLOWER, GLOOMSHROOM, CATTAIL, SPIKEROCK, GOLDMAGNET,
+        WINTERMELON, COBCANNON, IMITATER
+    };
+    return plants;
+}
+
 PlantData::PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float projectileCooldown) {
     this -> baseHealth = baseHealth;
     this -> baseDamage = baseDamage;

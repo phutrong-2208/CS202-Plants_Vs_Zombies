@@ -10,7 +10,7 @@ GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager
     choosePlants.setChooserPackage(assetManager -> getTextureManager() -> getPackage("PlantChooser"));
     choosePlants.setPacketPackage(assetManager -> getTextureManager() -> getPackage("PlantSeedPackets"));
     choosePlants.setTextManager(assetManager -> getTextManager());
-    choosePlants.setAvailablePlants({PEASHOOTER, SUNFLOWER, REPEATER, SNOWPEA, WALLNUT, CACTUS});
+    choosePlants.setAvailablePlants(getAllPlantTypes());
     choosePlants.setMaxSlots(6);
     choosePlants.setSeedBank(&seedBank);
 }

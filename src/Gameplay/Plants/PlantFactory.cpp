@@ -8,17 +8,20 @@
 #include "Gameplay/Plants/ShooterPlants/SnowPea.hpp"
 #include "Gameplay/Plants/ShooterPlants/Repeater.hpp"
 #include "Gameplay/Plants/ShooterPlants/Cactus.hpp"
+#include "Gameplay/Plants/ShooterPlants/ShooterPlantTypes.hpp"
+#include "Gameplay/Plants/DefensivePlants/DefensivePlantTypes.hpp"
+#include "Gameplay/Plants/ExplosivePlants/ExplosivePlantTypes.hpp"
+#include "Gameplay/Plants/SunProducePlants/SunPlantTypes.hpp"
 
 
 // Maps section name strings from PlantConfig.txt to PlantType enum values
-static const std::map<std::string, PlantType> plantTypeNameMap = {
-    {"PEASHOOTER", PEASHOOTER},
-    {"SUNFLOWER",  SUNFLOWER},
-    {"REPEATER",   REPEATER},
-    {"SNOWPEA",    SNOWPEA},
-    {"WALLNUT",    WALLNUT},
-    {"CACTUS",     CACTUS}
-};
+static const std::map<std::string, PlantType> plantTypeNameMap = [] {
+    std::map<std::string, PlantType> result;
+    for(PlantType type : getAllPlantTypes()) {
+        result.emplace(getPlantTextureKey(type), type);
+    }
+    return result;
+}();
 
 
 ///////////////////////////
@@ -137,6 +140,48 @@ void PlantFactory::loadPlantMechanics() {
     creatorMap[SNOWPEA]    = []() { return std::make_unique<SnowPea>(); };
     creatorMap[WALLNUT]    = []() { return std::make_unique<WallNut>(); };
     creatorMap[CACTUS]     = []() { return std::make_unique<Cactus>(); };
+    creatorMap[CHERRYBOMB] = []() { return std::make_unique<CherryBomb>(); };
+    creatorMap[POTATOMINE] = []() { return std::make_unique<PotatoMine>(); };
+    creatorMap[CHOMPER] = []() { return std::make_unique<Chomper>(); };
+    creatorMap[PUFFSHROOM] = []() { return std::make_unique<PuffShroom>(); };
+    creatorMap[SUNSHROOM] = []() { return std::make_unique<SunShroom>(); };
+    creatorMap[FUMESHROOM] = []() { return std::make_unique<FumeShroom>(); };
+    creatorMap[GRAVEBUSTER] = []() { return std::make_unique<GraveBuster>(); };
+    creatorMap[HYPNOSHROOM] = []() { return std::make_unique<HypnoShroom>(); };
+    creatorMap[SCAREDYSHROOM] = []() { return std::make_unique<ScaredyShroom>(); };
+    creatorMap[ICESHROOM] = []() { return std::make_unique<IceShroom>(); };
+    creatorMap[DOOMSHROOM] = []() { return std::make_unique<DoomShroom>(); };
+    creatorMap[LILYPAD] = []() { return std::make_unique<LilyPad>(); };
+    creatorMap[SQUASH] = []() { return std::make_unique<Squash>(); };
+    creatorMap[THREEPEATER] = []() { return std::make_unique<ThreePeater>(); };
+    creatorMap[TANGLEKELP] = []() { return std::make_unique<TangleKelp>(); };
+    creatorMap[JALAPENO] = []() { return std::make_unique<Jalapeno>(); };
+    creatorMap[CALTROP] = []() { return std::make_unique<Caltrop>(); };
+    creatorMap[TORCHWOOD] = []() { return std::make_unique<TorchWood>(); };
+    creatorMap[TALLNUT] = []() { return std::make_unique<TallNut>(); };
+    creatorMap[SEASHROOM] = []() { return std::make_unique<SeaShroom>(); };
+    creatorMap[PLANTERN] = []() { return std::make_unique<Plantern>(); };
+    creatorMap[BLOVER] = []() { return std::make_unique<Blover>(); };
+    creatorMap[SPLITPEA] = []() { return std::make_unique<SplitPea>(); };
+    creatorMap[STARFRUIT] = []() { return std::make_unique<Starfruit>(); };
+    creatorMap[PUMPKIN] = []() { return std::make_unique<Pumpkin>(); };
+    creatorMap[MAGNETSHROOM] = []() { return std::make_unique<MagnetShroom>(); };
+    creatorMap[CABBAGEPULT] = []() { return std::make_unique<CabbagePult>(); };
+    creatorMap[CORNPULT] = []() { return std::make_unique<CornPult>(); };
+    creatorMap[COFFEEBEAN] = []() { return std::make_unique<CoffeeBean>(); };
+    creatorMap[GARLIC] = []() { return std::make_unique<Garlic>(); };
+    creatorMap[UMBRELLALEAF] = []() { return std::make_unique<UmbrellaLeaf>(); };
+    creatorMap[MARIGOLD] = []() { return std::make_unique<Marigold>(); };
+    creatorMap[MELONPULT] = []() { return std::make_unique<MelonPult>(); };
+    creatorMap[GATLINGPEA] = []() { return std::make_unique<GatlingPea>(); };
+    creatorMap[TWINSUNFLOWER] = []() { return std::make_unique<TwinSunflower>(); };
+    creatorMap[GLOOMSHROOM] = []() { return std::make_unique<GloomShroom>(); };
+    creatorMap[CATTAIL] = []() { return std::make_unique<Cattail>(); };
+    creatorMap[SPIKEROCK] = []() { return std::make_unique<SpikeRock>(); };
+    creatorMap[GOLDMAGNET] = []() { return std::make_unique<GoldMagnet>(); };
+    creatorMap[WINTERMELON] = []() { return std::make_unique<WinterMelon>(); };
+    creatorMap[COBCANNON] = []() { return std::make_unique<CobCannon>(); };
+    creatorMap[IMITATER] = []() { return std::make_unique<Imitater>(); };
 } 
 
 ReanimInstance PlantFactory::createReanim(float scalar, const std::string& packageName, const std::string& animName, const std::string& clipLoopName) {
