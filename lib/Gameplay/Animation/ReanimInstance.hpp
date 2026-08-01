@@ -51,7 +51,7 @@ public:
     float getCurrentTime() const;
     bool  isLooping() const;
 
-    void draw(Rectangle hitbox);
+    void draw(Rectangle hitbox) const;
 };
 
 #endif

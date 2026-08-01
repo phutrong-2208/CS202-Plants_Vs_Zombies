@@ -21,6 +21,10 @@
 #include "Gameplay/Projectile/ProjectileFactory.hpp"
 #include "Gameplay/Projectile/Projectile.hpp"
 
+// Particles
+#include <Gameplay/Particle/ParticleManager.hpp>
+#include <Gameplay/Particle/Sun.hpp>
+
 
 class World : public IGameplayMediator {
 private:
@@ -31,6 +35,8 @@ private:
     ZombieManager zombieManager;
     ProjectileManager projectileManager;
     ProjectileFactory projectileFactory;
+    ParticleManager particleManager;
+    int sunAmount = 50;
 
 
     void addProjectile(PlantType plantType, Vector2 position, float damage) override;
@@ -47,6 +53,8 @@ public:
     void draw();
     void drawPlacementPreview(int selectedPlantId) const;
     bool tryPlacePlant(Vector2 position, PlantType plantType);
+    bool handleParticleClick(Vector2 position);
+    int getSunAmount() const;
     bool isReady() const;
     bool isChoosingPlants() const;
     void finishChoosingPlants();

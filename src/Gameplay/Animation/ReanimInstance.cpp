@@ -93,7 +93,7 @@ bool ReanimInstance::isLooping() const {
 // Rendering
 // -----------------------------------------------------------------------
 
-void ReanimInstance::draw(Rectangle hitbox) {
+void ReanimInstance::draw(Rectangle hitbox) const {
     if (rawAnim == nullptr || rawTexPack == nullptr) {
         TraceLog(LOG_ERROR, "ReanimInstance: animation or texture package not set");
         return;

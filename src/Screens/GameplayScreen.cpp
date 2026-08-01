@@ -54,6 +54,10 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
             return;
         }
 
+        if (world -> handleParticleClick(inputEvent.position)) {
+            return;
+        }
+
         if (seedBank.handleMouseClick(inputEvent.position)) {
             return;
         }

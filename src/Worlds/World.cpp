@@ -63,6 +63,26 @@ World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
     projectileFactory.setProjectileTexturePackage(textureManager -> getPackage("Projectile"));
     projectileFactory.loadProjectileMechanics();
 
+    // Temporary ParticleManager smoke test. Remove after Sun spawning is wired.
+    TexturePackage* particlePackage = textureManager -> getPackage("Particles");
+    ReanimParser* sunAnimationData =
+        assetManager -> getAnimationManager() -> getAnimationData("SunAnim");
+    if(particlePackage && sunAnimationData){
+        ReanimInstance sunAnimation;
+        sunAnimation.setTexturePackage(particlePackage);
+        sunAnimation.setAnimation(sunAnimationData);
+        sunAnimation.setTextureScalar(1.0f);
+
+        particleManager.addParticle(
+            std :: make_unique<Sun>(
+                std :: move(sunAnimation),
+                Vector2{screenWidth * 0.5f, 100.0f},
+                300.0f,
+                25
+            )
+        );
+    }
+
     for (int i = 0; i < 5; ++i) {
         if (i % 2 == 0)
         zombieManager.addZombie(zombieFactory.createZombie(
@@ -82,7 +102,7 @@ World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
     zombieManager.setMediator(this);
 }
 
-void World ::update(float dt) {
+void World :: update(float dt) {
     if (!map)
         return;
 
@@ -93,6 +113,7 @@ void World ::update(float dt) {
     grid.updateTime(dt);
     projectileManager.update(dt);
     zombieManager.update(dt);
+    particleManager.update(dt);
 
     grid.sendPlantAttacks();
     projectileManager.toggleProjectiles();
@@ -109,15 +130,16 @@ void World ::draw() {
     grid.draw();
     projectileManager.simulate();
     zombieManager.draw();
+    particleManager.draw();
 }
 
-void World ::drawPlacementPreview(int selectedPlantId) const {
+void World :: drawPlacementPreview(int selectedPlantId) const {
     if (!map || isReady() == false || selectedPlantId < 0)
         return;
 
     Vector2 mouse = GetMousePosition();
     int hovR, hovC;
-    std ::tie(hovR, hovC) = grid.getCellID(mouse);
+    std :: tie(hovR, hovC) = grid.getCellID(mouse);
 
     if (hovR != -1 && hovC != -1) {
         Rectangle rect = grid.getCellRect(hovR, hovC);
@@ -125,23 +147,35 @@ void World ::drawPlacementPreview(int selectedPlantId) const {
     }
 }
 
-bool World ::tryPlacePlant(Vector2 position, PlantType plantType) {
+bool World :: tryPlacePlant(Vector2 position, PlantType plantType) {
     if (!map || isReady() == false)
         return false;
 
     int r, c;
-    std ::tie(r, c) = grid.getCellID(position);
+    std :: tie(r, c) = grid.getCellID(position);
     if (r < 0 || c < 0 || grid.getPlant(r, c))
         return false;
     return grid.placePlant(r, c, plantFactory.createPlant(plantType));
 }
 
-bool World ::isReady() const { return map && map->isReady(); }
+bool World :: handleParticleClick(Vector2 position) {
+    const int collectedValue = particleManager.handleClick(position);
+    if(collectedValue <= 0) return false;
 
-bool World ::isChoosingPlants() const { return map && map->isChoosingPlants(); }
+    sunAmount += collectedValue;
+    return true;
+}
 
-void World ::finishChoosingPlants() {
+int World :: getSunAmount() const {
+    return sunAmount;
+}
+
+bool World :: isReady() const { return map && map->isReady(); }
+
+bool World :: isChoosingPlants() const { return map && map->isChoosingPlants(); }
+
+void World :: finishChoosingPlants() {
     if (map) {
-        map->finishChoosingPlants();
+        map -> finishChoosingPlants();
     }
 }
