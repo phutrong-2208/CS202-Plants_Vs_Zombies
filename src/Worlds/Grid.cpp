@@ -144,3 +144,28 @@ Plant* Grid :: getPlant(int row, int col) const {
     }
     return garden[row][col].getPlant();
 }
+
+Plant* Grid::getPlantInArea(Rectangle area) const {
+    for (int row = 0; row < NUM_ROWS; ++row) {
+        for (int col = 0; col < NUM_COLS; ++col) {
+            Plant* plant = getPlant(row, col);
+            if (plant == nullptr || plant -> isDead()) continue;
+
+            if (CheckCollisionRecs(area, plant -> getHitbox())) return plant;
+        }
+    }
+
+    return nullptr;
+}
+
+bool Grid::hasPlantInArea(Rectangle area) const {
+    return getPlantInArea(area) != nullptr;
+}
+
+bool Grid::damagePlantInArea(Rectangle area, float damage) {
+    Plant* plant = getPlantInArea(area);
+    if (plant == nullptr) return false;
+
+    plant -> receiveDamage(static_cast<int>(damage));
+    return true;
+}

@@ -24,6 +24,8 @@ public:
     virtual bool touchTarget(Projectile* projectile) = 0;
 
     // Zombie killing signals
+    virtual bool hasPlantInArea(Rectangle area) const = 0;
+    virtual bool damagePlantInArea(Rectangle area, float damage) = 0;
 };
 
 #endif

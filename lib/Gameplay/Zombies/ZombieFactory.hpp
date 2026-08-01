@@ -27,7 +27,8 @@ private:
         float scalar,
         const std::string& packageName,
         const std::string& animName,
-        const std::string& clipLoopName
+        const std::string& clipLoopName,
+        const std::vector<std::string>& hiddenTracks
     );
 
 public:

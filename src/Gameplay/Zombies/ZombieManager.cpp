@@ -7,9 +7,15 @@ void ZombieManager :: addZombie(std::unique_ptr<Zombie> zombie) {
     if(zombie) zombies.emplace_back(std::move(zombie));
 }
 
-void ZombieManager::update(float dt) {
+void ZombieManager :: update(float dt) {
     for(auto& zombie : zombies) {
-        if(!zombie->isDead()) zombie->updateTime(dt);
+        if(zombie -> isDead()) continue;
+
+        if(gameplayMediator){
+            zombie -> updateCombat(dt, *gameplayMediator);
+        }
+
+        zombie -> updateTime(dt);
     }
 
     zombies.erase(

@@ -34,6 +34,9 @@ public:
     bool placePlant(int row, int col, std :: unique_ptr<Plant> plant);
     void removePlant(int row, int col);
     Plant* getPlant(int row, int col) const;
+    Plant* getPlantInArea(Rectangle area) const;
+    bool hasPlantInArea(Rectangle area) const;
+    bool damagePlantInArea(Rectangle area, float damage);
 };
 
 #endif

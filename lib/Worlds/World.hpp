@@ -36,6 +36,8 @@ private:
     void addProjectile(PlantType plantType, Vector2 position, float damage) override;
     bool hasTarget(PlantType plantType, Vector2 spawnPos, Rectangle bounds) override;
     bool touchTarget(Projectile* projectile) override;
+    bool hasPlantInArea(Rectangle area) const override;
+    bool damagePlantInArea(Rectangle area, float damage) override;
 public:
     World() = default;
     ~World() = default;

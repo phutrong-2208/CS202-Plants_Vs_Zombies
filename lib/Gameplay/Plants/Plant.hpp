@@ -66,6 +66,7 @@ private:
     float baseDamage = 10.0f, buffDamage = 20.0f;
     int sunCost = 100;
     float projectileCooldown = 0.0f;
+    float seedRecharge = 7.5f;
 
     // Reanim metadata
     float reanimScalar = 1.5f;
@@ -80,6 +81,7 @@ public:
     float getDamage(bool buffed) const;
     int getSunCost() const;
     float getProjectileCooldown() const;
+    float getSeedRecharge() const;
 
     float getReanimScalar() const;
     const std::string& getReanimPackage() const;
@@ -96,6 +98,7 @@ public:
     void setBuffDamage(float damage);
     void setSunCost(int cost);
     void setProjectileCooldown(float cooldown);
+    void setSeedRecharge(float recharge);
 };
 
 class Plant {
@@ -119,6 +122,7 @@ public:
 
     void setBounds(Rectangle newBounds);
     Rectangle getBounds() const;
+    virtual Rectangle getHitbox() const;
 
     virtual Vector2 getProjectileSpawnPosition();
     virtual PlantType getType();

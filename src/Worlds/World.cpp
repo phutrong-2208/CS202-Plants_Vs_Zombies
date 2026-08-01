@@ -35,6 +35,14 @@ bool World::touchTarget(Projectile* projectile) {
     return false;
 }
 
+bool World::hasPlantInArea(Rectangle area) const {
+    return grid.hasPlantInArea(area);
+}
+
+bool World::damagePlantInArea(Rectangle area, float damage) {
+    return grid.damagePlantInArea(area, damage);
+}
+
 World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
     map = std::make_unique<DayMap>();
     if (assetManager == nullptr) {
@@ -94,7 +102,7 @@ void World ::draw() {
     if (!map)
         return;
 
-    map->drawBackground();
+    map -> drawBackground();
     if (isReady() == false)
         return;
 

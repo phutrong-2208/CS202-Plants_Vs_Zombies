@@ -92,6 +92,8 @@ void PlantDataset::loadFromFile(const std::string& filepath) {
             currentData->setBuffDamage(std::stof(value));
         } else if (key == "COOLDOWN") {
             currentData->setProjectileCooldown(std::stof(value));
+        } else if (key == "SEED_RECHARGE") {
+            currentData->setSeedRecharge(std::stof(value));
         } else if (key == "REANIM_SCALAR") {
             currentData->setReanimScalar(std::stof(value));
         } else if (key == "REANIM_PACKAGE") {

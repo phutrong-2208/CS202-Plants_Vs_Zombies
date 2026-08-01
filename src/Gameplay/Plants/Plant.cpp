@@ -56,6 +56,9 @@ int PlantData::getSunCost() const {
 float PlantData::getProjectileCooldown() const {
     return projectileCooldown;
 }
+float PlantData::getSeedRecharge() const {
+    return seedRecharge;
+}
 
 float PlantData::getReanimScalar() const {
     return reanimScalar;
@@ -88,6 +91,7 @@ void PlantData::setBaseDamage(float damage) { baseDamage = damage; }
 void PlantData::setBuffDamage(float damage) { buffDamage = damage; }
 void PlantData::setSunCost(int cost) { sunCost = cost; }
 void PlantData::setProjectileCooldown(float cooldown) { projectileCooldown = cooldown; }
+void PlantData::setSeedRecharge(float recharge) { seedRecharge = recharge; }
 
 void Plant::plantSetup() {
     cooldownTimer = 0.0f;
@@ -114,6 +118,14 @@ void Plant::setBounds(Rectangle newBounds) {
 Rectangle Plant::getBounds() const {
     return bounds;
 }
+Rectangle Plant::getHitbox() const {
+    return {
+        bounds.x + bounds.width * 0.25f,
+        bounds.y + bounds.height * 0.25f,
+        bounds.width * 0.5f,
+        bounds.height * 0.7f
+    };
+}
 
 
 Vector2 Plant::getProjectileSpawnPosition() {
@@ -125,7 +137,8 @@ PlantType Plant::getType() {
 
 
 void Plant::draw(Rectangle hitbox) {
-    animation.draw(hitbox);   
+    animation.draw(hitbox);
+    DrawRectangleLinesEx(getHitbox(), 2.0f, GREEN);
 }
 void Plant::setReanimInstance(ReanimInstance anim) {
     animation = anim;
