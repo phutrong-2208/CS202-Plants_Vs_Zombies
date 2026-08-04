@@ -84,7 +84,7 @@ void Grid::updateTime(float deltaSeconds) {
         }
     }
 }
-void Grid::sendPlantAttacks() {
+void Grid::sendPlantActions() {
     if (gameplayMediator == nullptr) return;
 
     for (int row = 0; row < NUM_ROWS; ++row) {
@@ -93,6 +93,23 @@ void Grid::sendPlantAttacks() {
             if (plant == nullptr || plant -> isDead()) continue;
 
             if (plant -> isOnCooldown()) continue;
+
+            if (plant->getType() == SUNFLOWER || plant->getType() == TWINSUNFLOWER) {
+                Vector2 spawnPos = { plant->getBounds().x + plant->getBounds().width * 0.5f, plant->getBounds().y };
+                float targetY = plant->getBounds().y + plant->getBounds().height * 0.5f + GetRandomValue(-20, 20);
+                spawnPos.x += GetRandomValue(-20, 20);
+                
+                gameplayMediator->spawnSun(spawnPos, targetY);
+                plant->resetCooldown();
+                
+                if (plant->getType() == TWINSUNFLOWER) {
+                    spawnPos.x += GetRandomValue(-30, 30);
+                    targetY += GetRandomValue(-30, 30);
+                    gameplayMediator->spawnSun(spawnPos, targetY);
+                }
+                continue;
+            }
+
             if (!gameplayMediator -> hasTarget(
                 plant -> getType(), 
                 plant -> getProjectileSpawnPosition(), 

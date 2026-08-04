@@ -4,7 +4,7 @@
 #include <Core/TextureManager.hpp>
 #include <Core/AnimationManager.hpp>
 #include <Gameplay/Animation/ReanimInstance.hpp>
-#include "Gameplay/IGameplayMediator.hpp"
+#include <Gameplay/IGameplayMediator.hpp>
 
 enum ZombieType : int {
     NORMAL_ZOMBIE,
@@ -93,7 +93,6 @@ public:
     void setHiddenTracks(std::vector<std::string> tracks);
 };
 
-class IGameplayMediator;
 
 class Zombie {
 protected:
@@ -102,7 +101,7 @@ protected:
     int attackDamage = 0;
 
     float attackTimer = 0.0f;
-    float attackInterval = 1.0f;
+    float deathTimer = 0.0f;
 
     ZombieState state = ZombieState :: WALKING;
     Rectangle hitbox = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -110,7 +109,7 @@ protected:
     ZombieData* zombieData = nullptr;
 
     void zombieSetup();
-    virtual void onStateChanged(ZombieState previousState, ZombieState newState);
+    virtual void onStateChanged(ZombieState newState);
 
 public:
     Zombie() = default;
@@ -121,7 +120,7 @@ public:
     void setReanimInstance(ReanimInstance anim);
     void draw();
 
-    void receiveDamage(float damage);
+    void receiveDamage(float damage, IGameplayMediator* mediator = nullptr);
     bool isDead() const;
 
     float getHealth() const;

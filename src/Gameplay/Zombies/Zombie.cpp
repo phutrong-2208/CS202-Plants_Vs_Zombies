@@ -1,4 +1,5 @@
 #include "Gameplay/Zombies/Zombie.hpp"
+#include "Gameplay/Particle/ZombiePart.hpp"
 
 ZombieData::ZombieData(float health, float speed, int damage)
     : baseHealth(health), moveSpeed(speed), attackDamage(damage) {}
@@ -51,20 +52,48 @@ void Zombie::updateTime(float dt) {
 
     animation.updateTime(dt);
     if(state == ZombieState::WALKING) hitbox.x -= speed * dt;
+    
+    const float ZOMBIE_DEATH_COUNTDOWN = 3.0f;
+    if (state == ZombieState::DYING) {
+        deathTimer += dt;
+
+        if (deathTimer >= ZOMBIE_DEATH_COUNTDOWN) {
+            setState(ZombieState::DEAD);
+        }
+    }
 }
 
 void Zombie::setReanimInstance(ReanimInstance anim) { animation = anim; }
-void Zombie::draw() {
+void Zombie::draw() {    
     animation.draw(hitbox);
     DrawRectangleLinesEx(getHitbox(), 2.0f, RED);
     DrawRectangleLinesEx(getAttackHitbox(), 2.0f, YELLOW);
 }
 
-void Zombie::receiveDamage(float damage) {
-    if(state == ZombieState::DEAD || damage <= 0.0f) return;
+void Zombie::receiveDamage(float damage, IGameplayMediator* mediator) {
+    if(state == ZombieState::DEAD || state == ZombieState::DYING || damage <= 0.0f) return;
 
     health = std::max(0.0f, health - damage);
-    if(health == 0.0f) setState(ZombieState::DEAD);
+    if(health == 0.0f) {
+        setState(ZombieState::DYING);
+        
+        if (mediator == nullptr) return;
+        
+        Texture2D* headTex = animation.getTrackTexture("anim_head1");
+        if (headTex == nullptr) headTex = animation.getTrackTexture("anim_head2");
+        
+        if (headTex == nullptr) return;
+                
+        mediator->addParticle(
+            std::make_unique<ZombiePart>(
+                ZombiePartType::HEAD,
+                headTex,
+                Vector2{hitbox.x + 30.0f, hitbox.y + 10.0f},
+                Vector2{GetRandomValue(-50, 50) / 1.0f, -200.0f},
+                hitbox.y + hitbox.height
+            )
+        );
+    }
 }
 
 bool Zombie::isDead() const { return state == ZombieState::DEAD; }
@@ -94,9 +123,8 @@ void Zombie :: setHitbox(Rectangle newHitbox) { hitbox = newHitbox; }
 void Zombie :: setState(ZombieState newState) {
     if(state == newState) return;
 
-    const ZombieState previousState = state;
     state = newState;
-    onStateChanged(previousState, newState);
+    onStateChanged(newState);
 }
 void Zombie :: setAttacking(bool isAttacking) {
     if(state == ZombieState :: DYING || state == ZombieState :: DEAD) return;
@@ -118,7 +146,7 @@ void Zombie :: updateCombat(float dt, IGameplayMediator& mediator){
     }
 
     attackTimer += dt;
-    if(attackTimer >= attackInterval){
+    if (zombieData != nullptr && attackTimer >= zombieData -> getAttackInterval()){
         mediator.damagePlantInArea(getAttackHitbox(), attackDamage);
         attackTimer = 0.0f;
     }
@@ -127,7 +155,7 @@ void Zombie :: updateCombat(float dt, IGameplayMediator& mediator){
 
 bool Zombie :: isAttacking() const { return state == ZombieState :: EATING; }
 
-void Zombie :: onStateChanged(ZombieState previousState, ZombieState newState) {
+void Zombie :: onStateChanged(ZombieState newState) {
     switch(newState){
         case ZombieState :: WALKING:
             animation.playClip("walk");
@@ -138,7 +166,7 @@ void Zombie :: onStateChanged(ZombieState previousState, ZombieState newState) {
             animation.setLoopToggle(true);
             break;
         case ZombieState :: DYING:
-            animation.playClip("die");
+            animation.playClip("death");
             animation.setLoopToggle(false);
             break;
         case ZombieState :: DEAD:

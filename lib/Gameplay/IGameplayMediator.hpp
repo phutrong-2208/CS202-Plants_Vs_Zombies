@@ -3,7 +3,7 @@
 
 #include <Gameplay/Plants/Plant.hpp>
 #include <Gameplay/Projectile/Projectile.hpp>
-#include <Gameplay/Zombies/Zombie.hpp>
+#include <Gameplay/Particle/Particle.hpp>
 
 static const std::map <PlantType, ProjectileType> projectileConvert = {
     {PEASHOOTER, PROJECTILE_PEA},
@@ -26,6 +26,10 @@ public:
     // Zombie killing signals
     virtual bool hasPlantInArea(Rectangle area) const = 0;
     virtual bool damagePlantInArea(Rectangle area, float damage) = 0;
+
+    // Particles
+    virtual void addParticle(std::unique_ptr<Particle> particle) = 0;
+    virtual void spawnSun(Vector2 position, float targetY) = 0;
 };
 
 #endif

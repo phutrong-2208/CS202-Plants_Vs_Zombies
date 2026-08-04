@@ -7,6 +7,7 @@ class Sunflower : public Plant {
 public:
     Sunflower();
     PlantType getType() override;
+    void resetCooldown();
 };
 
 #endif

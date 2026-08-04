@@ -30,6 +30,16 @@ void ReanimInstance::showOnlyTracks(const std::vector<std::string>& trackNames) 
 // For the default idle loop, do NOT call playClip — just let the full
 // file loop naturally; the reanim file IS one complete idle cycle.
 
+Texture2D* ReanimInstance::getTrackTexture(const std::string& trackName) const {
+    if (rawAnim == nullptr || rawTexPack == nullptr) return nullptr;
+    const ReanimTrack* track = rawAnim->getTrack(trackName);
+    if (track == nullptr) return nullptr;
+    
+    const float loopStart = (clipLoopStart >= 0.0f) ? clipLoopStart : rawAnim->getLoopStartTime();
+    Frame frame = track->getInterpolatedFrame(currentTime, loopStart, clipEnd);
+    return rawTexPack->GetTexture(frame.getTextureKey());
+}
+
 bool ReanimInstance::playClip(const std::string& clipName) {
     if (rawAnim == nullptr) return false;
 

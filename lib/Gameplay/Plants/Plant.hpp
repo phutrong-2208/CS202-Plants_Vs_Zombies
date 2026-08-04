@@ -118,7 +118,7 @@ public:
     void receiveDamage(int damage);
 
     void updateTime(float deltaSeconds);
-    void resetCooldown();
+    virtual void resetCooldown();
 
     void setBounds(Rectangle newBounds);
     Rectangle getBounds() const;

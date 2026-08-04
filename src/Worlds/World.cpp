@@ -28,7 +28,7 @@ bool World::touchTarget(Projectile* projectile) {
     Zombie* zombie = zombieManager.getShotFirst(hitbox);
 
     if (zombie != nullptr) {
-        zombie -> receiveDamage(projectile -> getDamage());
+        zombie -> receiveDamage(projectile -> getDamage(), this);
         return true;
     }
 
@@ -41,6 +41,28 @@ bool World::hasPlantInArea(Rectangle area) const {
 
 bool World::damagePlantInArea(Rectangle area, float damage) {
     return grid.damagePlantInArea(area, damage);
+}
+
+void World::addParticle(std::unique_ptr<Particle> particle) {
+    particleManager.addParticle(std::move(particle));
+}
+
+void World::spawnSun(Vector2 position, float targetY) {
+    if (sunPackage && sunAnimationData) {
+        ReanimInstance sunAnimation;
+        sunAnimation.setTexturePackage(sunPackage);
+        sunAnimation.setAnimation(sunAnimationData);
+        sunAnimation.setTextureScalar(1.0f);
+
+        particleManager.addParticle(
+            std::make_unique<Sun>(
+                std::move(sunAnimation),
+                position,
+                targetY,
+                25
+            )
+        );
+    }
 }
 
 World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
@@ -63,25 +85,8 @@ World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
     projectileFactory.setProjectileTexturePackage(textureManager -> getPackage("Projectile"));
     projectileFactory.loadProjectileMechanics();
 
-    // Temporary ParticleManager smoke test. Remove after Sun spawning is wired.
-    TexturePackage* particlePackage = textureManager -> getPackage("Particles");
-    ReanimParser* sunAnimationData =
-        assetManager -> getAnimationManager() -> getAnimationData("SunAnim");
-    if(particlePackage && sunAnimationData){
-        ReanimInstance sunAnimation;
-        sunAnimation.setTexturePackage(particlePackage);
-        sunAnimation.setAnimation(sunAnimationData);
-        sunAnimation.setTextureScalar(1.0f);
-
-        particleManager.addParticle(
-            std :: make_unique<Sun>(
-                std :: move(sunAnimation),
-                Vector2{screenWidth * 0.5f, 100.0f},
-                300.0f,
-                25
-            )
-        );
-    }
+    this->sunPackage = textureManager -> getPackage("Particles");
+    this->sunAnimationData = assetManager -> getAnimationManager() -> getAnimationData("SunAnim");
 
     for (int i = 0; i < 5; ++i) {
         if (i % 2 == 0)
@@ -115,7 +120,7 @@ void World :: update(float dt) {
     zombieManager.update(dt);
     particleManager.update(dt);
 
-    grid.sendPlantAttacks();
+    grid.sendPlantActions();
     projectileManager.toggleProjectiles();
 }
 

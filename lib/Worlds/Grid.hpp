@@ -28,7 +28,7 @@ public:
     Rectangle getCellRect(int row, int col) const;
 
     void updateTime(float deltaSeconds);
-    void sendPlantAttacks();
+    void sendPlantActions();
     void draw();
     
     bool placePlant(int row, int col, std :: unique_ptr<Plant> plant);

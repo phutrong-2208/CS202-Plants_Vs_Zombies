@@ -37,6 +37,7 @@ public:
     void setTextureScalar(float scaleFactor);
     void hideTrack(const std :: string& trackName);
     void showOnlyTracks(const std :: vector<std :: string>& trackNames);
+    Texture2D* getTrackTexture(const std::string& trackName) const;
 
     // ---------------------------------------------------------------
     // Clip selection — call once after setAnimation().
