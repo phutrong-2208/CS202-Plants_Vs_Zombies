@@ -1,5 +1,6 @@
 #include "Gameplay/Zombies/Zombie.hpp"
 #include "Gameplay/Particle/ZombiePart.hpp"
+#include "Gameplay/IGameplayMediator.hpp"
 
 ZombieData::ZombieData(float health, float speed, int damage)
     : baseHealth(health), moveSpeed(speed), attackDamage(damage) {}

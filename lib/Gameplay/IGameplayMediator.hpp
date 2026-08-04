@@ -4,6 +4,7 @@
 #include <Gameplay/Plants/Plant.hpp>
 #include <Gameplay/Projectile/Projectile.hpp>
 #include <Gameplay/Particle/Particle.hpp>
+#include <Gameplay/Zombies/ZombieType.hpp>
 
 static const std::map <PlantType, ProjectileType> projectileConvert = {
     {PEASHOOTER, PROJECTILE_PEA},
@@ -30,6 +31,9 @@ public:
     // Particles
     virtual void addParticle(std::unique_ptr<Particle> particle) = 0;
     virtual void spawnSun(Vector2 position, float targetY) = 0;
+
+    // Wave spawning
+    virtual void spawnZombie(ZombieType type, int lane) = 0;
 };
 
 #endif

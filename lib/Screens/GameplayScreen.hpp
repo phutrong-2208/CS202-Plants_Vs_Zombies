@@ -6,13 +6,17 @@
 #include <Worlds/World.hpp>
 #include <UI/ChoosePlants.hpp>
 #include <UI/SeedBank.hpp>
+#include <UI/WaveHUD.hpp>
 
 class GameplayScreen : public Screen {
 private:
     std::unique_ptr<World> world = nullptr;
     ChoosePlants choosePlants;
     SeedBank seedBank;
+    WaveHUD waveHUD;
     TextManager* textManager = nullptr;
+    int screenWidth  = 800;
+    int screenHeight = 600;
 
     void drawSunHUD() const;
 

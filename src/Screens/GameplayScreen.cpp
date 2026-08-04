@@ -4,6 +4,10 @@ GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager
     setAssetManager(manager);
     world = std::make_unique<World>(screenWidth, screenHeight, assetManager);
     textManager = assetManager->getTextManager();
+    this->screenWidth  = screenWidth;
+    this->screenHeight = screenHeight;
+
+    waveHUD.setTexturePackage(assetManager->getTextureManager()->getPackage("ZombiePhase"));
 
     seedBank.setTexturePackage(assetManager -> getTextureManager() -> getPackage("PlantChooser"));
     seedBank.setPacketPackage(assetManager -> getTextureManager() -> getPackage("PlantSeedPackets"));
@@ -40,6 +44,14 @@ void GameplayScreen :: draw() {
 
     if (world && world -> isReady()) {
         drawSunHUD();
+        waveHUD.draw(
+            world->getWaveProgress(),
+            world->getCurrentWave(),
+            world->getTotalWaves(),
+            world->isWaveFinished(),
+            screenWidth,
+            screenHeight
+        );
     }
 }
 

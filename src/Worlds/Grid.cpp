@@ -94,7 +94,7 @@ void Grid::sendPlantActions() {
 
             if (plant -> isOnCooldown()) continue;
 
-            if (plant->getType() == SUNFLOWER || plant->getType() == TWINSUNFLOWER) {
+            if (plant->getType() == SUNFLOWER || plant->getType() == TWINSUNFLOWER || plant->getType() == SUNSHROOM) {
                 Vector2 spawnPos = { plant->getBounds().x + plant->getBounds().width * 0.5f, plant->getBounds().y };
                 float targetY = plant->getBounds().y + plant->getBounds().height * 0.5f + GetRandomValue(-20, 20);
                 spawnPos.x += GetRandomValue(-20, 20);

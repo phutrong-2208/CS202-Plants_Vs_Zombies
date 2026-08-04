@@ -25,6 +25,9 @@
 #include <Gameplay/Particle/ParticleManager.hpp>
 #include <Gameplay/Particle/Sun.hpp>
 
+// Waves
+#include <Gameplay/Waves/WaveManager.hpp>
+
 
 class World : public IGameplayMediator {
 private:
@@ -36,6 +39,7 @@ private:
     ProjectileManager projectileManager;
     ProjectileFactory projectileFactory;
     ParticleManager particleManager;
+    WaveManager waveManager;
     
     int sunAmount = 50;
 
@@ -50,6 +54,7 @@ private:
     bool damagePlantInArea(Rectangle area, float damage) override;
     void addParticle(std::unique_ptr<Particle> particle) override;
     void spawnSun(Vector2 position, float targetY) override;
+    void spawnZombie(ZombieType type, int lane) override;
 
     bool canAfford(PlantType type) const;
     void spendSun(int amount);
@@ -65,6 +70,10 @@ public:
     bool handleParticleClick(Vector2 position);
     int getSunAmount() const;
     std::map<PlantType, int> getAllSunCosts() const;
+    float getWaveProgress()  const;
+    int   getCurrentWave()   const;
+    int   getTotalWaves()    const;
+    bool  isWaveFinished()   const;
     bool isReady() const;
     bool isChoosingPlants() const;
     void finishChoosingPlants();

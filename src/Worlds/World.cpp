@@ -95,19 +95,8 @@ World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
     this->sunPackage = textureManager -> getPackage("Particles");
     this->sunAnimationData = assetManager -> getAnimationManager() -> getAnimationData("SunAnim");
 
-    for (int i = 0; i < 5; ++i) {
-        if (i % 2 == 0)
-        zombieManager.addZombie(zombieFactory.createZombie(
-            NORMAL_ZOMBIE,
-            Rectangle{grid.getCellRect(i, 8).x, grid.getCellRect(i, 8).y - 40.0f,
-                        50.0f, 100.0f}));
-
-        if (i % 2 == 1)
-        zombieManager.addZombie(zombieFactory.createZombie(
-            DANCER_ZOMBIE,
-            Rectangle{grid.getCellRect(i, 8).x, grid.getCellRect(i, 8).y - 40.0f,
-                        50.0f, 100.0f}));
-    }
+    // Load wave data (replaces temp zombie spawn loop)
+    waveManager.loadLevel(1);
 
     grid.setMediator(this);
     projectileManager.setMediator(this);
@@ -126,6 +115,7 @@ void World :: update(float dt) {
     projectileManager.update(dt);
     zombieManager.update(dt);
     particleManager.update(dt);
+    waveManager.update(dt, *this);
 
     grid.sendPlantActions();
     projectileManager.toggleProjectiles();
@@ -191,6 +181,22 @@ int World :: getSunAmount() const {
 std::map<PlantType, int> World :: getAllSunCosts() const {
     return plantFactory.getAllSunCosts();
 }
+
+void World::spawnZombie(ZombieType type, int lane) {
+    if (lane < 0 || lane > 4) return;
+    Rectangle spawnRect = grid.getCellRect(lane, 8);
+    zombieManager.addZombie(
+        zombieFactory.createZombie(
+            type,
+            Rectangle{spawnRect.x, spawnRect.y - 40.0f, 50.0f, 100.0f}
+        )
+    );
+}
+
+float World::getWaveProgress()  const { return waveManager.getProgress(); }
+int   World::getCurrentWave()   const { return waveManager.getCurrentWave(); }
+int   World::getTotalWaves()    const { return waveManager.getTotalWaves(); }
+bool  World::isWaveFinished()   const { return waveManager.isFinished(); }
 
 bool World :: isReady() const { return map && map->isReady(); }
 

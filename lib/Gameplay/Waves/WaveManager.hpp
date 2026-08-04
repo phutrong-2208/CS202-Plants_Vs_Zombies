@@ -1,0 +1,42 @@
+﻿#ifndef WAVE_MANAGER_HPP
+#define WAVE_MANAGER_HPP
+
+#include <Common.hpp>
+#include <Gameplay/Zombies/Zombie.hpp>
+
+class IGameplayMediator;
+
+struct WaveEntry {
+    ZombieType type;
+    int lane;    // row 0-4
+    float delay; // seconds after wave-start before spawning
+};
+
+class WaveManager {
+private:
+    std::vector<std::vector<WaveEntry>> waves;
+
+    int   currentWave     = 0;
+    int   pendingIndex    = 0;
+    float spawnTimer      = 0.0f;
+
+    int   totalZombies    = 0;
+    int   spawnedZombies  = 0;
+
+    bool  waitingForClear = false;
+    bool  finished        = false;
+    float interWaveDelay  = 0.0f;
+
+public:
+    WaveManager() = default;
+
+    void loadLevel(int level);
+    void update(float dt, IGameplayMediator& mediator);
+
+    float getProgress()    const;
+    int   getCurrentWave() const;
+    int   getTotalWaves()  const;
+    bool  isFinished()     const;
+};
+
+#endif

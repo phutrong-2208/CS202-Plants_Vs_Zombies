@@ -111,7 +111,7 @@ protected:
     ReanimInstance animation;
     Rectangle bounds = {0.0f, 0.0f, 0.0f, 0.0f};
 
-    void plantSetup();
+    virtual void plantSetup();
 public:
     Plant() = default;
     virtual ~Plant() = default;

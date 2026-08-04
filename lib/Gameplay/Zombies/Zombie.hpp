@@ -4,40 +4,8 @@
 #include <Core/TextureManager.hpp>
 #include <Core/AnimationManager.hpp>
 #include <Gameplay/Animation/ReanimInstance.hpp>
+#include <Gameplay/Zombies/ZombieType.hpp>
 #include <Gameplay/IGameplayMediator.hpp>
-
-enum ZombieType : int {
-    NORMAL_ZOMBIE,
-    FLAG_ZOMBIE,
-    CONEHEAD_ZOMBIE,
-    POLE_VAULTING_ZOMBIE,
-    BUCKETHEAD_ZOMBIE,
-    NEWSPAPER_ZOMBIE,
-    SCREEN_DOOR_ZOMBIE,
-    FOOTBALL_ZOMBIE,
-    DANCING_ZOMBIE,
-    DANCER_ZOMBIE = DANCING_ZOMBIE,
-    BACKUP_DANCER_ZOMBIE,
-    DUCKY_TUBE_ZOMBIE,
-    DUCKY_TUBE_CONEHEAD_ZOMBIE,
-    DUCKY_TUBE_BUCKETHEAD_ZOMBIE,
-    SNORKEL_ZOMBIE,
-    ZOMBONI_ZOMBIE,
-    BOBSLED_TEAM_ZOMBIE,
-    DOLPHIN_RIDER_ZOMBIE,
-    JACK_IN_THE_BOX_ZOMBIE,
-    BALLOON_ZOMBIE,
-    DIGGER_ZOMBIE,
-    POGO_ZOMBIE,
-    YETI_ZOMBIE,
-    BUNGEE_ZOMBIE,
-    LADDER_ZOMBIE,
-    CATAPULT_ZOMBIE,
-    GARGANTUAR_ZOMBIE,
-    IMP_ZOMBIE,
-    ZOMBOSS_ZOMBIE,
-    ZOMBIE_COUNT
-};
 
 enum class ZombieState {
     WALKING,
