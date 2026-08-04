@@ -50,6 +50,9 @@ private:
     bool damagePlantInArea(Rectangle area, float damage) override;
     void addParticle(std::unique_ptr<Particle> particle) override;
     void spawnSun(Vector2 position, float targetY) override;
+
+    bool canAfford(PlantType type) const;
+    void spendSun(int amount);
 public:
     World() = default;
     ~World() = default;
@@ -61,6 +64,7 @@ public:
     bool tryPlacePlant(Vector2 position, PlantType plantType);
     bool handleParticleClick(Vector2 position);
     int getSunAmount() const;
+    std::map<PlantType, int> getAllSunCosts() const;
     bool isReady() const;
     bool isChoosingPlants() const;
     void finishChoosingPlants();

@@ -30,6 +30,8 @@ public:
 
     void loadPlantMechanics();
     std::unique_ptr <Plant> createPlant(PlantType pType);
+    int getSunCost(PlantType pType) const;
+    std::map<PlantType, int> getAllSunCosts() const;
 };
 
 #endif

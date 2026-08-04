@@ -23,6 +23,14 @@ void SeedBank :: setPacketPackage(TexturePackage* package) {
     packetPackage = package;
 }
 
+void SeedBank :: setTextManager(TextManager* manager) {
+    textManager = manager;
+}
+
+void SeedBank :: setSunCosts(const std::map<PlantType, int>& costs) {
+    sunCosts = costs;
+}
+
 void SeedBank :: setSlots(const std::vector<PlantType>& selectedPlants) {
     slots = selectedPlants;
     selectedSlot = -1;
@@ -58,6 +66,21 @@ void SeedBank :: draw() const {
 
         if (i == selectedSlot) {
             DrawRectangleLinesEx(slotRect, 3, LIME);
+        }
+
+        // Sun cost badge drawn directly on the bottom of the packet
+        if (textManager) {
+            auto costIt = sunCosts.find(slots[i]);
+            if (costIt != sunCosts.end()) {
+                const std::string costStr = std::to_string(costIt->second);
+                const Rectangle costRect = {
+                    slotRect.x,
+                    slotRect.y + slotRect.height - 20.0f,
+                    slotRect.width,
+                    20.0f
+                };
+                textManager->drawCenteredText("Luckiest_Guy", costStr.c_str(), costRect, 14.0f, 0.5f, Color{255, 230, 50, 255});
+            }
         }
     }
 }

@@ -18,6 +18,7 @@ private:
 
     std::vector<PlantType> availablePlants;
     std::vector<PlantType> selectedPlants;
+    std::map<PlantType, int> sunCosts;
     int maxSlots = 6;
     bool done = false;
 
@@ -37,6 +38,7 @@ public:
     void setMaxSlots(int maxPlants);
     void setSeedBank(SeedBank* seedBank);
     void setTextManager(TextManager* manager);
+    void setSunCosts(const std::map<PlantType, int>& costs);
     void reset();
 
     void draw() const;

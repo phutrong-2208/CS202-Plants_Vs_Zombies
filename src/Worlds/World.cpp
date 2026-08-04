@@ -58,11 +58,18 @@ void World::spawnSun(Vector2 position, float targetY) {
             std::make_unique<Sun>(
                 std::move(sunAnimation),
                 position,
-                targetY,
-                25
+                targetY
             )
         );
     }
+}
+
+bool World::canAfford(PlantType type) const {
+    return sunAmount >= plantFactory.getSunCost(type);
+}
+
+void World::spendSun(int amount) {
+    sunAmount = std::max(0, sunAmount - amount);
 }
 
 World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
@@ -160,7 +167,13 @@ bool World :: tryPlacePlant(Vector2 position, PlantType plantType) {
     std :: tie(r, c) = grid.getCellID(position);
     if (r < 0 || c < 0 || grid.getPlant(r, c))
         return false;
-    return grid.placePlant(r, c, plantFactory.createPlant(plantType));
+
+    if (!canAfford(plantType))
+        return false;
+
+    bool placed = grid.placePlant(r, c, plantFactory.createPlant(plantType));
+    if (placed) spendSun(plantFactory.getSunCost(plantType));
+    return placed;
 }
 
 bool World :: handleParticleClick(Vector2 position) {
@@ -173,6 +186,10 @@ bool World :: handleParticleClick(Vector2 position) {
 
 int World :: getSunAmount() const {
     return sunAmount;
+}
+
+std::map<PlantType, int> World :: getAllSunCosts() const {
+    return plantFactory.getAllSunCosts();
 }
 
 bool World :: isReady() const { return map && map->isReady(); }

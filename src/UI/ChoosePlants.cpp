@@ -52,6 +52,10 @@ void ChoosePlants :: setTextManager(TextManager* manager) {
     textManager = manager;
 }
 
+void ChoosePlants :: setSunCosts(const std::map<PlantType, int>& costs) {
+    sunCosts = costs;
+}
+
 void ChoosePlants :: setMaxSlots(int maxPlants) {
     maxSlots = std::max(1, maxPlants);
     if ((int)selectedPlants.size() > maxSlots) {
@@ -111,6 +115,16 @@ void ChoosePlants :: draw() const {
         if (isSelected(plant)) {
             DrawRectangleRec(rect, (Color){0, 0, 0, 90});
             DrawRectangleLinesEx(rect, 4.0f, LIME);
+        }
+
+        // Sun cost overlay at the bottom of the packet
+        if (textManager) {
+            auto costIt = sunCosts.find(plant);
+            if (costIt != sunCosts.end()) {
+                const std::string costStr = std::to_string(costIt->second);
+                const Rectangle costRect = { rect.x, rect.y + rect.height - 20.0f, rect.width, 20.0f };
+                textManager->drawCenteredText(UI_FONT, costStr.c_str(), costRect, 13.0f, 0.5f, Color{255, 230, 50, 255});
+            }
         }
     }
     //Drawing the Start button

@@ -214,18 +214,19 @@ std::unique_ptr <Plant> PlantFactory::createPlant(PlantType pType) {
         );
     }
 
-    ///THIS JUST FOR TESTING, WOULD BE DELETED WHEN THE STRUCTURE IS DONE
-    // if (pType == PEASHOOTER && textureManager) {
-    //     auto* peashooter = static_cast<Peashooter*>(plantPtr.get());
-    //     TexturePackage* projectilePackage =
-    //         textureManager->getPackage("Projectile");
-
-    //     if (projectilePackage) {
-    //         peashooter->setProjectileTexture(
-    //             projectilePackage->GetTexture("PROJECTILEPEA")
-    //         );
-    //     }
-    // }
-
     return plantPtr;
+}
+
+int PlantFactory::getSunCost(PlantType pType) const {
+    if (!plantDataStorage) return 0;
+    PlantData* data = plantDataStorage->getPlantData(pType);
+    return data ? data->getSunCost() : 0;
+}
+
+std::map<PlantType, int> PlantFactory::getAllSunCosts() const {
+    std::map<PlantType, int> result;
+    for (PlantType type : getAllPlantTypes()) {
+        result[type] = getSunCost(type);
+    }
+    return result;
 }

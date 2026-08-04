@@ -13,7 +13,8 @@ enum class SunState{
 
 class Sun : public Particle{
 private:
-    int value = 25;
+    static const int SUN_NORMAL_GAIN = 50;
+    int value = SUN_NORMAL_GAIN;
     float targetY = 0.0f;
     bool collected = false;
     SunState state = SunState :: DROPPING;
@@ -23,7 +24,7 @@ public:
         ReanimInstance animation,
         Vector2 position,
         float targetY,
-        int value = 25
+        int value = SUN_NORMAL_GAIN
     );
 
     void update(float dt) override;

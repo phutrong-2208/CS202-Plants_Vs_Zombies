@@ -12,6 +12,9 @@ private:
     std::unique_ptr<World> world = nullptr;
     ChoosePlants choosePlants;
     SeedBank seedBank;
+    TextManager* textManager = nullptr;
+
+    void drawSunHUD() const;
 
 public:
     GameplayScreen(int screenWidth, int screenHeight, AssetManager* manager);

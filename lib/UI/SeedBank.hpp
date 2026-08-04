@@ -3,13 +3,16 @@
 
 #include <Common.hpp>
 #include <Core/TexturePackage.hpp>
+#include <Core/TextManager.hpp>
 #include <Gameplay/Plants/Plant.hpp>
 
 class SeedBank {
 private:
     TexturePackage* chooserPackage = nullptr;
-    TexturePackage* packetPackage = nullptr;
+    TexturePackage* packetPackage  = nullptr;
+    TextManager*    textManager    = nullptr;
 
+    std::map<PlantType, int> sunCosts;
     std::vector<PlantType> slots;
     int selectedSlot = -1;
 
@@ -21,6 +24,8 @@ public:
 
     void setTexturePackage(TexturePackage* package);
     void setPacketPackage(TexturePackage* package);
+    void setTextManager(TextManager* manager);
+    void setSunCosts(const std::map<PlantType, int>& costs);
     void setSlots(const std::vector<PlantType>& selectedPlants);
 
     void draw() const;
