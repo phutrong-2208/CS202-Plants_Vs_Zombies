@@ -51,6 +51,7 @@ public:
     void  setLoopToggle(bool isTrue);
     float getCurrentTime() const;
     bool  isLooping() const;
+    bool  isFinished() const;
 
     void draw(Rectangle hitbox) const;
 };

@@ -99,6 +99,10 @@ bool ReanimInstance::isLooping() const {
     return looping;
 }
 
+bool ReanimInstance::isFinished() const {
+    return !looping && clipLoopStart >= 0.0f && currentTime >= clipEnd;
+}
+
 // -----------------------------------------------------------------------
 // Rendering
 // -----------------------------------------------------------------------

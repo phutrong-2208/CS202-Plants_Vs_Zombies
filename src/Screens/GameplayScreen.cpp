@@ -53,6 +53,48 @@ void GameplayScreen :: draw() {
             screenHeight
         );
     }
+
+    drawPauseButton();
+}
+
+Rectangle GameplayScreen::getPauseButtonBounds() const {
+    return {
+        static_cast<float>(screenWidth) - 58.0f,
+        14.0f,
+        44.0f,
+        44.0f
+    };
+}
+
+void GameplayScreen::drawPauseButton() const {
+    const Rectangle bounds = getPauseButtonBounds();
+    const bool hovered = CheckCollisionPointRec(GetMousePosition(), bounds);
+
+    DrawRectangleRounded(
+        bounds,
+        0.25f,
+        8,
+        hovered ? Color{88, 93, 120, 235} : Color{45, 48, 65, 210}
+    );
+    DrawRectangleRoundedLinesEx(
+        bounds,
+        0.25f,
+        8,
+        2.0f,
+        hovered ? Color{255, 225, 120, 255} : Color{205, 210, 225, 255}
+    );
+
+    const float barWidth = 7.0f;
+    const float barHeight = 22.0f;
+    const float barY = bounds.y + (bounds.height - barHeight) * 0.5f;
+    DrawRectangleRec(
+        {bounds.x + 12.0f, barY, barWidth, barHeight},
+        WHITE
+    );
+    DrawRectangleRec(
+        {bounds.x + 25.0f, barY, barWidth, barHeight},
+        WHITE
+    );
 }
 
 void GameplayScreen :: drawSunHUD() const {
@@ -84,6 +126,11 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
     }
 
     if (inputEvent.inputType == RawInputEvent::InputType::LEFT_MOUSE_CLICKED) {
+        if (CheckCollisionPointRec(inputEvent.position, getPauseButtonBounds())) {
+            requestTransition(ScreenAction::PUSH, ScreenID::PAUSE_MENU);
+            return;
+        }
+
         if (world -> isChoosingPlants()) {
             if (choosePlants.handleMouseClick(inputEvent.position) && choosePlants.isDone()) {
                 seedBank.setSlots(choosePlants.choosePlants());

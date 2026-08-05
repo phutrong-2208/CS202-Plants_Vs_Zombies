@@ -1,16 +1,19 @@
 #include <GameLoop.hpp>
-#include <Screens/GameplayScreen.hpp>
-#include <Screens/MainMenuScreen.hpp>
-
 
 void GameLoop::initGame() {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(1200, 900, "Plants Vs Zombies");
     SetTargetFPS(60);
 
-    assetManager = std::make_unique<AssetManager>();
-    activeScreen = std::make_unique<GameplayScreen>(GetScreenWidth(), GetScreenHeight(), assetManager.get()); //will be replaced later 
-    inputManager = std::make_unique<InputManager>();
+    assetManager = std :: make_unique<AssetManager>();
+    assetManager -> beginLoading();
+    inputManager = std :: make_unique<InputManager>();
+    screenManager = std :: make_unique<ScreenManager>(
+        GetScreenWidth(),
+        GetScreenHeight(),
+        assetManager.get()
+    );
+    screenManager -> push(ScreenID :: LOAD_MENU);
 }
 
 
@@ -27,28 +30,23 @@ void GameLoop::runGame() {
     inputManager -> update();
     while (inputManager -> hasEvents()) {
         RawInputEvent inputEvent = inputManager -> pollEvent();
-        if (activeScreen) {
-            activeScreen -> handleInput(inputEvent);
-        }
+        screenManager->handleInput(inputEvent);
     }
 
-    if (activeScreen) {
-        activeScreen -> update(GetFrameTime());
-    }
+    screenManager->update(GetFrameTime());
 
     BeginDrawing();
         ClearBackground(BLACK);
-        if (activeScreen) {
-            activeScreen -> draw();
-        }
+        screenManager->draw();
 
         DrawFPS(10, 10);
     EndDrawing();
 }
 
 void GameLoop::closeGame() {
-    activeScreen.reset();
+    screenManager.reset();
     inputManager.reset();
+    assetManager.reset();
 
     CloseWindow();
 }

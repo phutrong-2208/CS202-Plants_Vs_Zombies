@@ -19,6 +19,8 @@ private:
     int screenHeight = 600;
 
     void drawSunHUD() const;
+    void drawPauseButton() const;
+    Rectangle getPauseButtonBounds() const;
 
 public:
     GameplayScreen(int screenWidth, int screenHeight, AssetManager* manager);

@@ -275,5 +275,15 @@ void MainMenuScreen :: update(float dt){
 }
 
 void MainMenuScreen :: handleInput(const RawInputEvent& inputEvent){
-    
+    if (inputEvent.inputType != RawInputEvent::InputType::LEFT_MOUSE_CLICKED) {
+        return;
+    }
+
+    constexpr std::size_t START_ADVENTURE_INDEX = 2;
+    if (CheckCollisionPointRec(
+            inputEvent.position,
+            toScreenBounds(hoverButtons[START_ADVENTURE_INDEX].bounds)
+        )) {
+        requestTransition(ScreenAction::REPLACE, ScreenID::GAME_PLAY);
+    }
 }
