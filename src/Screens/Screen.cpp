@@ -4,8 +4,12 @@ void Screen :: setAssetManager(AssetManager* manager){
     assetManager = manager;
 }
 
-void Screen :: requestTransition(ScreenAction action, ScreenID target) {
-    pendingTransition = {action, target};
+void Screen :: requestTransition(
+    ScreenAction action,
+    ScreenID target,
+    ScreenData data
+) {
+    pendingTransition = {action, target, std :: move(data)};
 }
 
 ScreenTransition Screen :: consumeTransition() {

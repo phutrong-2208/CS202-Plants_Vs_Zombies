@@ -12,17 +12,17 @@ private:
     int screenHeight = 0;
     AssetManager* assetManager = nullptr;
 
-    std::unique_ptr<Screen> createScreen(ScreenID id);
+    std::unique_ptr<Screen> createScreen(ScreenID id, const ScreenData& data);
     void processTransition();
 
 public:
     // ScreenManager behaves like a stack: screens can be pushed, popped or replaced.
     ScreenManager(int screenWidth, int screenHeight, AssetManager* assetManager);
 
-    void push(ScreenID id);
+    void push(ScreenID id, ScreenData data = {});
     void pop();
-    void replace(ScreenID id);
-    void clearAndPush(ScreenID id);
+    void replace(ScreenID id, ScreenData data = {});
+    void clearAndPush(ScreenID id, ScreenData data = {});
 
     void handleInput(const RawInputEvent& inputEvent);
     void update(float dt);

@@ -1,5 +1,6 @@
 #include "Screens/ScreenManager.hpp"
 #include "Screens/GameplayScreen.hpp"
+#include "Screens/GameResultScreen.hpp"
 #include "Screens/LoadScreen.hpp"
 #include "Screens/MainMenuScreen.hpp"
 #include "Screens/PauseScreen.hpp"
@@ -7,11 +8,16 @@
 ScreenManager::ScreenManager(int screenWidth, int screenHeight, AssetManager* assetManager) : 
 screenWidth(screenWidth), screenHeight(screenHeight), assetManager(assetManager) {}
 
-std :: unique_ptr<Screen> ScreenManager :: createScreen(ScreenID id) {
+std :: unique_ptr<Screen> ScreenManager :: createScreen(ScreenID id, const ScreenData& data) {
     switch (id) {
         case ScreenID :: GAME_PLAY:
             return std :: make_unique<GameplayScreen>(
                 screenWidth, screenHeight, assetManager
+            );
+
+        case ScreenID :: GAME_RESULT:
+            return std :: make_unique<GameResultScreen>(
+                screenWidth, screenHeight, assetManager, data
             );
 
         case ScreenID :: MAIN_MENU:
@@ -35,8 +41,8 @@ std :: unique_ptr<Screen> ScreenManager :: createScreen(ScreenID id) {
     return nullptr;
 }
 
-void ScreenManager :: push(ScreenID id) {
-    auto screen = createScreen(id);
+void ScreenManager :: push(ScreenID id, ScreenData data) {
+    auto screen = createScreen(id, data);
     if (screen) {
         screenStorage.push_back(std :: move(screen));
     }
@@ -48,8 +54,8 @@ void ScreenManager :: pop() {
     }
 }
 
-void ScreenManager :: replace(ScreenID id) {
-    auto screen = createScreen(id);
+void ScreenManager :: replace(ScreenID id, ScreenData data) {
+    auto screen = createScreen(id, data);
     if (!screen) return;
 
     if (!screenStorage.empty()) {
@@ -58,37 +64,37 @@ void ScreenManager :: replace(ScreenID id) {
     screenStorage.push_back(std :: move(screen));
 }
 
-void ScreenManager::clearAndPush(ScreenID id) {
-    auto screen = createScreen(id);
+void ScreenManager::clearAndPush(ScreenID id, ScreenData data) {
+    auto screen = createScreen(id, data);
     if (!screen) return;
 
     screenStorage.clear();
     screenStorage.push_back(std::move(screen));
 }
 
-void ScreenManager::processTransition() {
+void ScreenManager :: processTransition() {
     Screen* screen = top();
     if (screen == nullptr) return;
 
     const ScreenTransition transition = screen->consumeTransition();
     switch (transition.action) {
-        case ScreenAction::PUSH:
-            push(transition.target);
+        case ScreenAction :: PUSH:
+            push(transition.target, transition.data);
             break;
 
-        case ScreenAction::POP:
+        case ScreenAction :: POP:
             pop();
             break;
 
-        case ScreenAction::REPLACE:
-            replace(transition.target);
+        case ScreenAction :: REPLACE:
+            replace(transition.target, transition.data);
             break;
 
-        case ScreenAction::CLEAR_AND_PUSH:
-            clearAndPush(transition.target);
+        case ScreenAction :: CLEAR_AND_PUSH:
+            clearAndPush(transition.target, transition.data);
             break;
 
-        case ScreenAction::NONE:
+        case ScreenAction :: NONE:
         default:
             break;
     }

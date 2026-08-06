@@ -4,12 +4,20 @@
 #include <Common.hpp>
 #include <Gameplay/Zombies/ZombieType.hpp>
 
-struct WaveEntry {
-    ZombieType type;
-    int lane;       // Row index, counted from top to bottom.
-    float delay;    // Seconds from the beginning of the wave.
+struct ZombieWaveEntry {
+    ZombieType type = ZOMBIE_COUNT;
+    int count = 0;
 };
 
-using WaveList = std :: vector<std :: vector<WaveEntry>>;
+struct WaveConfig {
+    std :: vector<ZombieWaveEntry> zombies;
+
+    float spawnIntervalMin = 0.0f;
+    float spawnIntervalMax = 0.0f;
+
+    bool isHugeWave = false;
+};
+
+using WaveList = std :: vector<WaveConfig>;
 
 #endif

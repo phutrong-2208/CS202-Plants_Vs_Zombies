@@ -18,6 +18,8 @@ public:
     Zombie* getShotFirst(Rectangle area);
     bool hasZombieInArea(Rectangle area) const;
     std :: vector<std::unique_ptr<Zombie>>& getZombies();
+    bool empty(void) const;
+    bool hasZombieReachedHouse(float houseBoundX) const;
 };
 
 #endif

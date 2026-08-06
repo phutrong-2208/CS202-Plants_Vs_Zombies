@@ -29,6 +29,9 @@
 // Waves
 #include <Gameplay/Levels/WaveManager.hpp>
 
+//World Results
+#include "Gameplay/WorldResult.hpp"
+
 
 class World : public IGameplayMediator {
 private:
@@ -44,7 +47,8 @@ private:
     WaveManager waveManager;
     
     int sunAmount = 50;
-
+    WorldResult wResult = WorldResult :: RUNNING;
+    
     // Sky Sun properties for textures
     TexturePackage* sunPackage = nullptr;
     ReanimParser* sunAnimationData = nullptr;
@@ -60,6 +64,7 @@ private:
 
     bool canAfford(PlantType type) const;
     void spendSun(int amount);
+    void updateWorldState();
 public:
     World() = default;
     ~World() = default;
@@ -70,8 +75,10 @@ public:
     void drawPlacementPreview(int selectedPlantId) const;
     bool tryPlacePlant(Vector2 position, PlantType plantType);
     bool handleParticleClick(Vector2 position);
+    
     int getSunAmount() const;
     std::map<PlantType, int> getAllSunCosts() const;
+
     float getWaveProgress()  const;
     int   getCurrentWave()   const;
     int   getTotalWaves()    const;
@@ -79,6 +86,12 @@ public:
     bool isReady() const;
     bool isChoosingPlants() const;
     void finishChoosingPlants();
+
+    void setResult(WorldResult result);
+    WorldResult getResult() const;
+    const LevelID& getLevelID() const;
+    PlantType getRewardPlant() const;
+
 };
 
 #endif

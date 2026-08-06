@@ -3,6 +3,11 @@
 namespace {
     constexpr float MAIN_MENU_WIDTH = 800.0f;
     constexpr float MAIN_MENU_HEIGHT = 600.0f;
+
+    constexpr Vector2 WORLD_NUMBER_POSITION = {558.0f, 87.0f};
+    constexpr Vector2 STAGE_NUMBER_POSITION = {580.0f, 88.0f};
+    constexpr float LEVEL_DIGIT_WIDTH = 12.0f;
+    constexpr float LEVEL_DIGIT_HEIGHT = 17.0f;
 }
 
 MainMenuScreen :: MainMenuScreen(
@@ -42,6 +47,10 @@ MainMenuScreen :: MainMenuScreen(
         TraceLog(LOG_ERROR, "MainMenuScreen: selector clips are unavailable");
         return;
     }
+
+    levelNumbersTexture =
+        package -> GetTexture("SELECTORSCREEN_LEVELNUMBERS");
+
     loadHoverButtons(package);
     loadFlowerLabels(package);
     animationReady = true;
@@ -90,7 +99,7 @@ void MainMenuScreen :: loadHoverButtons(TexturePackage* package) {
         {
             {405.0f, 65.0f, 331.0f, 108.1f},
             {405.0f, 65.0f},
-            package -> GetTexture("SELECTORSCREEN_STARTADVENTURE_HIGHLIGHT"), 
+            package -> GetTexture("SELECTORSCREEN_ADVENTURE_HIGHLIGHT"),
             MainMenuAction :: START_ADVENTURE
         },
         {
@@ -207,6 +216,39 @@ bool MainMenuScreen :: loadSceneAnimations(ReanimParser* parser, TexturePackage*
     return true;
 }
 
+void MainMenuScreen :: drawLevelNumber(
+    int value,
+    Vector2 position,
+    float scale
+) const {
+    if(levelNumbersTexture == nullptr || value < 0) return;
+
+    const std :: string digits = std :: to_string(value);
+    for(size_t index = 0; index < digits.size(); ++index) {
+        const int digit = digits[index] - '0';
+        if(digit < 0 || digit > 9) continue;
+
+        DrawTexturePro(
+            *levelNumbersTexture,
+            {
+                digit * LEVEL_DIGIT_WIDTH,
+                0.0f,
+                LEVEL_DIGIT_WIDTH,
+                LEVEL_DIGIT_HEIGHT
+            },
+            {
+                position.x + index * LEVEL_DIGIT_WIDTH * scale,
+                position.y,
+                LEVEL_DIGIT_WIDTH * scale,
+                LEVEL_DIGIT_HEIGHT * scale
+            },
+            {0.0f, 0.0f},
+            0.0f,
+            WHITE
+        );
+    }
+}
+
 void MainMenuScreen :: draw(void){
     if(!animationReady) return;
 
@@ -242,6 +284,24 @@ void MainMenuScreen :: draw(void){
             WHITE
         );
     }
+
+    // Hover redraws the stone texture, so digits must be drawn on top of it.
+    drawLevelNumber(
+        id.world,
+        {
+            offset.x + WORLD_NUMBER_POSITION.x * scale,
+            offset.y + WORLD_NUMBER_POSITION.y * scale
+        },
+        scale
+    );
+    drawLevelNumber(
+        id.stage,
+        {
+            offset.x + STAGE_NUMBER_POSITION.x * scale,
+            offset.y + STAGE_NUMBER_POSITION.y * scale
+        },
+        scale
+    );
 
     for(const MainMenuFlowerLabel& label : flowerLabels) {
         Texture2D* texture = label.hovered && label.hoverTexture != nullptr

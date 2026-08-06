@@ -15,6 +15,7 @@ private:
     SeedBank seedBank;
     WaveHUD waveHUD;
     TextManager* textManager = nullptr;
+    bool resultRequested = false;
     int screenWidth  = 800;
     int screenHeight = 600;
 

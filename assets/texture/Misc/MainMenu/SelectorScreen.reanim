@@ -22689,7 +22689,7 @@
 </track>
 <track>
 <name>SelectorScreen_StartAdventure_button</name>
-<t><x>405.0</x><y>624.0</y><i>IMAGE_REANIM_SELECTORSCREEN_STARTADVENTURE_BUTTON1</i></t>
+<t><x>405.0</x><y>624.0</y><i>IMAGE_REANIM_SELECTORSCREEN_ADVENTURE_BUTTON</i></t>
 <t><x>405</x><y>577.4</y></t>
 <t><y>530.9</y></t>
 <t><x>405.0</x><y>484.3</y></t>
@@ -24107,7 +24107,7 @@
 </track>
 <track>
 <name>SelectorScreen_Adventure_button</name>
-<t><x>405.0</x><y>624.0</y><i>IMAGE_REANIM_SELECTORSCREEN_STARTADVENTURE_BUTTON1</i></t>
+<t><x>405.0</x><y>624.0</y><i>IMAGE_REANIM_SELECTORSCREEN_ADVENTURE_BUTTON</i></t>
 <t><x>405</x><y>577.4</y></t>
 <t><y>530.9</y></t>
 <t><x>405.0</x><y>484.3</y></t>

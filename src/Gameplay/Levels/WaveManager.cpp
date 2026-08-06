@@ -1,113 +1,160 @@
 #include <Gameplay/Levels/WaveManager.hpp>
 #include <Gameplay/IGameplayMediator.hpp>
 
-void WaveManager::loadLevel(int level) {
-    waves.clear();
+void WaveManager :: loadWaves(const WaveList& waveList, const std :: vector<int>& lanes, float firstWaveDelay, float waveDelay) {
+    waves = &waveList;
+    activeLanes = lanes;
+    remainingZombies.clear();
 
-    // Wave 1 - 3 zombies, spread out over 20s
-    waves.push_back({
-        {NORMAL_ZOMBIE, 1, 0.0f},
-        {NORMAL_ZOMBIE, 3, 10.0f},
-        {NORMAL_ZOMBIE, 0, 20.0f},
-    });
-
-    // Wave 2 - 4 zombies, over 24s
-    waves.push_back({
-        {NORMAL_ZOMBIE, 2, 0.0f},
-        {NORMAL_ZOMBIE, 4, 8.0f},
-        {NORMAL_ZOMBIE, 0, 16.0f},
-        {NORMAL_ZOMBIE, 3, 24.0f},
-    });
-
-    // Wave 3 - 5 zombies, over 20s
-    waves.push_back({
-        {NORMAL_ZOMBIE, 0, 0.0f},
-        {NORMAL_ZOMBIE, 1, 5.0f},
-        {NORMAL_ZOMBIE, 2, 10.0f},
-        {NORMAL_ZOMBIE, 3, 15.0f},
-        {NORMAL_ZOMBIE, 4, 20.0f},
-    });
-
-    // Wave 4 - 6 zombies, over 15s
-    waves.push_back({
-        {NORMAL_ZOMBIE, 1, 0.0f},
-        {NORMAL_ZOMBIE, 0, 3.0f},
-        {NORMAL_ZOMBIE, 3, 6.0f},
-        {NORMAL_ZOMBIE, 2, 9.0f},
-        {NORMAL_ZOMBIE, 4, 12.0f},
-        {NORMAL_ZOMBIE, 0, 15.0f},
-    });
-
-    // Wave 5 - HUGE WAVE: 10 zombies rapid-fire across all lanes
-    waves.push_back({
-        {NORMAL_ZOMBIE, 0, 0.0f},
-        {NORMAL_ZOMBIE, 1, 0.3f},
-        {NORMAL_ZOMBIE, 2, 0.6f},
-        {NORMAL_ZOMBIE, 3, 0.9f},
-        {NORMAL_ZOMBIE, 4, 1.2f},
-        {NORMAL_ZOMBIE, 0, 1.5f},
-        {NORMAL_ZOMBIE, 2, 1.8f},
-        {NORMAL_ZOMBIE, 1, 2.1f},
-        {NORMAL_ZOMBIE, 3, 2.4f},
-        {NORMAL_ZOMBIE, 4, 2.7f},
-    });
-
-    // Tally total
     totalZombies = 0;
-    for (auto& wave : waves) totalZombies += (int)wave.size();
+    for(const WaveConfig& wave : waveList) {
+        for(const ZombieWaveEntry& entry : wave.zombies) {
+            totalZombies += std :: max(0, entry.count);
+        }
+    }
 
-    currentWave     = -1; // -1 means waiting for the very first wave to start
-    pendingIndex    = 0;
-    spawnedZombies  = 0;
-    waitingForClear = true; // Initial delay before the game really starts
-    finished        = false;
-    spawnTimer      = 0.0f;
-    interWaveDelay  = 18.0f; // Give the player 18 seconds to place some sunflowers!
+    currentWave = -1;
+    remainingZombieCount = 0;
+    spawnedZombies = 0;
+    spawnTimer = 0.0f;
+    nextWaveTimer = std :: max(0.0f, firstWaveDelay);
+    betweenWaveDelay = std :: max(0.0f, waveDelay);
+    waitingForNextWave = true;
+    finished = waveList.empty() || activeLanes.empty();
+
+    if(!waveList.empty() && activeLanes.empty()) {
+        TraceLog(LOG_ERROR, "WaveManager: level has no active lanes");
+    }
 }
 
-void WaveManager::update(float dt, IGameplayMediator& mediator) {
-    if (finished || waves.empty()) return;
+void WaveManager :: prepareCurrentWave() {
+    remainingZombies.clear();
+    remainingZombieCount = 0;
 
-    // Between waves: count down then start the next one
-    if (waitingForClear) {
-        interWaveDelay -= dt;
-        if (interWaveDelay > 0.0f) return;
+    if(!waves || currentWave < 0 || currentWave >= static_cast<int>(waves -> size())) {
+        return;
+    }
+
+    const WaveConfig& wave = (*waves)[currentWave];
+    for(const ZombieWaveEntry& entry : wave.zombies) {
+        if(entry.type == ZOMBIE_COUNT || entry.count <= 0) continue;
+
+        remainingZombies.push_back(entry);
+        remainingZombieCount += entry.count;
+    }
+
+    spawnTimer = 0.0f;
+}
+
+ZombieType WaveManager :: takeRandomZombie() {
+    if(remainingZombieCount <= 0) return ZOMBIE_COUNT;
+
+    int ticket = GetRandomValue(1, remainingZombieCount);
+    for(ZombieWaveEntry& entry : remainingZombies) {
+        if(entry.count <= 0) continue;
+
+        ticket -= entry.count;
+        if(ticket <= 0) {
+            entry.count--;
+            remainingZombieCount--;
+            return entry.type;
+        }
+    }
+
+    return ZOMBIE_COUNT;
+}
+
+int WaveManager :: chooseRandomLane() const {
+    if(activeLanes.empty()) return -1;
+
+    const int index = GetRandomValue(
+        0,
+        static_cast<int>(activeLanes.size()) - 1
+    );
+    return activeLanes[index];
+}
+
+float WaveManager :: getRandomSpawnInterval() const {
+    if(!waves || currentWave < 0 || currentWave >= static_cast<int>(waves -> size())) {
+        return 0.0f;
+    }
+
+    const WaveConfig& wave = (*waves)[currentWave];
+    const float minimum = std :: max(0.0f, wave.spawnIntervalMin);
+    const float maximum = std :: max(minimum, wave.spawnIntervalMax);
+
+    if(minimum == maximum) return minimum;
+
+    constexpr int RANDOM_PRECISION = 1000000;
+    const float ratio = static_cast<float>(GetRandomValue(0, RANDOM_PRECISION)) /
+                        static_cast<float>(RANDOM_PRECISION);
+    return minimum + (maximum - minimum) * ratio;
+}
+
+void WaveManager :: update(float dt, IGameplayMediator& mediator) {
+    if(finished || !waves || waves -> empty()) return;
+
+    if(waitingForNextWave) {
+        nextWaveTimer -= dt;
+        if(nextWaveTimer > 0.0f) return;
 
         currentWave++;
-        if (currentWave >= (int)waves.size()) {
+        if(currentWave >= static_cast<int>(waves -> size())) {
             finished = true;
             return;
         }
-        pendingIndex    = 0;
-        spawnTimer      = 0.0f;
-        waitingForClear = false;
+
+        prepareCurrentWave();
+        waitingForNextWave = false;
+
+        if(remainingZombieCount == 0) {
+            waitingForNextWave = true;
+            nextWaveTimer = betweenWaveDelay;
+            return;
+        }
     }
 
-    // Spawn pending zombies in the current wave
-    const auto& waveEntries = waves[currentWave];
-    spawnTimer += dt;
+    spawnTimer -= dt;
+    while(spawnTimer <= 0.0f && remainingZombieCount > 0) {
+        const ZombieType type = takeRandomZombie();
+        const int lane = chooseRandomLane();
 
-    while (pendingIndex < (int)waveEntries.size()) {
-        const WaveEntry& entry = waveEntries[pendingIndex];
-        if (spawnTimer < entry.delay) break;
+        if(type == ZOMBIE_COUNT || lane < 0) {
+            finished = true;
+            return;
+        }
 
-        mediator.spawnZombie(entry.type, entry.lane);
+        mediator.spawnZombie(type, lane);
         spawnedZombies++;
-        pendingIndex++;
+
+        if(remainingZombieCount > 0) {
+            spawnTimer += getRandomSpawnInterval();
+        }
     }
 
-    // All zombies in this wave spawned — wait 10s then advance
-    if (pendingIndex >= (int)waveEntries.size() && !waitingForClear) {
-        waitingForClear = true;
-        interWaveDelay  = 10.0f;
+    if(remainingZombieCount == 0 && !waitingForNextWave) {
+        waitingForNextWave = true;
+        nextWaveTimer = betweenWaveDelay;
     }
 }
 
-float WaveManager::getProgress() const {
-    if (totalZombies == 0) return 0.0f;
-    return std::min(1.0f, (float)spawnedZombies / (float)totalZombies);
+float WaveManager :: getProgress() const {
+    if(totalZombies == 0) return 0.0f;
+    return std :: min(1.0f, static_cast<float>(spawnedZombies) / totalZombies);
 }
 
-int WaveManager::getCurrentWave()  const { return std::max(0, currentWave); }
-int WaveManager::getTotalWaves()   const { return (int)waves.size(); }
-bool WaveManager::isFinished()     const { return finished; }
+int WaveManager :: getCurrentWave() const {
+    return std :: max(0, currentWave);
+}
+
+int WaveManager :: getTotalWaves() const {
+    return waves ? static_cast<int>(waves -> size()) : 0;
+}
+
+bool WaveManager :: isFinished() const {
+    return finished;
+}
+
+bool WaveManager :: hasSpawnAll(void) const{
+    return totalZombies > 0 and spawnedZombies >= totalZombies;
+}

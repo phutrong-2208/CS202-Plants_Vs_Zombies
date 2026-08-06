@@ -25,6 +25,21 @@ GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager
 void GameplayScreen :: update(float dt) {
     if (world) {
         world -> update(dt);
+
+        if(!resultRequested && world -> getResult() != WorldResult :: RUNNING) {
+            resultRequested = true;
+
+            ScreenData resultData;
+            resultData.wResult = world -> getResult();
+            resultData.levelID = world -> getLevelID();
+            resultData.rewardPlant = world -> getRewardPlant();
+
+            requestTransition(
+                ScreenAction :: PUSH,
+                ScreenID :: GAME_RESULT,
+                resultData
+            );
+        }
     }
 }
 

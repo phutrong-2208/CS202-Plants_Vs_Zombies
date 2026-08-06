@@ -61,10 +61,12 @@ private:
     std :: array<ReanimInstance, 7> dynamicAnimations;
     std :: array<MainMenuHoverButton, 6> hoverButtons;
     std :: array<MainMenuFlowerLabel, 3> flowerLabels;
+    Texture2D* levelNumbersTexture = nullptr;
 
     float getMenuScale() const;
     Vector2 getMenuOffset() const;
     Rectangle toScreenBounds(Rectangle virtualBounds) const;
+    void drawLevelNumber(int value, Vector2 position, float scale) const;
     void loadHoverButtons(TexturePackage* package);
     void loadFlowerLabels(TexturePackage* package);
     bool loadSceneAnimations(ReanimParser* parser, TexturePackage* package);

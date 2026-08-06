@@ -10,7 +10,11 @@ protected:
     AssetManager* assetManager = nullptr;
     ScreenTransition pendingTransition;
 
-    void requestTransition(ScreenAction action, ScreenID target = ScreenID::MAIN_MENU);
+    void requestTransition(
+        ScreenAction action,
+        ScreenID target = ScreenID :: MAIN_MENU,
+        ScreenData data = {}
+    );
 
 public:
     virtual ~Screen() = default;

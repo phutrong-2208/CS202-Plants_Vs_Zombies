@@ -79,10 +79,15 @@ World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
     }
 
     currentLevel = std :: make_unique<Level>(LevelID{1, 1});
+    sunAmount = currentLevel -> getStartingSun();
 
     int grassLaneCount = 0;
-    for(LaneType lane : currentLevel -> getLanes()) {
-        if(lane == LaneType :: GRASS) grassLaneCount++;
+    std :: vector<int> activeLanes;
+    const std :: vector<LaneType>& levelLanes = currentLevel -> getLanes();
+
+    for(int lane = 0; lane < static_cast<int>(levelLanes.size()); ++lane) {
+        if(levelLanes[lane] == LaneType :: GRASS) grassLaneCount++;
+        if(levelLanes[lane] != LaneType :: INACTIVE) activeLanes.push_back(lane);
     }
 
     map = std::make_unique<DayMap>(
@@ -107,8 +112,12 @@ World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
     this->sunPackage = textureManager -> getPackage("Particles");
     this->sunAnimationData = assetManager -> getAnimationManager() -> getAnimationData("SunAnim");
 
-    // Load wave data (replaces temp zombie spawn loop)
-    waveManager.loadLevel(1);
+    waveManager.loadWaves(
+        currentLevel -> getWaves(),
+        activeLanes,
+        currentLevel -> getFirstWaveDelay(),
+        currentLevel -> getBetweenWaveDelay()
+    );
 
     grid.setMediator(this);
     projectileManager.setMediator(this);
@@ -131,6 +140,7 @@ void World :: update(float dt) {
 
     grid.sendPlantActions();
     projectileManager.toggleProjectiles();
+    updateWorldState();
 }
 
 void World ::draw() {
@@ -205,10 +215,10 @@ void World::spawnZombie(ZombieType type, int lane) {
     );
 }
 
-float World::getWaveProgress()  const { return waveManager.getProgress(); }
-int   World::getCurrentWave()   const { return waveManager.getCurrentWave(); }
-int   World::getTotalWaves()    const { return waveManager.getTotalWaves(); }
-bool  World::isWaveFinished()   const { return waveManager.isFinished(); }
+float World :: getWaveProgress() const { return waveManager.getProgress(); }
+int World :: getCurrentWave() const { return waveManager.getCurrentWave(); }
+int World :: getTotalWaves() const { return waveManager.getTotalWaves(); }
+bool World :: isWaveFinished() const { return waveManager.isFinished(); }
 
 bool World :: isReady() const { return map && map->isReady(); }
 
@@ -217,5 +227,33 @@ bool World :: isChoosingPlants() const { return map && map->isChoosingPlants(); 
 void World :: finishChoosingPlants() {
     if (map) {
         map -> finishChoosingPlants();
+    }
+}
+
+void World :: setResult(WorldResult result) {
+    wResult = result;
+}
+
+WorldResult World :: getResult() const {
+    return wResult;
+}
+
+const LevelID& World :: getLevelID() const {
+    static const LevelID defaultLevelID;
+    return currentLevel ? currentLevel -> getID() : defaultLevelID;
+}
+
+PlantType World :: getRewardPlant() const {
+    return currentLevel ? currentLevel -> getRewardPlant() : PLANT_COUNT;
+}
+
+void World :: updateWorldState() {
+    if(wResult != WorldResult :: RUNNING) return;
+
+    if(zombieManager.hasZombieReachedHouse(0.0f)){
+        wResult = WorldResult :: LOST;
+    }
+    else if(waveManager.hasSpawnAll() and zombieManager.empty()){
+        wResult = WorldResult :: WON;
     }
 }

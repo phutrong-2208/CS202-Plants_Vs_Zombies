@@ -8,29 +8,38 @@ class IGameplayMediator;
 
 class WaveManager {
 private:
-    WaveList waves;
+    const WaveList* waves = nullptr;
+    std :: vector<int> activeLanes;
+    std :: vector<ZombieWaveEntry> remainingZombies;
 
-    int   currentWave     = 0;
-    int   pendingIndex    = 0;
-    float spawnTimer      = 0.0f;
+    int currentWave = -1;
+    int remainingZombieCount = 0;
+    float spawnTimer = 0.0f;
+    float nextWaveTimer = 0.0f;
+    float betweenWaveDelay = 0.0f;
 
-    int   totalZombies    = 0;
-    int   spawnedZombies  = 0;
+    int totalZombies = 0;
+    int spawnedZombies = 0;
 
-    bool  waitingForClear = false;
-    bool  finished        = false;
-    float interWaveDelay  = 0.0f;
+    bool waitingForNextWave = false;
+    bool finished = false;
+
+    void prepareCurrentWave();
+    ZombieType takeRandomZombie();
+    int chooseRandomLane() const;
+    float getRandomSpawnInterval() const;
 
 public:
     WaveManager() = default;
 
-    void loadLevel(int level);
+    void loadWaves(const WaveList& waveList, const std :: vector<int>& lanes, float firstWaveDelay, float betweenWaveDelay);
     void update(float dt, IGameplayMediator& mediator);
 
-    float getProgress()    const;
-    int   getCurrentWave() const;
-    int   getTotalWaves()  const;
-    bool  isFinished()     const;
+    float getProgress(void) const;
+    int getCurrentWave(void) const;
+    int getTotalWaves(void) const;
+    bool isFinished(void) const;
+    bool hasSpawnAll(void) const;
 };
 
 #endif

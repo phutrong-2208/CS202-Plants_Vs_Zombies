@@ -72,3 +72,20 @@ bool ZombieManager :: hasZombieInArea(Rectangle area) const{
 std :: vector<std :: unique_ptr<Zombie>>& ZombieManager :: getZombies() {
     return zombies;
 }
+
+bool ZombieManager :: empty(void) const{
+    return zombies.empty();
+}
+bool ZombieManager :: hasZombieReachedHouse(float houseBoundX) const{
+    for(const auto&zombie : zombies){
+        if(!zombie) continue;
+
+
+        const ZombieState state = zombie -> getState();
+        if(state == ZombieState :: DEAD || state == ZombieState :: DYING) continue;
+
+        const Rectangle hitbox = zombie -> getHitbox();
+        if(hitbox.x <= houseBoundX) return true;
+    }
+    return false;
+}
