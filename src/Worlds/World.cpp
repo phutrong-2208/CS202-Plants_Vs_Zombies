@@ -64,20 +64,32 @@ void World::spawnSun(Vector2 position, float targetY) {
     }
 }
 
-bool World::canAfford(PlantType type) const {
+bool World :: canAfford(PlantType type) const {
     return sunAmount >= plantFactory.getSunCost(type);
 }
 
-void World::spendSun(int amount) {
+void World :: spendSun(int amount) {
     sunAmount = std::max(0, sunAmount - amount);
 }
 
 World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
-    map = std::make_unique<DayMap>();
     if (assetManager == nullptr) {
         TraceLog(LOG_ERROR, "Asset Manager was not found");
         return;
     }
+
+    currentLevel = std :: make_unique<Level>(LevelID{1, 1});
+
+    int grassLaneCount = 0;
+    for(LaneType lane : currentLevel -> getLanes()) {
+        if(lane == LaneType :: GRASS) grassLaneCount++;
+    }
+
+    map = std::make_unique<DayMap>(
+        assetManager,
+        grassLaneCount,
+        currentLevel -> usesSodRollIntro()
+    );
 
     TextureManager *textureManager = assetManager->getTextureManager();
 

@@ -2,19 +2,13 @@
 #define WAVE_MANAGER_HPP
 
 #include <Common.hpp>
-#include <Gameplay/Zombies/Zombie.hpp>
+#include <Gameplay/Levels/WaveConfig.hpp>
 
 class IGameplayMediator;
 
-struct WaveEntry {
-    ZombieType type;
-    int lane;    // row 0-4
-    float delay; // seconds after wave-start before spawning
-};
-
 class WaveManager {
 private:
-    std::vector<std::vector<WaveEntry>> waves;
+    WaveList waves;
 
     int   currentWave     = 0;
     int   pendingIndex    = 0;

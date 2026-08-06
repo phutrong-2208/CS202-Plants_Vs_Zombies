@@ -78,32 +78,38 @@ void MainMenuScreen :: loadHoverButtons(TexturePackage* package) {
         {
             {25.5f, 126.8f, 291.0f, 53.6f},
             {25.5f, 126.8f},
-            package -> GetTexture("SELECTORSCREEN_WOODSIGN2_PRESS")
+            package -> GetTexture("SELECTORSCREEN_WOODSIGN2_PRESS"),
+            MainMenuAction :: CHANGE_PROFILE
         },
         {
             {32.4f, 180.4f, 279.0f, 83.0f},
             {32.4f, 180.4f},
-            package -> GetTexture("SELECTORSCREEN_WOODSIGN3_PRESS")
+            package -> GetTexture("SELECTORSCREEN_WOODSIGN3_PRESS"), 
+            MainMenuAction :: ZOMBATAR
         },
         {
             {405.0f, 65.0f, 331.0f, 108.1f},
             {405.0f, 65.0f},
-            package -> GetTexture("SELECTORSCREEN_STARTADVENTURE_HIGHLIGHT")
+            package -> GetTexture("SELECTORSCREEN_STARTADVENTURE_HIGHLIGHT"), 
+            MainMenuAction :: START_ADVENTURE
         },
         {
             {406.0f, 173.1f, 313.0f, 84.4f},
             {406.0f, 173.1f},
-            package -> GetTexture("SELECTORSCREEN_SURVIVAL_HIGHLIGHT")
+            package -> GetTexture("SELECTORSCREEN_SURVIVAL_HIGHLIGHT"),
+            MainMenuAction :: SURVIVAL
         },
         {
             {410.0f, 257.5f, 286.0f, 70.5f},
             {410.0f, 257.5f},
-            package -> GetTexture("SELECTORSCREEN_CHALLENGES_HIGHLIGHT")
+            package -> GetTexture("SELECTORSCREEN_CHALLENGES_HIGHLIGHT"),
+            MainMenuAction :: MINI_GAMES
         },
         {
             {413.0f, 328.0f, 266.0f, 123.0f},
             {413.0f, 328.0f},
-            package -> GetTexture("SELECTORSCREEN_VASEBREAKER_HIGHLIGHT")
+            package -> GetTexture("SELECTORSCREEN_VASEBREAKER_HIGHLIGHT"),
+            MainMenuAction :: PUZZLE
         }
     }};
 }
@@ -114,19 +120,22 @@ void MainMenuScreen :: loadFlowerLabels(TexturePackage* package) {
             {558.0f, 481.0f, 81.0f, 31.0f},
             {558.0f, 481.0f},
             package -> GetTexture("SELECTORSCREEN_OPTIONS1"),
-            package -> GetTexture("SELECTORSCREEN_OPTIONS2")
+            package -> GetTexture("SELECTORSCREEN_OPTIONS2"), 
+            MainMenuAction :: OPTION
         },
         {
             {654.0f, 501.0f, 48.0f, 22.0f},
             {654.0f, 501.0f},
             package -> GetTexture("SELECTORSCREEN_HELP1"),
-            package -> GetTexture("SELECTORSCREEN_HELP2")
+            package -> GetTexture("SELECTORSCREEN_HELP2"),
+            MainMenuAction :: HELP 
         },
         {
             {725.0f, 489.0f, 47.0f, 27.0f},
             {725.0f, 489.0f},
             package -> GetTexture("SELECTORSCREEN_QUIT1"),
-            package -> GetTexture("SELECTORSCREEN_QUIT2")
+            package -> GetTexture("SELECTORSCREEN_QUIT2"),
+            MainMenuAction :: QUIT
         }
     }};
 }
@@ -261,16 +270,25 @@ void MainMenuScreen :: update(float dt){
 
     const Vector2 mousePosition = GetMousePosition();
     for(MainMenuHoverButton& button : hoverButtons) {
-        button.hovered = CheckCollisionPointRec(
+        button.hovered = button.enabled and CheckCollisionPointRec(
             mousePosition,
             toScreenBounds(button.bounds)
         );
     }
     for(MainMenuFlowerLabel& label : flowerLabels) {
-        label.hovered = CheckCollisionPointRec(
+        label.hovered = label.enabled and CheckCollisionPointRec(
             mousePosition,
             toScreenBounds(label.bounds)
         );
+    }
+}
+
+void MainMenuScreen :: executeAction(MainMenuAction target){
+    switch(target){
+        case MainMenuAction :: START_ADVENTURE:
+            requestTransition(ScreenAction :: REPLACE, ScreenID :: GAME_PLAY); break;
+        case MainMenuAction :: OPTION:
+            requestTransition(ScreenAction :: PUSH, ScreenID :: PAUSE_MENU); break;
     }
 }
 

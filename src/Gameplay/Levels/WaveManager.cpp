@@ -1,4 +1,4 @@
-#include <Gameplay/Waves/WaveManager.hpp>
+#include <Gameplay/Levels/WaveManager.hpp>
 #include <Gameplay/IGameplayMediator.hpp>
 
 void WaveManager::loadLevel(int level) {

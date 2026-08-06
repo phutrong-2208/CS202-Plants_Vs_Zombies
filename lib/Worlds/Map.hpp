@@ -11,10 +11,10 @@ public:
 
     virtual void update(float dt);
     virtual void draw() const;
-    void drawBackground() const;
+    virtual void drawBackground() const;
 
     State getState() const;
-    bool isReady() const;
+    virtual bool isReady() const;
     bool isChoosingPlants() const;
     void finishChoosingPlants();
     // virtual Rectangle getGridArea() const;

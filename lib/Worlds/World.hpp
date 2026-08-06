@@ -4,6 +4,7 @@
 #include <Core/AssetManager.hpp>
 
 #include <Gameplay/IGameplayMediator.hpp>
+#include <Gameplay/Levels/Level.hpp>
 
 #include <Worlds/Grid.hpp>
 #include <Worlds/Map.hpp>
@@ -26,11 +27,12 @@
 #include <Gameplay/Particle/Sun.hpp>
 
 // Waves
-#include <Gameplay/Waves/WaveManager.hpp>
+#include <Gameplay/Levels/WaveManager.hpp>
 
 
 class World : public IGameplayMediator {
 private:
+    std::unique_ptr<Level> currentLevel = nullptr;
     std::unique_ptr <Map> map = nullptr;
     Grid grid;
     PlantFactory plantFactory;

@@ -36,7 +36,8 @@ Texture2D* ReanimInstance::getTrackTexture(const std::string& trackName) const {
     if (track == nullptr) return nullptr;
     
     const float loopStart = (clipLoopStart >= 0.0f) ? clipLoopStart : rawAnim->getLoopStartTime();
-    Frame frame = track->getInterpolatedFrame(currentTime, loopStart, clipEnd);
+    const float timelineEnd = (clipLoopStart >= 0.0f) ? clipEnd : rawAnim->getDuration();
+    Frame frame = track->getInterpolatedFrame(currentTime, loopStart, timelineEnd);
     return rawTexPack->GetTexture(frame.getTextureKey());
 }
 
@@ -100,7 +101,10 @@ bool ReanimInstance::isLooping() const {
 }
 
 bool ReanimInstance::isFinished() const {
-    return !looping && clipLoopStart >= 0.0f && currentTime >= clipEnd;
+    if(looping || rawAnim == nullptr) return false;
+
+    const float timelineEnd = (clipLoopStart >= 0.0f) ? clipEnd : rawAnim->getDuration();
+    return currentTime >= timelineEnd;
 }
 
 // -----------------------------------------------------------------------
@@ -117,6 +121,7 @@ void ReanimInstance::draw(Rectangle hitbox) const {
     // at currentTime.  When a clip is active we use its loopStart; otherwise
     // we use the file-wide heuristic (most common first-visible snap).
     const float loopStart = (clipLoopStart >= 0.0f) ? clipLoopStart : rawAnim->getLoopStartTime();
+    const float timelineEnd = (clipLoopStart >= 0.0f) ? clipEnd : rawAnim->getDuration();
     const int   trackCount = rawAnim->getTrackCount();
 
     for (int i = 0; i < trackCount; ++i) {
@@ -128,7 +133,7 @@ void ReanimInstance::draw(Rectangle hitbox) const {
         if(useVisibleTrackFilter &&
            visibleTracks.find(trackName) == visibleTracks.end()) continue;
 
-        Frame frame = track -> getInterpolatedFrame(currentTime, loopStart, clipEnd);
+        Frame frame = track -> getInterpolatedFrame(currentTime, loopStart, timelineEnd);
         if (frame.alpha <= 0.0f) continue;
 
         Texture2D* currentTex = rawTexPack->GetTexture(frame.getTextureKey());
