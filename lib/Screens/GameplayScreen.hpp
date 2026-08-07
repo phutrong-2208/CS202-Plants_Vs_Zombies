@@ -29,7 +29,8 @@ public:
         int screenWidth,
         int screenHeight,
         AssetManager* manager,
-        LevelID levelID = {1, 1}
+        LevelID levelID = {1, 1},
+        UserProfile *user = nullptr
     );
 
     void update(float dt) override;

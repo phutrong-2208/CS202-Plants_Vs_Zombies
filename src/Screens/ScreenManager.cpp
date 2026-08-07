@@ -19,7 +19,8 @@ std :: unique_ptr<Screen> ScreenManager :: createScreen(ScreenID id, const Scree
     switch (id) {
         case ScreenID :: GAME_PLAY:
             screen = std :: make_unique<GameplayScreen>(
-                screenWidth, screenHeight, assetManager, data.levelID
+                screenWidth, screenHeight, assetManager, data.levelID, 
+                userProfileManager -> getActiveProfile()
             );
             break;
 

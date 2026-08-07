@@ -32,11 +32,15 @@
 //World Results
 #include "Gameplay/WorldResult.hpp"
 
+//User's Profile
+#include "Core/UserProfile.hpp"
+#include "Core/UserProfileManager.hpp"
+
 
 class World : public IGameplayMediator {
 private:
-    std::unique_ptr<Level> currentLevel = nullptr;
-    std::unique_ptr <Map> map = nullptr;
+    std :: unique_ptr<Level> currentLevel = nullptr;
+    std :: unique_ptr <Map> map = nullptr;
     Grid grid;
     PlantFactory plantFactory;
     ZombieFactory zombieFactory;
@@ -45,6 +49,7 @@ private:
     ProjectileFactory projectileFactory;
     ParticleManager particleManager;
     WaveManager waveManager;
+    UserProfileManager *userManager = nullptr;
     
     int sunAmount = 50;
     WorldResult wResult = WorldResult :: RUNNING;
@@ -90,7 +95,9 @@ public:
     bool  isWaveFinished()   const;
     bool isReady() const;
     bool isChoosingPlants() const;
-    void finishChoosingPlants();
+    void finishChoosingPlants();    
+
+    void setUserProfileManager(UserProfileManager* user); 
 
     void setResult(WorldResult result);
     WorldResult getResult() const;

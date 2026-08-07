@@ -64,6 +64,19 @@ void ChoosePlants :: setMaxSlots(int maxPlants) {
     syncSeedBank();
 }
 
+void ChoosePlants :: setUnlockedPlants(std :: bitset<PLANT_COUNT> list){
+    unlockedPlants = list;
+    availablePlants.erase(
+        std :: remove_if(
+            availablePlants.begin(), availablePlants.end(),
+            [&](PlantType plant){
+                return !unlockedPlants.test(static_cast<int>(plant));
+            }
+        ),
+        availablePlants.end()
+    );
+}
+
 void ChoosePlants :: reset() {
     selectedPlants.clear();
     done = false;

@@ -3,14 +3,14 @@
 
 #include <filesystem>
 
-GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager* manager, LevelID levelID) {
+GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager* manager, LevelID levelID, UserProfile* user) {
     setAssetManager(manager);
     world = std::make_unique<World>(
         screenWidth, screenHeight, assetManager, levelID
     );
-    textManager = assetManager->getTextManager();
-    this->screenWidth  = screenWidth;
-    this->screenHeight = screenHeight;
+    textManager = assetManager -> getTextManager();
+    this -> screenWidth  = screenWidth;
+    this -> screenHeight = screenHeight;
 
     waveHUD.setTexturePackage(assetManager->getTextureManager()->getPackage("ZombiePhase"));
 
@@ -25,6 +25,7 @@ GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager
     choosePlants.setAvailablePlants(getAllPlantTypes());
     choosePlants.setMaxSlots(6);
     choosePlants.setSeedBank(&seedBank);
+    choosePlants.setUnlockedPlants(user -> getUnlockedPlants());
 }
 
 void GameplayScreen :: update(float dt) {
@@ -123,9 +124,7 @@ void GameplayScreen :: draw() {
 Rectangle GameplayScreen::getPauseButtonBounds() const {
     return {
         static_cast<float>(screenWidth) - 58.0f,
-        14.0f,
-        44.0f,
-        44.0f
+        14.0f, 44.0f, 44.0f
     };
 }
 

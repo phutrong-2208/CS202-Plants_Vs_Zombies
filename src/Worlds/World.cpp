@@ -133,7 +133,7 @@ void World :: update(float dt) {
     if (!map)
         return;
 
-    map->update(dt);
+    map -> update(dt);
     if (isReady() == false)
         return;
 
@@ -162,13 +162,17 @@ void World ::draw() {
     particleManager.draw();
 }
 
-void World :: drawPlacementPreview(int selectedPlantId) const {
+void World :: drawPlacementPreview(int selectedPlantId) const { //need to improved
     if (!map || isReady() == false || selectedPlantId < 0)
         return;
 
     Vector2 mouse = GetMousePosition();
     int hovR, hovC;
     std :: tie(hovR, hovC) = grid.getCellID(mouse);
+
+    if(currentLevel -> getLanes()[grid.getCellID(mouse).first] == LaneType :: INACTIVE){
+        return;
+    }
 
     if (hovR != -1 && hovC != -1) {
         Rectangle rect = grid.getCellRect(hovR, hovC);
@@ -184,6 +188,11 @@ bool World :: tryPlacePlant(Vector2 position, PlantType plantType) {
     std :: tie(r, c) = grid.getCellID(position);
     if (r < 0 || c < 0 || grid.getPlant(r, c))
         return false;
+
+    if(currentLevel -> getLanes()[r] == LaneType :: INACTIVE){
+        return false;
+    }
+
 
     if (!canAfford(plantType))
         return false;
@@ -215,7 +224,7 @@ void World::spawnZombie(ZombieType type, int lane) {
     zombieManager.addZombie(
         zombieFactory.createZombie(
             type,
-            Rectangle{spawnRect.x, spawnRect.y - 40.0f, 50.0f, 100.0f}
+            Rectangle{spawnRect.x + 100.0f, spawnRect.y - 40.0f, 50.0f, 100.0f}
         )
     );
 }
@@ -261,4 +270,9 @@ void World :: updateWorldState() {
     else if(waveManager.hasSpawnAll() and zombieManager.empty()){
         wResult = WorldResult :: WON;
     }
+}
+
+
+void World :: setUserProfileManager(UserProfileManager* user){
+    userManager = user;
 }

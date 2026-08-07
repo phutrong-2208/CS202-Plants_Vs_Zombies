@@ -16,11 +16,15 @@ private:
     SeedBank* seedBank = nullptr;
     TextManager* textManager = nullptr;
 
+
+
     std::vector<PlantType> availablePlants;
     std::vector<PlantType> selectedPlants;
     std::map<PlantType, int> sunCosts;
     int maxSlots = 6;
     bool done = false;
+
+    std :: bitset<PLANT_COUNT> unlockedPlants;
 
     Rectangle getAvailableRect(int index) const;
     Rectangle getSelectedRect(int index) const;
@@ -39,6 +43,7 @@ public:
     void setSeedBank(SeedBank* seedBank);
     void setTextManager(TextManager* manager);
     void setSunCosts(const std::map<PlantType, int>& costs);
+    void setUnlockedPlants(std :: bitset<PLANT_COUNT> list);
     void reset();
 
     void draw() const;

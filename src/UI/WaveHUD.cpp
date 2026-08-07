@@ -23,7 +23,7 @@ void WaveHUD::draw(float progress, int currentWave, int totalWaves, bool finishe
         if (brain) {
             const float sz = 48.0f;
             DrawTexturePro(*brain,
-                {0, 0, (float)brain->width, (float)brain->height},
+                {0, 0, (float)brain -> width, (float)brain -> height},
                 {barRect.x + barRect.width * 0.5f - sz * 0.5f,
                  barRect.y - sz - 4.0f, sz, sz},
                 {0, 0}, 0, WHITE);
