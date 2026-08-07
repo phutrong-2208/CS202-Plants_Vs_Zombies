@@ -99,13 +99,13 @@ void Grid::sendPlantActions() {
                 float targetY = plant->getBounds().y + plant->getBounds().height * 0.5f + GetRandomValue(-20, 20);
                 spawnPos.x += GetRandomValue(-20, 20);
                 
-                gameplayMediator->spawnSun(spawnPos, targetY);
+                gameplayMediator->spawnSun(spawnPos, targetY, 25);
                 plant->resetCooldown();
                 
                 if (plant->getType() == TWINSUNFLOWER) {
                     spawnPos.x += GetRandomValue(-30, 30);
                     targetY += GetRandomValue(-30, 30);
-                    gameplayMediator->spawnSun(spawnPos, targetY);
+                    gameplayMediator->spawnSun(spawnPos, targetY, 25);
                 }
                 continue;
             }

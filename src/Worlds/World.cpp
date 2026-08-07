@@ -47,7 +47,7 @@ void World::addParticle(std::unique_ptr<Particle> particle) {
     particleManager.addParticle(std::move(particle));
 }
 
-void World::spawnSun(Vector2 position, float targetY) {
+void World::spawnSun(Vector2 position, float targetY, int value) {
     if (sunPackage && sunAnimationData) {
         ReanimInstance sunAnimation;
         sunAnimation.setTexturePackage(sunPackage);
@@ -55,10 +55,8 @@ void World::spawnSun(Vector2 position, float targetY) {
         sunAnimation.setTextureScalar(1.0f);
 
         particleManager.addParticle(
-            std::make_unique<Sun>(
-                std::move(sunAnimation),
-                position,
-                targetY
+            std :: make_unique<Sun>(
+                std :: move(sunAnimation), position, targetY, value
             )
         );
     }
@@ -72,12 +70,43 @@ void World :: spendSun(int amount) {
     sunAmount = std::max(0, sunAmount - amount);
 }
 
-World::World(
-    int screenWidth,
-    int screenHeight,
-    AssetManager* assetManager,
-    LevelID levelID
-) {
+void World :: resetSkySunTimer() {
+    if(!currentLevel || !currentLevel -> isSkySunEnabled()) {
+        skySunTimer = 0.0f;
+        return;
+    }
+
+    const float minInterval = std :: max(0.1f, currentLevel -> getSkySunIntervalMin());
+    const float maxInterval = std :: max(minInterval, currentLevel -> getSkySunIntervalMax());
+    const int minMs = static_cast<int>(minInterval * 1000.0f);
+    const int maxMs = static_cast<int>(maxInterval * 1000.0f);
+    skySunTimer = GetRandomValue(minMs, maxMs) / 1000.0f;
+}
+
+void World :: updateSkySun(float dt) {
+    if(!currentLevel || !currentLevel -> isSkySunEnabled() || wResult != WorldResult :: RUNNING || activeLanes.empty()) return;
+    skySunTimer -= dt;
+    if(skySunTimer > 0.0f) return;
+    spawnSkySun();
+    resetSkySunTimer();
+}
+
+void World :: spawnSkySun() {
+    if(!currentLevel || activeLanes.empty()) return;
+
+    const int lane = activeLanes[GetRandomValue(0, static_cast<int>(activeLanes.size()) - 1)];
+    const Rectangle firstCell = grid.getCellRect(lane, 0);
+    const Rectangle lastCell = grid.getCellRect(lane, 8);
+    const int minX = static_cast<int>(firstCell.x + 35.0f);
+    const int maxX = static_cast<int>(lastCell.x + lastCell.width - 35.0f);
+    const int minY = static_cast<int>(firstCell.y + 25.0f);
+    const int maxY = static_cast<int>(firstCell.y + firstCell.height - 25.0f);
+    const Vector2 position = {static_cast<float>(GetRandomValue(minX, maxX)), -45.0f};
+    const float targetY = static_cast<float>(GetRandomValue(minY, maxY));
+    spawnSun(position, targetY, currentLevel -> getSkySunValue());
+}
+
+World::World(int screenWidth, int screenHeight, AssetManager* assetManager, LevelID levelID) {
     if (assetManager == nullptr) {
         TraceLog(LOG_ERROR, "Asset Manager was not found");
         return;
@@ -87,7 +116,6 @@ World::World(
     sunAmount = currentLevel -> getStartingSun();
 
     int grassLaneCount = 0;
-    std :: vector<int> activeLanes;
     const std :: vector<LaneType>& levelLanes = currentLevel -> getLanes();
 
     for(int lane = 0; lane < static_cast<int>(levelLanes.size()); ++lane) {
@@ -116,6 +144,7 @@ World::World(
 
     this->sunPackage = textureManager -> getPackage("Particles");
     this->sunAnimationData = assetManager -> getAnimationManager() -> getAnimationData("SunAnim");
+    resetSkySunTimer();
 
     waveManager.loadWaves(
         currentLevel -> getWaves(),
@@ -137,6 +166,7 @@ void World :: update(float dt) {
     if (isReady() == false)
         return;
 
+    updateSkySun(dt);
     grid.updateTime(dt);
     projectileManager.update(dt);
     zombieManager.update(dt);

@@ -45,6 +45,10 @@ private:
     MapType mapType = MapType :: DAY;
 
     int startingSun = 50;
+    bool skySunEnabled = false;
+    float skySunIntervalMin = 7.0f;
+    float skySunIntervalMax = 12.0f;
+    int skySunValue = 25;
     int seedSlots = 6;
     bool allowPlantChooser = true;
     bool useSodRollIntro = false;
@@ -73,6 +77,10 @@ public:
     int getFormatVersion() const;
     MapType getMapType() const;
     int getStartingSun() const;
+    bool isSkySunEnabled() const;
+    float getSkySunIntervalMin() const;
+    float getSkySunIntervalMax() const;
+    int getSkySunValue() const;
     int getSeedSlots() const;
     bool allowsPlantChooser() const;
     bool usesSodRollIntro() const;

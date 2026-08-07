@@ -30,7 +30,7 @@ public:
 
     // Particles
     virtual void addParticle(std::unique_ptr<Particle> particle) = 0;
-    virtual void spawnSun(Vector2 position, float targetY) = 0;
+    virtual void spawnSun(Vector2 position, float targetY, int value) = 0;
 
     // Wave spawning
     virtual void spawnZombie(ZombieType type, int lane) = 0;

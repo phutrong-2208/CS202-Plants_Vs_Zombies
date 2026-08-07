@@ -148,6 +148,10 @@ void Level :: loadFromFile() {
                     }
                 }
                 else if(key == "STARTING_SUN") startingSun = std :: stoi(value);
+                else if(key == "SKY_SUN_ENABLED") skySunEnabled = parseBool(value);
+                else if(key == "SKY_SUN_INTERVAL_MIN") skySunIntervalMin = std :: stof(value);
+                else if(key == "SKY_SUN_INTERVAL_MAX") skySunIntervalMax = std :: stof(value);
+                else if(key == "SKY_SUN_VALUE") skySunValue = std :: stoi(value);
                 else if(key == "SEED_SLOTS") seedSlots = std :: stoi(value);
                 else if(key == "ALLOW_PLANT_CHOOSER") {
                     allowPlantChooser = parseBool(value);
@@ -201,6 +205,11 @@ void Level :: loadFromFile() {
             std :: swap(wave.spawnIntervalMin, wave.spawnIntervalMax);
         }
     }
+
+    skySunIntervalMin = std :: max(0.0f, skySunIntervalMin);
+    skySunIntervalMax = std :: max(0.0f, skySunIntervalMax);
+    if(skySunIntervalMin > skySunIntervalMax) std :: swap(skySunIntervalMin, skySunIntervalMax);
+    skySunValue = std :: max(1, skySunValue);
 }
 
 void Level :: parseLanes(const std :: string& value) {
@@ -285,6 +294,11 @@ MapType Level :: getMapType() const {
 int Level :: getStartingSun() const {
     return startingSun;
 }
+
+bool Level :: isSkySunEnabled() const { return skySunEnabled; }
+float Level :: getSkySunIntervalMin() const { return skySunIntervalMin; }
+float Level :: getSkySunIntervalMax() const { return skySunIntervalMax; }
+int Level :: getSkySunValue() const { return skySunValue; }
 
 int Level :: getSeedSlots() const {
     return seedSlots;

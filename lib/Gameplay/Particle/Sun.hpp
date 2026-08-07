@@ -13,7 +13,7 @@ enum class SunState{
 
 class Sun : public Particle{
 private:
-    static const int SUN_NORMAL_GAIN = 50;
+    static const int SUN_NORMAL_GAIN = 25;
     int value = SUN_NORMAL_GAIN;
     float targetY = 0.0f;
     bool collected = false;

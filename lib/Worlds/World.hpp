@@ -50,8 +50,10 @@ private:
     ParticleManager particleManager;
     WaveManager waveManager;
     UserProfileManager *userManager = nullptr;
+    std :: vector<int> activeLanes;
     
     int sunAmount = 50;
+    float skySunTimer = 0.0f;
     WorldResult wResult = WorldResult :: RUNNING;
     
     // Sky Sun properties for textures
@@ -64,11 +66,14 @@ private:
     bool hasPlantInArea(Rectangle area) const override;
     bool damagePlantInArea(Rectangle area, float damage) override;
     void addParticle(std::unique_ptr<Particle> particle) override;
-    void spawnSun(Vector2 position, float targetY) override;
+    void spawnSun(Vector2 position, float targetY, int value) override;
     void spawnZombie(ZombieType type, int lane) override;
 
     bool canAfford(PlantType type) const;
     void spendSun(int amount);
+    void resetSkySunTimer();
+    void updateSkySun(float dt);
+    void spawnSkySun();
     void updateWorldState();
 public:
     World() = default;
@@ -104,7 +109,7 @@ public:
     WorldResult getResult() const;
     const LevelID& getLevelID() const;
     PlantType getRewardPlant() const;
-
+    
 };
 
 #endif
