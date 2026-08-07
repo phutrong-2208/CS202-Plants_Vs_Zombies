@@ -218,6 +218,10 @@ std::map<PlantType, int> World :: getAllSunCosts() const {
     return plantFactory.getAllSunCosts();
 }
 
+std::map<PlantType, float> World :: getAllSeedRecharges() const {
+    return plantFactory.getAllSeedRecharges();
+}
+
 void World::spawnZombie(ZombieType type, int lane) {
     if (lane < 0 || lane > 4) return;
     Rectangle spawnRect = grid.getCellRect(lane, 8);

@@ -88,6 +88,7 @@ public:
     
     int getSunAmount() const;
     std::map<PlantType, int> getAllSunCosts() const;
+    std::map<PlantType, float> getAllSeedRecharges() const;
 
     float getWaveProgress()  const;
     int   getCurrentWave()   const;

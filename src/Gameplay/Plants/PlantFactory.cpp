@@ -223,10 +223,22 @@ int PlantFactory::getSunCost(PlantType pType) const {
     return data ? data->getSunCost() : 0;
 }
 
+float PlantFactory::getSeedRecharge(PlantType pType) const {
+    if (!plantDataStorage) return 0.0f;
+    PlantData* data = plantDataStorage->getPlantData(pType);
+    return data ? data->getSeedRecharge() : 0.0f;
+}
+
 std::map<PlantType, int> PlantFactory::getAllSunCosts() const {
     std::map<PlantType, int> result;
     for (PlantType type : getAllPlantTypes()) {
         result[type] = getSunCost(type);
     }
+    return result;
+}
+
+std::map<PlantType, float> PlantFactory::getAllSeedRecharges() const {
+    std::map<PlantType, float> result;
+    for (PlantType type : getAllPlantTypes()) result[type] = getSeedRecharge(type);
     return result;
 }

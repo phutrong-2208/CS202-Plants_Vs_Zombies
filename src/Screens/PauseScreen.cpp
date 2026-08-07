@@ -6,10 +6,9 @@ namespace {
     constexpr float VIRTUAL_HEIGHT = 600.0f;
 
     constexpr Rectangle PANEL_BOUNDS = {188.5f, 51.0f, 423.0f, 498.0f};
-    constexpr Rectangle TITLE_BOUNDS = {240.0f, 135.0f, 320.0f, 55.0f};
-    constexpr Rectangle MESSAGE_BOUNDS = {245.0f, 210.0f, 310.0f, 65.0f};
-    constexpr Rectangle MAIN_MENU_BOUNDS = {250.0f, 325.0f, 300.0f, 76.0f};
-    constexpr Rectangle RESUME_BOUNDS = {220.0f, 415.0f, 360.0f, 100.0f};
+    constexpr Rectangle MAIN_MENU_BOUNDS = {270.0f, 380.0f, 260.0f, 45.0f};
+    constexpr Rectangle RESUME_BOUNDS = {220.0f, 430.0f, 360.0f, 100.0f};
+    constexpr Color MENU_TEXT_COLOR = {55, 52, 78, 255};
 }
 
 PauseScreen :: PauseScreen(int screenWidth, int screenHeight, AssetManager* manager) : 
@@ -90,9 +89,7 @@ void PauseScreen :: drawButton(Rectangle bounds, const char* text, bool hovered)
     }
 
     if (textManager != nullptr) {
-        textManager -> drawCenteredText(
-            "LUCKIESTGUY-REGULAR", text, screenBounds, 25.0f * getScale(), getScale(), hovered ? Color{255, 245, 150, 255} : WHITE
-        );
+        textManager -> drawCenteredText("LUCKIESTGUY-REGULAR", text, screenBounds, 25.0f * getScale(), getScale(), MENU_TEXT_COLOR);
     }
 }
 
@@ -106,24 +103,6 @@ void PauseScreen::draw() {
             *menuBackground,
             {0.0f, 0.0f, static_cast<float>(menuBackground->width), static_cast<float>(menuBackground->height)},
             toScreenBounds(PANEL_BOUNDS), {0.0f, 0.0f}, 0.0f, WHITE
-        );
-    }
-
-    if (textManager != nullptr) {
-        const float scale = getScale();
-        textManager -> drawCenteredText(
-            "LUCKIESTGUY-REGULAR", "GAME PAUSED", toScreenBounds(TITLE_BOUNDS),
-            34.0f * scale,
-            scale,
-            Color{255, 225, 120, 255}
-        );
-        textManager -> drawCenteredText(
-            "LUCKIESTGUY-REGULAR",
-            "THE ZOMBIES ARE WAITING...",
-            toScreenBounds(MESSAGE_BOUNDS),
-            18.0f * scale,
-            scale,
-            Color{205, 210, 225, 255}
         );
     }
 

@@ -31,9 +31,52 @@ void SeedBank :: setSunCosts(const std::map<PlantType, int>& costs) {
     sunCosts = costs;
 }
 
+void SeedBank :: setSeedRechargeTimes(const std::map<PlantType, float>& rechargeTimes) {
+    seedRechargeTimes = rechargeTimes;
+}
+
 void SeedBank :: setSlots(const std::vector<PlantType>& selectedPlants) {
     slots = selectedPlants;
     selectedSlot = -1;
+}
+
+void SeedBank :: update(float dt) {
+    for(auto& [type, remaining] : cooldownRemaining) remaining = std::max(0.0f, remaining - dt);
+}
+
+void SeedBank :: startCooldown(PlantType type) {
+    auto found = seedRechargeTimes.find(type);
+    if(found == seedRechargeTimes.end()) return;
+    cooldownRemaining[type] = std::max(0.0f, found -> second);
+    if(selectedPlantId() == static_cast<int>(type)) selectedSlot = -1;
+}
+
+bool SeedBank :: isCoolingDown(PlantType type) const {
+    auto found = cooldownRemaining.find(type);
+    return found != cooldownRemaining.end() && found -> second > 0.0f;
+}
+
+float SeedBank :: getCooldownRatio(PlantType type) const {
+    auto total = seedRechargeTimes.find(type);
+    auto remaining = cooldownRemaining.find(type);
+    if(total == seedRechargeTimes.end() || remaining == cooldownRemaining.end() || total -> second <= 0.0f) return 0.0f;
+    return std::clamp(remaining -> second / total -> second, 0.0f, 1.0f);
+}
+
+void SeedBank :: drawCooldownOverlay(PlantType type, Rectangle bounds) const {
+    const float ratio = getCooldownRatio(type);
+    if(ratio <= 0.0f) return;
+
+    Texture2D* silhouette = chooserPackage ? chooserPackage -> GetTexture("SEEDPACKETSILHOUETTE") : nullptr;
+    Rectangle dst = {bounds.x, bounds.y, bounds.width, bounds.height * ratio};
+    if(!silhouette) {
+        DrawRectangleRec(dst, Color{40, 40, 40, 190});
+        return;
+    }
+
+    Rectangle src = {0.0f, 0.0f, static_cast<float>(silhouette -> width), static_cast<float>(silhouette -> height) * ratio};
+    for(int layer = 0; layer < 3; ++layer) DrawTexturePro(*silhouette, src, dst, {0.0f, 0.0f}, 0.0f, Color{105, 105, 105, 225});
+    DrawRectangleRec(dst, Color{0, 0, 0, 90});
 }
 
 void SeedBank :: draw() const {
@@ -82,12 +125,15 @@ void SeedBank :: draw() const {
                 textManager->drawCenteredText("Luckiest_Guy", costStr.c_str(), costRect, 14.0f, 0.5f, Color{255, 230, 50, 255});
             }
         }
+
+        drawCooldownOverlay(slots[i], slotRect);
     }
 }
 
 bool SeedBank :: handleMouseClick(Vector2 position) {
     for (int i = 0; i < (int)slots.size(); ++i) {
         if (pointInRect(position, getSlotRect(i))) {
+            if(isCoolingDown(slots[i])) return true;
             selectedSlot = (selectedSlot == i) ? -1 : i;
             return true;
         }

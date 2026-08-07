@@ -17,6 +17,7 @@ GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager
     seedBank.setTexturePackage(assetManager -> getTextureManager() -> getPackage("PlantChooser"));
     seedBank.setPacketPackage(assetManager -> getTextureManager() -> getPackage("PlantSeedPackets"));
     seedBank.setTextManager(assetManager -> getTextManager());
+    seedBank.setSeedRechargeTimes(world -> getAllSeedRecharges());
 
     choosePlants.setChooserPackage(assetManager -> getTextureManager() -> getPackage("PlantChooser"));
     choosePlants.setPacketPackage(assetManager -> getTextureManager() -> getPackage("PlantSeedPackets"));
@@ -31,6 +32,7 @@ GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager
 void GameplayScreen :: update(float dt) {
     if (world) {
         world -> update(dt);
+        if(world -> isReady()) seedBank.update(dt);
 
         if(!resultRequested && world -> getResult() != WorldResult :: RUNNING) {
             resultRequested = true;
@@ -211,7 +213,8 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
 
         int selectedPlantId = seedBank.selectedPlantId();
         if (selectedPlantId >= 0) {
-            world -> tryPlacePlant(inputEvent.position, (PlantType)selectedPlantId);
+            PlantType selectedPlant = static_cast<PlantType>(selectedPlantId);
+            if(world -> tryPlacePlant(inputEvent.position, selectedPlant)) seedBank.startCooldown(selectedPlant);
         }
     }
 }
