@@ -8,10 +8,12 @@ void GameLoop::initGame() {
     assetManager = std :: make_unique<AssetManager>();
     assetManager -> beginLoading();
     inputManager = std :: make_unique<InputManager>();
+    userProfileManager = std :: make_unique<UserProfileManager>();
     screenManager = std :: make_unique<ScreenManager>(
         GetScreenWidth(),
         GetScreenHeight(),
-        assetManager.get()
+        assetManager.get(),
+        userProfileManager.get()
     );
     screenManager -> push(ScreenID :: LOAD_MENU);
 }
@@ -45,6 +47,7 @@ void GameLoop::runGame() {
 
 void GameLoop::closeGame() {
     screenManager.reset();
+    userProfileManager.reset();
     inputManager.reset();
     assetManager.reset();
 

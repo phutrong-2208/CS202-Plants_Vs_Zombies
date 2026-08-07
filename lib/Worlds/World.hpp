@@ -68,7 +68,12 @@ private:
 public:
     World() = default;
     ~World() = default;
-    World(int screenWidth, int screenHeight, AssetManager* assetManager);
+    World(
+        int screenWidth,
+        int screenHeight,
+        AssetManager* assetManager,
+        LevelID levelID = {1, 1}
+    );
 
     void update(float dt);
     void draw();

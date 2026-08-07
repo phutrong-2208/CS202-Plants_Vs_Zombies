@@ -22,9 +22,15 @@ private:
     void drawSunHUD() const;
     void drawPauseButton() const;
     Rectangle getPauseButtonBounds() const;
+    void applyWinProgress(const ScreenData& resultData);
 
 public:
-    GameplayScreen(int screenWidth, int screenHeight, AssetManager* manager);
+    GameplayScreen(
+        int screenWidth,
+        int screenHeight,
+        AssetManager* manager,
+        LevelID levelID = {1, 1}
+    );
 
     void update(float dt) override;
     void draw() override;

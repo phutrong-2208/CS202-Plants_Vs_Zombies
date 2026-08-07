@@ -1,0 +1,4 @@
+# User profile index. Individual profiles are stored in assets/data/users.
+
+ACTIVE_PROFILE_INDEX=0
+PROFILE_FILE=Anonymous.txt

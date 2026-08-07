@@ -12,6 +12,8 @@
 #include <vector>
 #include <array>
 #include <map>
+#include "bitset"
+#include "string"
 
 #include <iostream>
 #include <sstream>

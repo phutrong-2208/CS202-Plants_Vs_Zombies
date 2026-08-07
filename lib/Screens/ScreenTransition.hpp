@@ -7,6 +7,7 @@ enum class ScreenID {
     GAME_PLAY,
     GAME_RESULT,
     MAIN_MENU,
+    USER_PROFILE,
     PAUSE_MENU,
     LOAD_MENU
 };

@@ -1,4 +1,5 @@
 #include "Screens/MainMenuScreen.hpp"
+#include "Core/UserProfileManager.hpp"
 
 namespace {
     constexpr float MAIN_MENU_WIDTH = 800.0f;
@@ -6,6 +7,7 @@ namespace {
 
     constexpr Vector2 WORLD_NUMBER_POSITION = {558.0f, 87.0f};
     constexpr Vector2 STAGE_NUMBER_POSITION = {580.0f, 88.0f};
+    constexpr Rectangle PROFILE_NAME_BOUNDS = {55.0f, 87.0f, 238.0f, 29.0f};
     constexpr float LEVEL_DIGIT_WIDTH = 12.0f;
     constexpr float LEVEL_DIGIT_HEIGHT = 17.0f;
 }
@@ -285,6 +287,37 @@ void MainMenuScreen :: draw(void){
         );
     }
 
+    const UserProfile* activeProfile = userProfileManager
+        ? userProfileManager -> getActiveProfile()
+        : nullptr;
+    TextManager* textManager = assetManager
+        ? assetManager -> getTextManager()
+        : nullptr;
+    if(activeProfile && textManager) {
+        const std :: string& profileName = activeProfile -> getProfileName();
+        Rectangle nameBounds = toScreenBounds(PROFILE_NAME_BOUNDS);
+        Rectangle shadowBounds = nameBounds;
+        shadowBounds.x += 1.5f * scale;
+        shadowBounds.y += 2.0f * scale;
+
+        textManager -> drawCenteredText(
+            "LUCKIEST_GUY",
+            profileName.c_str(),
+            shadowBounds,
+            21.0f * scale,
+            1.0f * scale,
+            Color{55, 25, 10, 210}
+        );
+        textManager -> drawCenteredText(
+            "LUCKIEST_GUY",
+            profileName.c_str(),
+            nameBounds,
+            21.0f * scale,
+            1.0f * scale,
+            Color{85, 255, 45, 255}
+        );
+    }
+
     // Hover redraws the stone texture, so digits must be drawn on top of it.
     drawLevelNumber(
         id.world,
@@ -319,6 +352,10 @@ void MainMenuScreen :: draw(void){
 }
 
 void MainMenuScreen :: update(float dt){
+    if(userProfileManager && userProfileManager -> getActiveProfile()) {
+        id = userProfileManager -> getActiveProfile() -> getHighestUnlockedLevel();
+    }
+
     if(!animationReady) return;
 
     skyAnimation.updateTime(dt);
@@ -345,10 +382,22 @@ void MainMenuScreen :: update(float dt){
 
 void MainMenuScreen :: executeAction(MainMenuAction target){
     switch(target){
-        case MainMenuAction :: START_ADVENTURE:
-            requestTransition(ScreenAction :: REPLACE, ScreenID :: GAME_PLAY); break;
+        case MainMenuAction :: CHANGE_PROFILE:
+            requestTransition(ScreenAction :: PUSH, ScreenID :: USER_PROFILE); break;
+        case MainMenuAction :: START_ADVENTURE: {
+            ScreenData gameplayData;
+            gameplayData.levelID = id;
+            requestTransition(
+                ScreenAction :: REPLACE,
+                ScreenID :: GAME_PLAY,
+                gameplayData
+            );
+            break;
+        }
         case MainMenuAction :: OPTION:
             requestTransition(ScreenAction :: PUSH, ScreenID :: PAUSE_MENU); break;
+        default:
+            break;
     }
 }
 
@@ -357,11 +406,27 @@ void MainMenuScreen :: handleInput(const RawInputEvent& inputEvent){
         return;
     }
 
-    constexpr std::size_t START_ADVENTURE_INDEX = 2;
-    if (CheckCollisionPointRec(
-            inputEvent.position,
-            toScreenBounds(hoverButtons[START_ADVENTURE_INDEX].bounds)
-        )) {
-        requestTransition(ScreenAction::REPLACE, ScreenID::GAME_PLAY);
+    for(const MainMenuHoverButton& button : hoverButtons) {
+        if(!button.enabled || !CheckCollisionPointRec(
+                inputEvent.position,
+                toScreenBounds(button.bounds)
+            )) {
+            continue;
+        }
+
+        executeAction(button.action);
+        return;
+    }
+
+    for(const MainMenuFlowerLabel& label : flowerLabels) {
+        if(!label.enabled || !CheckCollisionPointRec(
+                inputEvent.position,
+                toScreenBounds(label.bounds)
+            )) {
+            continue;
+        }
+
+        executeAction(label.action);
+        return;
     }
 }

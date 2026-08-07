@@ -4,6 +4,7 @@
 #include "Common.hpp"
 #include "Screens/Screen.hpp"
 
+class UserProfileManager;
 
 class ScreenManager {
 private:
@@ -11,13 +12,19 @@ private:
     int screenWidth = 0;
     int screenHeight = 0;
     AssetManager* assetManager = nullptr;
+    UserProfileManager* userProfileManager = nullptr;
 
     std::unique_ptr<Screen> createScreen(ScreenID id, const ScreenData& data);
     void processTransition();
 
 public:
     // ScreenManager behaves like a stack: screens can be pushed, popped or replaced.
-    ScreenManager(int screenWidth, int screenHeight, AssetManager* assetManager);
+    ScreenManager(
+        int screenWidth,
+        int screenHeight,
+        AssetManager* assetManager,
+        UserProfileManager* userProfileManager
+    );
 
     void push(ScreenID id, ScreenData data = {});
     void pop();

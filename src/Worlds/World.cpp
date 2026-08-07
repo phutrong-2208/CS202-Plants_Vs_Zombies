@@ -72,13 +72,18 @@ void World :: spendSun(int amount) {
     sunAmount = std::max(0, sunAmount - amount);
 }
 
-World::World(int screenWidth, int screenHeight, AssetManager *assetManager) {
+World::World(
+    int screenWidth,
+    int screenHeight,
+    AssetManager* assetManager,
+    LevelID levelID
+) {
     if (assetManager == nullptr) {
         TraceLog(LOG_ERROR, "Asset Manager was not found");
         return;
     }
 
-    currentLevel = std :: make_unique<Level>(LevelID{1, 1});
+    currentLevel = std :: make_unique<Level>(levelID);
     sunAmount = currentLevel -> getStartingSun();
 
     int grassLaneCount = 0;

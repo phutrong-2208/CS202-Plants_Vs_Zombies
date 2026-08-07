@@ -13,7 +13,8 @@ namespace {
     bool isTextureExtension(const std::string& extension) {
         return extension == ".PNG" ||
                extension == ".JPG" ||
-               extension == ".JPEG";
+               extension == ".JPEG" ||
+               extension == ".GIF";
     }
 
     std::filesystem::path findMaskPath(const std::filesystem::path& texturePath) {

@@ -4,6 +4,10 @@ void Screen :: setAssetManager(AssetManager* manager){
     assetManager = manager;
 }
 
+void Screen :: setUserProfileManager(UserProfileManager* manager){
+    userProfileManager = manager;
+}
+
 void Screen :: requestTransition(
     ScreenAction action,
     ScreenID target,

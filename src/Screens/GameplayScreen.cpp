@@ -1,8 +1,13 @@
 #include <Screens/GameplayScreen.hpp>
+#include <Core/UserProfileManager.hpp>
 
-GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager* manager) {
+#include <filesystem>
+
+GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager* manager, LevelID levelID) {
     setAssetManager(manager);
-    world = std::make_unique<World>(screenWidth, screenHeight, assetManager);
+    world = std::make_unique<World>(
+        screenWidth, screenHeight, assetManager, levelID
+    );
     textManager = assetManager->getTextManager();
     this->screenWidth  = screenWidth;
     this->screenHeight = screenHeight;
@@ -34,6 +39,10 @@ void GameplayScreen :: update(float dt) {
             resultData.levelID = world -> getLevelID();
             resultData.rewardPlant = world -> getRewardPlant();
 
+            if(resultData.wResult == WorldResult :: WON) {
+                applyWinProgress(resultData);
+            }
+
             requestTransition(
                 ScreenAction :: PUSH,
                 ScreenID :: GAME_RESULT,
@@ -41,6 +50,45 @@ void GameplayScreen :: update(float dt) {
             );
         }
     }
+}
+
+void GameplayScreen :: applyWinProgress(const ScreenData& resultData) {
+    if(!userProfileManager) return;
+
+    UserProfile* profile = userProfileManager -> getActiveProfile();
+    if(!profile) return;
+
+    if(resultData.rewardPlant != PLANT_COUNT) {
+        profile -> unlockPlant(resultData.rewardPlant);
+    }
+
+    LevelID nextLevel = resultData.levelID;
+    nextLevel.stage++;
+
+    auto levelExists = [](const LevelID& level) {
+        const std :: filesystem :: path path =
+            std :: filesystem :: path(PROJECT_DIR) /
+            "assets/data/levels" /
+            level.getFileName();
+        return std :: filesystem :: exists(path);
+    };
+
+    if(!levelExists(nextLevel)) {
+        LevelID nextWorld{resultData.levelID.world + 1, 1};
+        if(levelExists(nextWorld)) nextLevel = nextWorld;
+        else nextLevel = resultData.levelID;
+    }
+
+    const LevelID& highestLevel = profile -> getHighestUnlockedLevel();
+    const bool advancesProgress =
+        nextLevel.world > highestLevel.world ||
+        (nextLevel.world == highestLevel.world &&
+         nextLevel.stage > highestLevel.stage);
+
+    if(advancesProgress) {
+        profile -> setHighestUnlockedLevel(nextLevel);
+    }
+    userProfileManager -> saveProfiles();
 }
 
 void GameplayScreen :: draw() {
@@ -60,10 +108,10 @@ void GameplayScreen :: draw() {
     if (world && world -> isReady()) {
         drawSunHUD();
         waveHUD.draw(
-            world->getWaveProgress(),
-            world->getCurrentWave(),
-            world->getTotalWaves(),
-            world->isWaveFinished(),
+            world -> getWaveProgress(),
+            world -> getCurrentWave(),
+            world -> getTotalWaves(),
+            world -> isWaveFinished(),
             screenWidth,
             screenHeight
         );
@@ -86,16 +134,11 @@ void GameplayScreen::drawPauseButton() const {
     const bool hovered = CheckCollisionPointRec(GetMousePosition(), bounds);
 
     DrawRectangleRounded(
-        bounds,
-        0.25f,
-        8,
+        bounds, 0.25f, 8,
         hovered ? Color{88, 93, 120, 235} : Color{45, 48, 65, 210}
     );
     DrawRectangleRoundedLinesEx(
-        bounds,
-        0.25f,
-        8,
-        2.0f,
+        bounds, 0.25f, 8, 2.0f,
         hovered ? Color{255, 225, 120, 255} : Color{205, 210, 225, 255}
     );
 

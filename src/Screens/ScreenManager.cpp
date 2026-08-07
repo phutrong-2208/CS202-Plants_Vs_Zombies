@@ -4,41 +4,61 @@
 #include "Screens/LoadScreen.hpp"
 #include "Screens/MainMenuScreen.hpp"
 #include "Screens/PauseScreen.hpp"
+#include "Screens/UserProfileScreen.hpp"
 
-ScreenManager::ScreenManager(int screenWidth, int screenHeight, AssetManager* assetManager) : 
-screenWidth(screenWidth), screenHeight(screenHeight), assetManager(assetManager) {}
+ScreenManager::ScreenManager(
+    int width,
+    int height,
+    AssetManager* assets,
+    UserProfileManager* profiles
+) : screenWidth(width), screenHeight(height), assetManager(assets),
+    userProfileManager(profiles) {}
 
 std :: unique_ptr<Screen> ScreenManager :: createScreen(ScreenID id, const ScreenData& data) {
+    std :: unique_ptr<Screen> screen;
     switch (id) {
         case ScreenID :: GAME_PLAY:
-            return std :: make_unique<GameplayScreen>(
-                screenWidth, screenHeight, assetManager
+            screen = std :: make_unique<GameplayScreen>(
+                screenWidth, screenHeight, assetManager, data.levelID
             );
+            break;
 
         case ScreenID :: GAME_RESULT:
-            return std :: make_unique<GameResultScreen>(
+            screen = std :: make_unique<GameResultScreen>(
                 screenWidth, screenHeight, assetManager, data
             );
+            break;
 
         case ScreenID :: MAIN_MENU:
-            return std :: make_unique<MainMenuScreen>(
+            screen = std :: make_unique<MainMenuScreen>(
                 screenWidth, screenHeight, assetManager
             );
+            break;
+
+        case ScreenID :: USER_PROFILE:
+            screen = std :: make_unique<UserProfileScreen>(
+                screenWidth, screenHeight, assetManager
+            );
+            break;
 
         case ScreenID :: LOAD_MENU:
-            return std :: make_unique<LoadScreen>(
+            screen = std :: make_unique<LoadScreen>(
                 screenWidth, screenHeight, assetManager
             );
+            break;
 
         case ScreenID :: PAUSE_MENU:
-            return std :: make_unique<PauseScreen>(
+            screen = std :: make_unique<PauseScreen>(
                 screenWidth, screenHeight, assetManager
             );
+            break;
 
-        default: return nullptr;
+        default:
+            break;
     }
 
-    return nullptr;
+    if(screen) screen -> setUserProfileManager(userProfileManager);
+    return screen;
 }
 
 void ScreenManager :: push(ScreenID id, ScreenData data) {

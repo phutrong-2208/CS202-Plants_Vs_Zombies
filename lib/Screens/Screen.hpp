@@ -5,9 +5,12 @@
 #include <Core/InputManager.hpp>
 #include <Screens/ScreenTransition.hpp>
 
+class UserProfileManager;
+
 class Screen {
 protected:
     AssetManager* assetManager = nullptr;
+    UserProfileManager* userProfileManager = nullptr;
     ScreenTransition pendingTransition;
 
     void requestTransition(
@@ -24,6 +27,7 @@ public:
     virtual void handleInput(const RawInputEvent& inputEvent) = 0;
 
     void setAssetManager(AssetManager* manager);
+    void setUserProfileManager(UserProfileManager* manager);
     ScreenTransition consumeTransition();
 };
 
