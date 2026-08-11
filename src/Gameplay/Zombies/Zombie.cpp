@@ -1,4 +1,5 @@
 #include "Gameplay/Zombies/Zombie.hpp"
+#include "Gameplay/Zombies/ZombieDeathHandler.hpp"
 #include "Gameplay/Particle/ZombiePart.hpp"
 #include "Gameplay/IGameplayMediator.hpp"
 
@@ -80,46 +81,7 @@ void Zombie::receiveDamage(float damage, IGameplayMediator* mediator) {
         
         if (mediator == nullptr) return;
         
-        Texture2D* headTex = animation.getTrackTexture("anim_head1");
-        if (headTex == nullptr) headTex = animation.getTrackTexture("anim_head2");
-        
-        if (headTex != nullptr) {
-            mediator->addParticle(
-                std::make_unique<ZombiePart>(
-                    ZombiePartType::HEAD,
-                    headTex,
-                    Vector2{hitbox.x + 30.0f, hitbox.y + 10.0f},
-                    Vector2{GetRandomValue(-50, 50) / 1.0f, -200.0f},
-                    hitbox.y + hitbox.height
-                )
-            );
-        }
-
-        Texture2D* coneTex = animation.getTrackTexture("anim_cone");
-        if (coneTex != nullptr) {
-            mediator->addParticle(
-                std::make_unique<ZombiePart>(
-                    ZombiePartType::HELMET,
-                    coneTex,
-                    Vector2{hitbox.x + 30.0f, hitbox.y + 5.0f},
-                    Vector2{GetRandomValue(-50, 50) / 1.0f, -250.0f},
-                    hitbox.y + hitbox.height
-                )
-            );
-        }
-        
-        Texture2D* bucketTex = animation.getTrackTexture("anim_bucket");
-        if (bucketTex != nullptr) {
-            mediator->addParticle(
-                std::make_unique<ZombiePart>(
-                    ZombiePartType::HELMET,
-                    bucketTex,
-                    Vector2{hitbox.x + 30.0f, hitbox.y + 5.0f},
-                    Vector2{GetRandomValue(-50, 50) / 1.0f, -250.0f},
-                    hitbox.y + hitbox.height
-                )
-            );
-        }
+        ZombieDeathHandler::spawnDeathParticles(animation, hitbox, mediator);
     }
 }
 
