@@ -31,6 +31,9 @@ void ReanimInstance::showOnlyTracks(const std::vector<std::string>& trackNames) 
 // file loop naturally; the reanim file IS one complete idle cycle.
 
 Texture2D* ReanimInstance::getTrackTexture(const std::string& trackName) const {
+    if (hiddenTracks.find(trackName) != hiddenTracks.end()) return nullptr;
+    if (useVisibleTrackFilter && visibleTracks.find(trackName) == visibleTracks.end()) return nullptr;
+
     if (rawAnim == nullptr || rawTexPack == nullptr) return nullptr;
     const ReanimTrack* track = rawAnim->getTrack(trackName);
     if (track == nullptr) return nullptr;
@@ -111,7 +114,7 @@ bool ReanimInstance::isFinished() const {
 // Rendering
 // -----------------------------------------------------------------------
 
-void ReanimInstance::draw(Rectangle hitbox) const {
+void ReanimInstance::draw(Rectangle hitbox, Color overrideTint) const {
     if (rawAnim == nullptr || rawTexPack == nullptr) {
         TraceLog(LOG_ERROR, "ReanimInstance: animation or texture package not set");
         return;
@@ -167,8 +170,8 @@ void ReanimInstance::draw(Rectangle hitbox) const {
         const float w = (float)currentTex->width;
         const float h = (float)currentTex->height;
 
-        const unsigned char alphaByte = (unsigned char)(frame.alpha * 255.0f);
-        const Color tint = {255, 255, 255, alphaByte};
+        const unsigned char alphaByte = (unsigned char)(frame.alpha * overrideTint.a);
+        const Color tint = {overrideTint.r, overrideTint.g, overrideTint.b, alphaByte};
 
         DrawTexturePro(
             *currentTex,

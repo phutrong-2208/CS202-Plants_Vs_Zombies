@@ -53,7 +53,7 @@ public:
     bool  isLooping() const;
     bool  isFinished() const;
 
-    void draw(Rectangle hitbox) const;
+    void draw(Rectangle hitbox, Color overrideTint = WHITE) const;
 };
 
 #endif

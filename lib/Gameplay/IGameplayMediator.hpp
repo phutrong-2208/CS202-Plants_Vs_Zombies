@@ -1,7 +1,7 @@
 #ifndef IGAMEPLAYMEDIATOR_HPP
 #define IGAMEPLAYMEDIATOR_HPP
 
-#include <Gameplay/Plants/Plant.hpp>
+#include <Gameplay/Plants/PlantType.hpp>
 #include <Gameplay/Projectile/Projectile.hpp>
 #include <Gameplay/Particle/Particle.hpp>
 #include <Gameplay/Zombies/ZombieType.hpp>

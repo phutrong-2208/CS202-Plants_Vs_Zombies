@@ -1,6 +1,6 @@
 #pragma once
-#include "Gameplay/Plants/Plant.hpp"
-class Marigold : public Plant {
+#include "Gameplay/Plants/SunProducePlants/SunPlant.hpp"
+class Marigold : public SunPlant {
 public:
     PlantType getType() override;
 };

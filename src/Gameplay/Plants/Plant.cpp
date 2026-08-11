@@ -101,8 +101,26 @@ void Plant::plantSetup() {
     health = plantData -> getBaseHealth();
 }
 
+void Plant::performAction(IGameplayMediator* mediator) {
+    if (plantData && plantData->getProjectileCooldown() > 0.0f && getProjectileSpawnPosition().x != 0.0f) {
+        if (!mediator->hasTarget(getType(), getProjectileSpawnPosition(), getBounds())) return;
+        mediator->addProjectile(getType(), getProjectileSpawnPosition(), getDamage());
+        resetCooldown();
+    }
+}
+
+void Plant::triggerAnimation(const std::string& clipName) {
+    animation.playClip(clipName);
+    animation.setLoopToggle(false);
+}
+
 void Plant::updateTime(float deltaSeconds) {
     animation.updateTime(deltaSeconds);
+    
+    if (!animation.isLooping() && animation.isFinished()) {
+        if (plantData) animation.playClip(plantData->getReanimClip());
+        animation.setLoopToggle(true);
+    }
 
     if(cooldownTimer > 0.0f){
         cooldownTimer -= deltaSeconds;

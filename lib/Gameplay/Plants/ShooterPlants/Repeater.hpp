@@ -8,6 +8,7 @@ public:
     Repeater();
     PlantType getType() override;
     Vector2 getProjectileSpawnPosition() override;
+    void performAction(IGameplayMediator* mediator) override;
 };
 
 #endif

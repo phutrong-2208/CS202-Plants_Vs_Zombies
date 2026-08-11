@@ -5,60 +5,8 @@
 #include <Core/AnimationManager.hpp>
 #include <Gameplay/Animation/ReanimInstance.hpp>
 
-enum PlantType : int {
-    PEASHOOTER,
-    SUNFLOWER,
-    CHERRYBOMB,
-    WALLNUT,
-    POTATOMINE,
-    SNOWPEA,
-    CHOMPER,
-    REPEATER,
-    PUFFSHROOM,
-    SUNSHROOM,
-    FUMESHROOM,
-    GRAVEBUSTER,
-    HYPNOSHROOM,
-    SCAREDYSHROOM,
-    ICESHROOM,
-    DOOMSHROOM,
-    LILYPAD,
-    SQUASH,
-    THREEPEATER,
-    TANGLEKELP,
-    JALAPENO,
-    CALTROP,
-    TORCHWOOD,
-    TALLNUT,
-    SEASHROOM,
-    PLANTERN,
-    CACTUS,
-    BLOVER,
-    SPLITPEA,
-    STARFRUIT,
-    PUMPKIN,
-    MAGNETSHROOM,
-    CABBAGEPULT,
-    CORNPULT,
-    COFFEEBEAN,
-    GARLIC,
-    UMBRELLALEAF,
-    MARIGOLD,
-    MELONPULT,
-    GATLINGPEA,
-    TWINSUNFLOWER,
-    GLOOMSHROOM,
-    CATTAIL,
-    SPIKEROCK,
-    GOLDMAGNET,
-    WINTERMELON,
-    COBCANNON,
-    IMITATER,
-    PLANT_COUNT
-};
-
-const char* getPlantTextureKey(PlantType type);
-const std :: vector<PlantType>& getAllPlantTypes();
+#include "PlantType.hpp"
+#include <Gameplay/IGameplayMediator.hpp>
 
 class PlantData {
 private:
@@ -117,8 +65,10 @@ public:
     virtual ~Plant() = default;
     void receiveDamage(int damage);
 
-    void updateTime(float deltaSeconds);
+    void triggerAnimation(const std::string& clipName);
+    virtual void updateTime(float deltaSeconds);
     virtual void resetCooldown();
+    virtual void performAction(IGameplayMediator* mediator);
 
     void setBounds(Rectangle newBounds);
     Rectangle getBounds() const;
@@ -129,7 +79,7 @@ public:
     
     void setReanimInstance(ReanimInstance anim);
     void setPlantData(PlantData* pData);
-    void draw(Rectangle hitbox);
+    virtual void draw(Rectangle hitbox);
     
     bool isDead() const;
     bool isOnCooldown() const;

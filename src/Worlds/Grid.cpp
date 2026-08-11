@@ -94,35 +94,7 @@ void Grid::sendPlantActions() {
 
             if (plant -> isOnCooldown()) continue;
 
-            if (plant->getType() == SUNFLOWER || plant->getType() == TWINSUNFLOWER || plant->getType() == SUNSHROOM) {
-                Vector2 spawnPos = { plant->getBounds().x + plant->getBounds().width * 0.5f, plant->getBounds().y };
-                float targetY = plant->getBounds().y + plant->getBounds().height * 0.5f + GetRandomValue(-20, 20);
-                spawnPos.x += GetRandomValue(-20, 20);
-                
-                gameplayMediator->spawnSun(spawnPos, targetY, 25);
-                plant->resetCooldown();
-                
-                if (plant->getType() == TWINSUNFLOWER) {
-                    spawnPos.x += GetRandomValue(-30, 30);
-                    targetY += GetRandomValue(-30, 30);
-                    gameplayMediator->spawnSun(spawnPos, targetY, 25);
-                }
-                continue;
-            }
-
-            if (!gameplayMediator -> hasTarget(
-                plant -> getType(), 
-                plant -> getProjectileSpawnPosition(), 
-                plant -> getBounds()
-            )) continue;
-
-            gameplayMediator -> addProjectile(
-                plant -> getType(), 
-                plant -> getProjectileSpawnPosition(), 
-                plant -> getDamage()
-            );
-
-            plant -> resetCooldown();
+            plant->performAction(gameplayMediator);
         }
     }
 }

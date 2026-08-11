@@ -1,0 +1,61 @@
+#ifndef PLANT_TYPE_HPP
+#define PLANT_TYPE_HPP
+
+#include <vector>
+
+enum PlantType : int {
+    PEASHOOTER,
+    SUNFLOWER,
+    CHERRYBOMB,
+    WALLNUT,
+    POTATOMINE,
+    SNOWPEA,
+    CHOMPER,
+    REPEATER,
+    PUFFSHROOM,
+    SUNSHROOM,
+    FUMESHROOM,
+    GRAVEBUSTER,
+    HYPNOSHROOM,
+    SCAREDYSHROOM,
+    ICESHROOM,
+    DOOMSHROOM,
+    LILYPAD,
+    SQUASH,
+    THREEPEATER,
+    TANGLEKELP,
+    JALAPENO,
+    CALTROP,
+    TORCHWOOD,
+    TALLNUT,
+    SEASHROOM,
+    PLANTERN,
+    CACTUS,
+    BLOVER,
+    SPLITPEA,
+    STARFRUIT,
+    PUMPKIN,
+    MAGNETSHROOM,
+    CABBAGEPULT,
+    CORNPULT,
+    COFFEEBEAN,
+    GARLIC,
+    UMBRELLALEAF,
+    MARIGOLD,
+    MELONPULT,
+    GATLINGPEA,
+    TWINSUNFLOWER,
+    GLOOMSHROOM,
+    CATTAIL,
+    SPIKEROCK,
+    GOLDMAGNET,
+    WINTERMELON,
+    COBCANNON,
+    IMITATER,
+    PLANT_COUNT
+};
+
+const char* getPlantTextureKey(PlantType type);
+const std::vector<PlantType>& getAllPlantTypes();
+
+#endif
