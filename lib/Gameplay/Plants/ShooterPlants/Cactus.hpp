@@ -1,13 +1,12 @@
 #ifndef CACTUS_HPP
 #define CACTUS_HPP
 
-#include "Gameplay/Plants/Plant.hpp"
+#include "Gameplay/Plants/ShooterPlants/ShooterPlant.hpp"
 
-class Cactus : public Plant {
+class Cactus : public ShooterPlant {
 public:
     Cactus();
     PlantType getType() override;
-    Vector2 getProjectileSpawnPosition() override;
 };
 
 #endif

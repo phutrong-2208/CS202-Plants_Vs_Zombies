@@ -1,13 +1,12 @@
 #ifndef REPEATER_HPP
 #define REPEATER_HPP
 
-#include "Gameplay/Plants/Plant.hpp"
+#include "Gameplay/Plants/ShooterPlants/ShooterPlant.hpp"
 
-class Repeater : public Plant {
+class Repeater : public ShooterPlant {
 public:
     Repeater();
     PlantType getType() override;
-    Vector2 getProjectileSpawnPosition() override;
     void performAction(IGameplayMediator* mediator) override;
 };
 

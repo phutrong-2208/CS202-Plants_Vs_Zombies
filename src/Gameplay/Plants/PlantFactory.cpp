@@ -102,6 +102,8 @@ void PlantDataset::loadFromFile(const std::string& filepath) {
             currentData->setReanimAnim(value);
         } else if (key == "REANIM_CLIP") {
             currentData->setReanimClip(value);
+        } else if (key == "REANIM_EXTRA_CLIP") {
+            currentData->addReanimExtraClip(value);
         }
     }
 
@@ -212,6 +214,12 @@ std::unique_ptr <Plant> PlantFactory::createPlant(PlantType pType) {
             createReanim(data->getReanimScalar(), data->getReanimPackage(),
                          data->getReanimAnim(), data->getReanimClip())
         );
+        for (const auto& extraClip : data->getReanimExtraClips()) {
+            plantPtr->addExtraReanimInstance(
+                createReanim(data->getReanimScalar(), data->getReanimPackage(),
+                             data->getReanimAnim(), extraClip)
+            );
+        }
     }
 
     return plantPtr;

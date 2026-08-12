@@ -10,7 +10,11 @@ static const std::map <PlantType, ProjectileType> projectileConvert = {
     {PEASHOOTER, PROJECTILE_PEA},
     {REPEATER,   PROJECTILE_PEA},
     {SNOWPEA,    PROJECTILE_SNOWPEA},
-    {CACTUS,     PROJECTILE_CACTUS}
+    {CACTUS,     PROJECTILE_CACTUS},
+    {THREEPEATER, PROJECTILE_PEA},
+    {GATLINGPEA, PROJECTILE_PEA},
+    {SPLITPEA,   PROJECTILE_PEA},
+    {STARFRUIT,  PROJECTILE_STAR}
 };
 
 class IGameplayMediator {

@@ -1,3 +1,3 @@
 #pragma once
-#include "Gameplay/Plants/Plant.hpp"
-class Starfruit : public Plant { public: PlantType getType() override; };
+#include "Gameplay/Plants/ShooterPlants/ShooterPlant.hpp"
+class Starfruit : public ShooterPlant { public: PlantType getType() override; };

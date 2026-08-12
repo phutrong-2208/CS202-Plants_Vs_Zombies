@@ -73,6 +73,10 @@ const std::string& PlantData::getReanimClip() const {
     return reanimClip;
 }
 
+const std::vector<std::string>& PlantData::getReanimExtraClips() const {
+    return reanimExtraClips;
+}
+
 void PlantData::setReanimScalar(float scalar) {
     reanimScalar = scalar;
 }
@@ -84,6 +88,10 @@ void PlantData::setReanimAnim(const std::string& anim) {
 }
 void PlantData::setReanimClip(const std::string& clip) {
     reanimClip = clip;
+}
+
+void PlantData::addReanimExtraClip(const std::string& clip) {
+    reanimExtraClips.push_back(clip);
 }
 
 void PlantData::setBaseHealth(float health) { baseHealth = health; }
@@ -116,6 +124,9 @@ void Plant::triggerAnimation(const std::string& clipName) {
 
 void Plant::updateTime(float deltaSeconds) {
     animation.updateTime(deltaSeconds);
+    for (auto& extra : extraAnimations) {
+        extra.updateTime(deltaSeconds);
+    }
     
     if (!animation.isLooping() && animation.isFinished()) {
         if (plantData) animation.playClip(plantData->getReanimClip());
@@ -156,10 +167,17 @@ PlantType Plant::getType() {
 
 void Plant::draw(Rectangle hitbox) {
     animation.draw(hitbox);
+    for (auto& extra : extraAnimations) {
+        extra.draw(hitbox);
+    }
     DrawRectangleLinesEx(getHitbox(), 2.0f, GREEN);
 }
 void Plant::setReanimInstance(ReanimInstance anim) {
-    animation = anim;
+    animation = std::move(anim);
+}
+
+void Plant::addExtraReanimInstance(ReanimInstance anim) {
+    extraAnimations.push_back(std::move(anim));
 }
 void Plant::setPlantData(PlantData* pData) {
     plantData = pData;

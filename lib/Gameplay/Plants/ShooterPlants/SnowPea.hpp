@@ -1,13 +1,12 @@
 #ifndef SNOWPEA_HPP
 #define SNOWPEA_HPP
 
-#include "Gameplay/Plants/Plant.hpp"
+#include "Gameplay/Plants/ShooterPlants/ShooterPlant.hpp"
 
-class SnowPea : public Plant {
+class SnowPea : public ShooterPlant {
 public:
     SnowPea();
     PlantType getType() override;
-    Vector2 getProjectileSpawnPosition() override;
 };
 
 #endif
