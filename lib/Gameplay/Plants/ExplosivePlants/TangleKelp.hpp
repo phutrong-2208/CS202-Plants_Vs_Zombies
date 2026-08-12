@@ -1,6 +1,6 @@
 #pragma once
-#include "Gameplay/Plants/Plant.hpp"
-class TangleKelp : public Plant {
+#include "Gameplay/Plants/ExplosivePlants/ExplosivePlant.hpp"
+class TangleKelp : public ExplosivePlant {
 public:
     PlantType getType() override;
 };

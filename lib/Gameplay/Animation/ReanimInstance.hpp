@@ -7,6 +7,19 @@
 #include <unordered_set>
 #include <vector>
 
+// A snapshot of a single track's render state at death-time.
+struct TrackSnapshot {
+    std::string trackName;
+    Texture2D*  texture  = nullptr;
+    float       worldX   = 0.0f;   // hitbox.x + frame.newX * scalar
+    float       worldY   = 0.0f;   // hitbox.y + frame.newY * scalar
+    float       scaleX   = 1.0f;
+    float       scaleY   = 1.0f;
+    float       skewX    = 0.0f;
+    float       skewY    = 0.0f;
+    float       alpha    = 1.0f;
+};
+
 class ReanimInstance {
 private:
     float currentTime = 0.0f;
@@ -38,6 +51,10 @@ public:
     void hideTrack(const std :: string& trackName);
     void showOnlyTracks(const std :: vector<std :: string>& trackNames);
     Texture2D* getTrackTexture(const std::string& trackName) const;
+
+    // Returns a snapshot of every visible track at the given hitbox origin.
+    // Used by ZombieDeathHandler to spawn parts at their real screen positions.
+    std::vector<TrackSnapshot> getActiveTrackParts(Rectangle hitbox) const;
 
     // ---------------------------------------------------------------
     // Clip selection — call once after setAnimation().

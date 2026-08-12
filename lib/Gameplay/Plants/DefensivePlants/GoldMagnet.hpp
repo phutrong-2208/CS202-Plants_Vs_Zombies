@@ -1,3 +1,3 @@
 #pragma once
-#include "Gameplay/Plants/Plant.hpp"
-class GoldMagnet : public Plant { public: PlantType getType() override; };
+#include "Gameplay/Plants/DefensivePlants/DefensivePlant.hpp"
+class GoldMagnet : public DefensivePlant { public: PlantType getType() override; };

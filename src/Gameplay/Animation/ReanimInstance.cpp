@@ -185,3 +185,40 @@ void ReanimInstance::draw(Rectangle hitbox, Color overrideTint) const {
         rlPopMatrix();
     }
 }
+
+std::vector<TrackSnapshot> ReanimInstance::getActiveTrackParts(Rectangle hitbox) const {
+    std::vector<TrackSnapshot> result;
+    if (rawAnim == nullptr || rawTexPack == nullptr) return result;
+
+    const float loopStart   = (clipLoopStart >= 0.0f) ? clipLoopStart : rawAnim->getLoopStartTime();
+    const float timelineEnd = (clipLoopStart >= 0.0f) ? clipEnd       : rawAnim->getDuration();
+    const int   trackCount  = rawAnim->getTrackCount();
+
+    for (int i = 0; i < trackCount; ++i) {
+        const ReanimTrack* track = rawAnim->getTrack(i);
+        if (track == nullptr) continue;
+
+        const std::string& trackName = track->getTrackName();
+        if (hiddenTracks.find(trackName) != hiddenTracks.end()) continue;
+        if (useVisibleTrackFilter && visibleTracks.find(trackName) == visibleTracks.end()) continue;
+
+        Frame frame = track->getInterpolatedFrame(currentTime, loopStart, timelineEnd);
+        if (frame.alpha <= 0.0f) continue;
+
+        Texture2D* tex = rawTexPack->GetTexture(frame.getTextureKey());
+        if (tex == nullptr) continue;
+
+        TrackSnapshot snap;
+        snap.trackName = trackName;
+        snap.texture   = tex;
+        snap.worldX    = hitbox.x + frame.newX * scalar;
+        snap.worldY    = hitbox.y + frame.newY * scalar;
+        snap.scaleX    = frame.scaleX * scalar;
+        snap.scaleY    = frame.scaleY * scalar;
+        snap.skewX     = frame.skewX;
+        snap.skewY     = frame.skewY;
+        snap.alpha     = frame.alpha;
+        result.push_back(snap);
+    }
+    return result;
+}

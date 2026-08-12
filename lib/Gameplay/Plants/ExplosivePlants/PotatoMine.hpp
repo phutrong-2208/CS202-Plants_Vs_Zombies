@@ -1,6 +1,6 @@
 #pragma once
-#include "Gameplay/Plants/Plant.hpp"
-class PotatoMine : public Plant {
+#include "Gameplay/Plants/ExplosivePlants/ExplosivePlant.hpp"
+class PotatoMine : public ExplosivePlant {
 public:
     PlantType getType() override;
 };

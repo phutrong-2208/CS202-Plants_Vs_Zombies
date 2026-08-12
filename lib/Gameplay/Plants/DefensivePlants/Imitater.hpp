@@ -1,3 +1,3 @@
 #pragma once
-#include "Gameplay/Plants/Plant.hpp"
-class Imitater : public Plant { public: PlantType getType() override; };
+#include "Gameplay/Plants/DefensivePlants/DefensivePlant.hpp"
+class Imitater : public DefensivePlant { public: PlantType getType() override; };
