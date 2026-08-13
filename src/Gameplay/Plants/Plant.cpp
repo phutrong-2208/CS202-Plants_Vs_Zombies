@@ -127,8 +127,22 @@ void PlantData::addActionClipLayerShowTrack(const std::string& track) {
     }
 }
 
-const std::vector<std::string>& PlantData::getHiddenTracks() const {
-    return hiddenTracks;
+const std::vector<std::string>& PlantData::getHiddenTracks() const { return hiddenTracks; }
+
+void PlantData::addCracked1Override(const std::string& track, const std::string& texture) {
+    cracked1Override[track] = texture;
+}
+
+void PlantData::addCracked2Override(const std::string& track, const std::string& texture) {
+    cracked2Override[track] = texture;
+}
+
+const std::map<std::string, std::string>& PlantData::getCracked1Override() const {
+    return cracked1Override;
+}
+
+const std::map<std::string, std::string>& PlantData::getCracked2Override() const {
+    return cracked2Override;
 }
 
 void PlantData::setBaseHealth(float health) { baseHealth = health; }
@@ -234,7 +248,7 @@ void Plant::setPlantData(PlantData* pData) {
     plantSetup();
 }
 
-void Plant :: receiveDamage(int damage){
+void Plant::receiveDamage(int damage, Zombie* attacker, IGameplayMediator* mediator) {
     health -= damage;
     if(health < 0) health = 0;
 }

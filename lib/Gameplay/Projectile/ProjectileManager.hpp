@@ -18,6 +18,7 @@ public:
     void update(float dt);
     void toggleProjectiles();
     void simulate(void) const;
+    std::vector<std::unique_ptr<Projectile>>& getProjectiles();
 }; 
 
 #endif

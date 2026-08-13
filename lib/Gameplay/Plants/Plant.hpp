@@ -26,6 +26,9 @@ private:
     
     std::string actionAnim;
     std::vector<std::pair<std::string, std::vector<std::string>>> actionClipLayers;
+
+    std::map<std::string, std::string> cracked1Override;
+    std::map<std::string, std::string> cracked2Override;
 public:
     PlantData() = default;
     PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float cooldown);
@@ -59,6 +62,11 @@ public:
 
     const std::vector<std::string>& getHiddenTracks() const;
 
+    void addCracked1Override(const std::string& track, const std::string& texture);
+    void addCracked2Override(const std::string& track, const std::string& texture);
+    const std::map<std::string, std::string>& getCracked1Override() const;
+    const std::map<std::string, std::string>& getCracked2Override() const;
+
     void setBaseHealth(float health);
     void setBaseDamage(float damage);
     void setBuffDamage(float damage);
@@ -82,7 +90,7 @@ protected:
 public:
     Plant() = default;
     virtual ~Plant() = default;
-    void receiveDamage(int damage);
+    virtual void receiveDamage(int damage, Zombie* attacker = nullptr, IGameplayMediator* mediator = nullptr);
 
     void triggerAnimation(const std::string& clipName);
     void triggerActionAnimation();

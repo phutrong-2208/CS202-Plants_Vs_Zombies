@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <map>
 
 // A snapshot of a single track's render state at death-time.
 struct TrackSnapshot {
@@ -69,6 +70,8 @@ private:
     // Additional clip layers for multi-part plants
     std::vector<ClipLayer> clipLayers;
 
+    std::unordered_map<std::string, std::string> textureOverrides;
+
 public:
     // Setup
     void setAnimation(ReanimParser* Anim);
@@ -77,6 +80,8 @@ public:
     void hideTrack(const std::string& trackName);
     void unhideTrack(const std::string& trackName);
     void showOnlyTracks(const std::vector<std::string>& trackNames);
+    void setTextureOverrides(const std::map<std::string, std::string>& overrides);
+    void clearTextureOverrides();
     Texture2D* getTrackTexture(const std::string& trackName) const;
 
     // Sets the default looping clip and plays it

@@ -3,6 +3,7 @@
 // Maps section name strings from ProjectileConfig.txt to ProjectileType enum values
 static const std::map<std::string, ProjectileType> projectileTypeNameMap = {
     {"PROJECTILE_PEA",     PROJECTILE_PEA},
+    {"PROJECTILE_FIREPEA", PROJECTILE_FIREPEA},
     {"PROJECTILE_SNOWPEA", PROJECTILE_SNOWPEA},
     {"PROJECTILE_CACTUS",  PROJECTILE_CACTUS},
     {"PROJECTILE_STAR",    PROJECTILE_STAR},

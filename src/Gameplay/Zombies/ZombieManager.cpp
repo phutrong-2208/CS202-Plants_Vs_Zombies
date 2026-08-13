@@ -68,10 +68,38 @@ Zombie* ZombieManager::getZombiePriority(Rectangle area) {
 
     return target;
 }
-bool ZombieManager :: hasZombieInArea(Rectangle area) const{
-    for(auto& zombie : zombies) if(!zombie -> isDead()){
-        Rectangle hitbox = zombie -> getHitbox();
-        if(CheckCollisionRecs(area, hitbox)) return true;
+
+Zombie* ZombieManager::getZombieWithArmor(Rectangle area) {
+    float distance = 1e9;
+    Zombie* target = nullptr;
+
+    for (auto& zombie : zombies) {
+        if (zombie->isDead() || zombie->getArmorHealth() <= 0.0f) continue;
+        
+        // Also check if it's metallic? Buckethead and Football are metallic.
+        // Screen door is not metallic? Actually screen door is metallic in PVZ!
+        // We'll just assume all armor is metallic for now.
+
+        Rectangle hitbox = zombie->getHitbox();
+        if (!CheckCollisionRecs(area, hitbox)) continue;
+
+        Vector2 areaCenter = {area.x + area.width * 0.5f, area.y + area.height * 0.5f};
+        Vector2 hitboxCenter = {hitbox.x + hitbox.width * 0.5f, hitbox.y + hitbox.height * 0.5f};
+
+        float localDist = Vector2Distance(areaCenter, hitboxCenter);
+        if (distance > localDist) {
+            distance = localDist;
+            target = zombie.get();
+        }
+    }
+    return target;
+}
+bool ZombieManager::hasZombieInArea(Rectangle area, Zombie* exclude) const {
+    for (auto& zombie : zombies) {
+        if (!zombie->isDead() && zombie.get() != exclude) {
+            Rectangle hitbox = zombie->getHitbox();
+            if (CheckCollisionRecs(area, hitbox)) return true;
+        }
     }
     return false;
 }

@@ -46,3 +46,7 @@ void ProjectileManager :: simulate(void) const{
         }
     }
 }
+
+std::vector<std::unique_ptr<Projectile>>& ProjectileManager::getProjectiles() {
+    return projectiles;
+}

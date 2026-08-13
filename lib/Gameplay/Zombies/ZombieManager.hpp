@@ -4,6 +4,8 @@
 #include <Gameplay/IGameplayMediator.hpp>
 #include "Gameplay/Zombies/Zombie.hpp"
 #include "Gameplay/Zombies/ZombieDeathHandler.hpp"
+#include <vector>
+#include <memory>
 
 class ZombieManager {
 private:
@@ -19,8 +21,9 @@ public:
     void draw() const;
 
     Zombie* getZombiePriority(Rectangle area);
-    bool hasZombieInArea(Rectangle area) const;
-    std :: vector<std::unique_ptr<Zombie>>& getZombies();
+    Zombie* getZombieWithArmor(Rectangle area);
+    bool hasZombieInArea(Rectangle area, Zombie* exclude = nullptr) const;
+    std::vector<std::unique_ptr<Zombie>>& getZombies();
     bool empty(void) const;
     bool hasZombieReachedHouse(float houseBoundX) const;
 };

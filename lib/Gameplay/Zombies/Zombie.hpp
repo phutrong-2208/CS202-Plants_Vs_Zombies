@@ -82,18 +82,23 @@ protected:
     ZombieType zombieType = ZOMBIE_COUNT;
     ZombieDeathHandler* deathHandler = nullptr;
 
+    bool isHypnotized = false;
+
     void zombieSetup();
     virtual void onStateChanged(ZombieState newState);
 
 public:
     Zombie() = default;
     virtual ~Zombie() = default;
-
+    
     virtual void updateTime(float dt);
     void setZombieType(ZombieType type);
     void setDeathHandler(ZombieDeathHandler* handler);
     void setZombieData(ZombieData* data);
     void setReanimInstance(ReanimInstance anim);
+    
+    void setSwallowed(bool isSwallowed);
+    void setHypnotized(bool hypnotized);
     void draw();
 
     void receiveDamage(float damage, IGameplayMediator* mediator = nullptr);
@@ -101,11 +106,14 @@ public:
     bool isFullyDead() const;
     bool isDying() const;
     float getHealth() const;
+    float getArmorHealth() const;
+    void setArmorHealth(float armor);
     float getSpeed() const;
     int getAttackDamage() const;
     Rectangle getHitbox() const;
     virtual Rectangle getAttackHitbox() const;
     ZombieState getState() const;
+    ZombieType getType() const;
 
     void setHitbox(Rectangle newHitbox);
     void setState(ZombieState newState);
@@ -118,7 +126,6 @@ public:
     void freeze(float duration);
     void chill(float duration);
 
-    void setSwallowed(bool isSwallowed);
     bool isSwallowed() const;
 };
 

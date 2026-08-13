@@ -6,19 +6,27 @@
 
 class Cell {
 private:
-    std :: unique_ptr<Plant> plant = nullptr;
+    std::unique_ptr<Plant> basePlant = nullptr; // Lilypad
+    std::unique_ptr<Plant> plant = nullptr;     // Normal plant
+    std::unique_ptr<Plant> pumpkin = nullptr;   // Pumpkin
 public:
     Cell();
     ~Cell();
 
     bool isOccupied() const;
+    bool hasNormalPlant() const;
 
     void updateTime(float deltaSeconds);
     void draw(Rectangle hitbox);
     
     bool placePlant(std::unique_ptr<Plant> newPlant);
     Plant* getPlant() const;
-    void removePlant();
+    Plant* getPumpkin() const;
+    Plant* getBasePlant() const;
+    
+    // Check and remove dead plants
+    void checkDeadPlants();
+    void removePlant(); // Removes all
 };
 
 #endif

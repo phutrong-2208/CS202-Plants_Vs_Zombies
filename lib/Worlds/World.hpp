@@ -64,13 +64,17 @@ private:
     bool hasTarget(PlantType plantType, Vector2 spawnPos, Rectangle bounds) override;
     bool touchTarget(Projectile* projectile) override;
     void explodeProjectile(Projectile* projectile) override;
-    bool hasPlantInArea(Rectangle area) const override;
-    bool damagePlantInArea(Rectangle area, float damage) override;
-    bool hasZombieInArea(Rectangle area) const override;
-    void damageZombiesInArea(Rectangle area, float damage) override;
-    Zombie* getZombiePriority(Rectangle area) override;
-    
-    void freezeZombiesInArea(Rectangle area, float duration) override;
+    void tryIgniteProjectile(Rectangle area) override;
+    virtual void hypnotizeZombie(Zombie* zombie) override;
+    virtual void changeZombieLane(Zombie* zombie) override;
+    virtual void killZombiesOfType(ZombieType type) override;
+    virtual bool hasPlantInArea(Rectangle area) const override;
+    virtual bool damagePlantInArea(Rectangle area, float damage, Zombie* attacker = nullptr) override;
+    virtual bool hasZombieInArea(Rectangle area, Zombie* exclude = nullptr) const override;
+    virtual void damageZombiesInArea(Rectangle area, float damage, Zombie* exclude = nullptr) override;
+    virtual Zombie* getZombiePriority(Rectangle area) override;
+    virtual bool stripArmorInArea(Rectangle area) override;
+    virtual void freezeZombiesInArea(Rectangle area, float duration) override;
     void addParticle(std::unique_ptr<Particle> particle) override;
     void spawnExplosionParticles(Vector2 position, PlantType type) override;
     void spawnSun(Vector2 position, float targetY, int value) override;

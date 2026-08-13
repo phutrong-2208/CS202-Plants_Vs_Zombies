@@ -27,7 +27,18 @@ void ReanimInstance::unhideTrack(const std::string& trackName) {
 void ReanimInstance::showOnlyTracks(const std::vector<std::string>& trackNames) {
     visibleTracks.clear();
     visibleTracks.insert(trackNames.begin(), trackNames.end());
-    useVisibleTrackFilter = true;
+    useVisibleTrackFilter = !trackNames.empty();
+}
+
+void ReanimInstance::setTextureOverrides(const std::map<std::string, std::string>& overrides) {
+    textureOverrides.clear();
+    for (const auto& kv : overrides) {
+        textureOverrides[kv.first] = kv.second;
+    }
+}
+
+void ReanimInstance::clearTextureOverrides() {
+    textureOverrides.clear();
 }
 
 // Clip selection (optional — call this when you want to play a specific
@@ -224,11 +235,17 @@ size_t ReanimInstance::getClipLayersCount() const {
 static void drawTrack(const ReanimTrack* track, float time,
                       float loopStart, float timelineEnd,
                       float scalar, Rectangle hitbox,
-                      TexturePackage* texPack, Color overrideTint) {
+                      TexturePackage* texPack, Color overrideTint,
+                      const std::unordered_map<std::string, std::string>& overrides) {
     Frame frame = track->getInterpolatedFrame(time, loopStart, timelineEnd);
     if (frame.alpha <= 0.0f) return;
 
-    Texture2D* currentTex = texPack->GetTexture(frame.getTextureKey());
+    std::string texKey = frame.getTextureKey();
+    if (overrides.find(texKey) != overrides.end()) {
+        texKey = overrides.at(texKey);
+    }
+
+    Texture2D* currentTex = texPack->GetTexture(texKey);
     if (currentTex == nullptr) return;
 
     const float kx = frame.skewX * DEG2RAD;
@@ -293,7 +310,7 @@ void ReanimInstance::draw(Rectangle hitbox, Color overrideTint) const {
         if (useVisibleTrackFilter && visibleTracks.find(trackName) == visibleTracks.end()) continue;
 
         drawTrack(track, currentTime, loopStart, timelineEnd,
-                  scalar, hitbox, rawTexPack, overrideTint);
+                  scalar, hitbox, rawTexPack, overrideTint, textureOverrides);
     }
 
     // --- Pass 2: Render each clip layer (head tracks, etc.) ---
@@ -312,7 +329,7 @@ void ReanimInstance::draw(Rectangle hitbox, Color overrideTint) const {
             if (layer.showTracks.find(trackName) == layer.showTracks.end()) continue;
 
             drawTrack(track, layer.currentTime, layerLoopStart, layerEnd,
-                      scalar, hitbox, rawTexPack, overrideTint);
+                      scalar, hitbox, rawTexPack, overrideTint, textureOverrides);
         }
     }
 }
@@ -337,7 +354,12 @@ std::vector<TrackSnapshot> ReanimInstance::getActiveTrackParts(Rectangle hitbox)
         Frame frame = track->getInterpolatedFrame(currentTime, loopStart, timelineEnd);
         if (frame.alpha <= 0.0f) continue;
 
-        Texture2D* tex = rawTexPack->GetTexture(frame.getTextureKey());
+        std::string texKey = frame.getTextureKey();
+        if (textureOverrides.find(texKey) != textureOverrides.end()) {
+            texKey = textureOverrides.at(texKey);
+        }
+
+        Texture2D* tex = rawTexPack->GetTexture(texKey);
         if (tex == nullptr) continue;
 
         TrackSnapshot snap;
@@ -371,7 +393,12 @@ std::vector<TrackSnapshot> ReanimInstance::getActiveTrackParts(Rectangle hitbox)
             Frame frame = track->getInterpolatedFrame(layer.currentTime, layerLoopStart, layerEnd);
             if (frame.alpha <= 0.0f) continue;
 
-            Texture2D* tex = rawTexPack->GetTexture(frame.getTextureKey());
+            std::string texKey = frame.getTextureKey();
+            if (textureOverrides.find(texKey) != textureOverrides.end()) {
+                texKey = textureOverrides.at(texKey);
+            }
+
+            Texture2D* tex = rawTexPack->GetTexture(texKey);
             if (tex == nullptr) continue;
 
             TrackSnapshot snap;

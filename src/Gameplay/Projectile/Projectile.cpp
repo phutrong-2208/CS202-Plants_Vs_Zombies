@@ -54,6 +54,10 @@ Projectile :: Projectile(Vector2 pos, ProjectileData* _projData, float _damage, 
     }
 }
 
+void Projectile::setProjectileData(ProjectileData* data) {
+    projData = data;
+}
+
 void Projectile :: setTexture(Texture2D* newTexture){
     texture = newTexture;
 }

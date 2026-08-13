@@ -81,7 +81,7 @@ void Zombie::updateTime(float dt) {
     }
 
     animation.updateTime(dt * timeMultiplier);
-    if(state == ZombieState::WALKING) hitbox.x -= effectiveSpeed * dt;
+    if(state == ZombieState::WALKING) hitbox.x -= effectiveSpeed * dt * (isHypnotized ? -1.0f : 1.0f);
     
     const float ZOMBIE_DEATH_COUNTDOWN = 3.0f;
     if (state == ZombieState::DYING) {
@@ -100,6 +100,8 @@ void Zombie::draw() {
         tint = Color{200, 200, 200, 255}; // Light grey / white flash effect
     } else if (freezeTimer > 0.0f || chillTimer > 0.0f) {
         tint = Color{100, 150, 255, 255}; // Blue tint
+    } else if (isHypnotized) {
+        tint = Color{200, 100, 255, 255}; // Purple tint
     }
     
     animation.draw(hitbox, tint);
@@ -162,8 +164,15 @@ bool Zombie::isDying() const { return state == ZombieState::DYING; }
 
 void Zombie::setSwallowed(bool isSwallowed) { swallowed = isSwallowed; }
 bool Zombie::isSwallowed() const { return swallowed; }
+void Zombie::setHypnotized(bool hypnotized) { isHypnotized = hypnotized; }
 float Zombie::getHealth() const { return health; }
 float Zombie::getSpeed() const { return speed; }
+float Zombie::getArmorHealth() const { 
+    return zombieData ? zombieData->getArmorHealth() : 0.0f; 
+}
+void Zombie::setArmorHealth(float armor) { 
+    if (zombieData) zombieData->setArmorHealth(armor); 
+}
 int Zombie::getAttackDamage() const { return attackDamage; }
 Rectangle Zombie::getHitbox() const { 
     return{
@@ -183,6 +192,7 @@ Rectangle Zombie::getAttackHitbox() const {
     };
 }
 ZombieState Zombie :: getState() const { return state; }
+ZombieType Zombie::getType() const { return zombieType; }
 
 void Zombie :: setHitbox(Rectangle newHitbox) { hitbox = newHitbox; }
 void Zombie :: setState(ZombieState newState) {
@@ -197,15 +207,21 @@ void Zombie :: setAttacking(bool isAttacking) {
 }
 
 void Zombie :: performAttack(IGameplayMediator& mediator){
-    mediator.damagePlantInArea(getAttackHitbox(), attackDamage);
+    if (isHypnotized) mediator.damageZombiesInArea(getAttackHitbox(), attackDamage, this);
+    else mediator.damagePlantInArea(getAttackHitbox(), attackDamage, this);
 }
 
 void Zombie :: updateCombat(float dt, IGameplayMediator& mediator){
-    const bool hasPlant = mediator.hasPlantInArea(getAttackHitbox());
+    bool hasTarget = false;
+    if (isHypnotized) {
+        hasTarget = mediator.hasZombieInArea(getAttackHitbox(), this);
+    } else {
+        hasTarget = mediator.hasPlantInArea(getAttackHitbox());
+    }
 
-    setAttacking(hasPlant);
+    setAttacking(hasTarget);
     
-    if(!hasPlant){
+    if(!hasTarget){
         attackTimer = 0.0f;
         return;
     }
@@ -216,7 +232,8 @@ void Zombie :: updateCombat(float dt, IGameplayMediator& mediator){
 
     attackTimer += effectiveDt;
     if (zombieData != nullptr && attackTimer >= zombieData -> getAttackInterval()){
-        mediator.damagePlantInArea(getAttackHitbox(), attackDamage);
+        if (isHypnotized) mediator.damageZombiesInArea(getAttackHitbox(), attackDamage, this);
+        else mediator.damagePlantInArea(getAttackHitbox(), attackDamage, this);
         attackTimer = 0.0f;
     }
 }

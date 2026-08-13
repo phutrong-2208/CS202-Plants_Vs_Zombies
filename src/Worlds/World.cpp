@@ -68,21 +68,33 @@ bool World::touchTarget(Projectile* projectile) {
 }
 
 void World::explodeProjectile(Projectile* projectile) {
-    if (!projectile) return;
-    
-    Vector2 splash = projectile->getSplashArea();
-    if (splash.x > 0.0f && splash.y > 0.0f) {
-        Vector2 pos = projectile->getPosition();
-        Rectangle area = {pos.x - splash.x / 2.0f, pos.y - splash.y / 2.0f, splash.x, splash.y};
-        
-        // Damage all zombies in this area
-        for (auto& zombie : zombieManager.getZombies()) {
-            if (!zombie->isDead() && CheckCollisionRecs(zombie->getHitbox(), area)) {
-                if (projectile->getChillDuration() > 0.0f) {
-                    zombie->chill(projectile->getChillDuration());
-                }
-                zombie->receiveDamage(projectile->getDamage(), this);
-            }
+    if(!projectile || !projectile -> isLobbed()) return;
+
+    Vector2 center = projectile -> getPosition();
+    Vector2 splash = projectile -> getSplashArea();
+
+    Rectangle splashArea = {
+        center.x - splash.x * 0.5f,
+        center.y - splash.y * 0.5f,
+        splash.x,
+        splash.y
+    };
+
+    if (projectile->getChillDuration() > 0) {
+        freezeZombiesInArea(splashArea, projectile->getChillDuration());
+    }
+    damageZombiesInArea(splashArea, projectile -> getDamage());
+}
+
+void World::tryIgniteProjectile(Rectangle area) {
+    for (auto& projectile : projectileManager.getProjectiles()) {
+        if (projectile->isDespawned()) continue;
+        if (projectile->getType() == PROJECTILE_PEA && CheckCollisionRecs(area, projectile->getHitbox())) {
+            projectile->setType(PROJECTILE_FIREPEA);
+            projectile->setDamage(projectile->getDamage() * 2.0f);
+            ProjectileData* fireData = projectileFactory.getProjectileData(PROJECTILE_FIREPEA);
+            projectile->setProjectileData(fireData);
+            projectile->setTexture(projectileFactory.getProjectileTexture(PROJECTILE_FIREPEA));
         }
     }
 }
@@ -91,17 +103,52 @@ bool World::hasPlantInArea(Rectangle area) const {
     return grid.hasPlantInArea(area);
 }
 
-bool World::damagePlantInArea(Rectangle area, float damage) {
-    return grid.damagePlantInArea(area, damage);
+bool World::damagePlantInArea(Rectangle area, float damage, Zombie* attacker) {
+    return grid.damagePlantInArea(area, damage, attacker);
 }
 
-bool World::hasZombieInArea(Rectangle area) const {
-    return zombieManager.hasZombieInArea(area);
+void World::hypnotizeZombie(Zombie* zombie) {
+    if (zombie) zombie->setHypnotized(true);
 }
 
-void World::damageZombiesInArea(Rectangle area, float damage) {
+void World::changeZombieLane(Zombie* zombie) {
+    if (!zombie) return;
+    
+    Rectangle hitbox = zombie->getHitbox();
+    float yCenter = hitbox.y + hitbox.height * 0.5f;
+    std::pair<int, int> cell = grid.getCellID({hitbox.x, yCenter});
+    int currentRow = cell.first;
+    if (currentRow == -1) return; // Not on grid
+    
+    // Simple logic: shift up or down based on current lane.
+    int newRow = currentRow;
+    if (currentRow == 0) newRow = 1;
+    else if (currentRow == 4) newRow = 3;
+    else newRow = currentRow + (GetRandomValue(0, 1) == 0 ? 1 : -1);
+    
+    Rectangle newCellRect = grid.getCellRect(newRow, 0); // Get y from the row
+    float newYCenter = newCellRect.y + newCellRect.height * 0.5f;
+    float yOffset = newYCenter - yCenter;
+    
+    hitbox.y += yOffset;
+    zombie->setHitbox(hitbox);
+}
+
+void World::killZombiesOfType(ZombieType type) {
     for (auto& zombie : zombieManager.getZombies()) {
-        if (!zombie->isDead() && CheckCollisionRecs(zombie->getHitbox(), area)) {
+        if (!zombie->isDead() && zombie->getType() == type) {
+            zombie->receiveDamage(zombie->getHealth(), this);
+        }
+    }
+}
+
+bool World::hasZombieInArea(Rectangle area, Zombie* exclude) const {
+    return zombieManager.hasZombieInArea(area, exclude);
+}
+
+void World::damageZombiesInArea(Rectangle area, float damage, Zombie* exclude) {
+    for (auto& zombie : zombieManager.getZombies()) {
+        if (!zombie->isDead() && zombie.get() != exclude && CheckCollisionRecs(zombie->getHitbox(), area)) {
             zombie->receiveDamage(damage, this);
         }
     }
@@ -109,6 +156,15 @@ void World::damageZombiesInArea(Rectangle area, float damage) {
 
 Zombie* World::getZombiePriority(Rectangle area) {
     return zombieManager.getZombiePriority(area);
+}
+
+bool World::stripArmorInArea(Rectangle area) {
+    Zombie* target = zombieManager.getZombieWithArmor(area);
+    if (target) {
+        target->setArmorHealth(0.0f);
+        return true;
+    }
+    return false;
 }
 
 void World::freezeZombiesInArea(Rectangle area, float duration) {

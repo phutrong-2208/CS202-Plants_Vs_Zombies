@@ -125,6 +125,30 @@ void PlantDataset::loadFromFile(const std::string& filepath) {
             currentData->setActionAnim(value);
         } else if (key == "ACTION_LAYER_CLIP") {
             currentData->addActionClipLayer(value);
+        } else if (key == "CRACKED1_OVERRIDE" || key == "CRACKED2_OVERRIDE") {
+            std::stringstream ss(value);
+            std::string pairStr;
+            while (std::getline(ss, pairStr, ',')) {
+                size_t colonPos = pairStr.find(':');
+                if (colonPos != std::string::npos) {
+                    std::string trackName = pairStr.substr(0, colonPos);
+                    std::string texName = pairStr.substr(colonPos + 1);
+                    
+                    // Trim spaces
+                    size_t start = trackName.find_first_not_of(" \t\r\n");
+                    if (start != std::string::npos) trackName = trackName.substr(start);
+                    size_t end = trackName.find_last_not_of(" \t\r\n");
+                    if (end != std::string::npos) trackName = trackName.substr(0, end + 1);
+                    
+                    start = texName.find_first_not_of(" \t\r\n");
+                    if (start != std::string::npos) texName = texName.substr(start);
+                    end = texName.find_last_not_of(" \t\r\n");
+                    if (end != std::string::npos) texName = texName.substr(0, end + 1);
+                    
+                    if (key == "CRACKED1_OVERRIDE") currentData->addCracked1Override(trackName, texName);
+                    else if (key == "CRACKED2_OVERRIDE") currentData->addCracked2Override(trackName, texName);
+                }
+            }
         }
     }
 

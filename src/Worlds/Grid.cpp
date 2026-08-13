@@ -89,12 +89,14 @@ void Grid::sendPlantActions() {
 
     for (int row = 0; row < NUM_ROWS; ++row) {
         for (int col = 0; col < NUM_COLS; ++col) {
-            Plant* plant = getPlant(row, col);
-            if (plant == nullptr || plant -> isDead()) continue;
-
-            if (plant -> isOnCooldown()) continue;
-
-            plant->performAction(gameplayMediator);
+            Cell& cell = garden[row][col];
+            Plant* pumpkin = cell.getPumpkin();
+            Plant* plant = cell.getPlant();
+            Plant* base = cell.getBasePlant();
+            
+            if (pumpkin && !pumpkin->isDead() && !pumpkin->isOnCooldown()) pumpkin->performAction(gameplayMediator);
+            if (plant && !plant->isDead() && !plant->isOnCooldown()) plant->performAction(gameplayMediator);
+            if (base && !base->isDead() && !base->isOnCooldown()) base->performAction(gameplayMediator);
         }
     }
 }
@@ -104,10 +106,7 @@ void Grid::draw() {
         for (int col = 0; col < NUM_COLS; ++col) {
             if (!garden[row][col].isOccupied()) continue;
 
-            Plant* plant = garden[row][col].getPlant();
-            if (plant) {
-                plant->draw(cellRects[row][col]);
-            }
+            garden[row][col].draw(cellRects[row][col]);
         }
     }
 }
@@ -137,10 +136,14 @@ Plant* Grid :: getPlant(int row, int col) const {
 Plant* Grid::getPlantInArea(Rectangle area) const {
     for (int row = 0; row < NUM_ROWS; ++row) {
         for (int col = 0; col < NUM_COLS; ++col) {
-            Plant* plant = getPlant(row, col);
-            if (plant == nullptr || plant -> isDead()) continue;
-
-            if (CheckCollisionRecs(area, plant -> getHitbox())) return plant;
+            const Cell& cell = garden[row][col];
+            Plant* pumpkin = cell.getPumpkin();
+            Plant* plant = cell.getPlant();
+            Plant* base = cell.getBasePlant();
+            
+            if (pumpkin && !pumpkin->isDead() && CheckCollisionRecs(area, pumpkin->getHitbox())) return pumpkin;
+            if (plant && !plant->isDead() && CheckCollisionRecs(area, plant->getHitbox())) return plant;
+            if (base && !base->isDead() && CheckCollisionRecs(area, base->getHitbox())) return base;
         }
     }
 
@@ -151,10 +154,10 @@ bool Grid::hasPlantInArea(Rectangle area) const {
     return getPlantInArea(area) != nullptr;
 }
 
-bool Grid::damagePlantInArea(Rectangle area, float damage) {
+bool Grid::damagePlantInArea(Rectangle area, float damage, Zombie* attacker) {
     Plant* plant = getPlantInArea(area);
     if (plant == nullptr) return false;
 
-    plant -> receiveDamage(static_cast<int>(damage));
+    plant -> receiveDamage(static_cast<int>(damage), attacker, gameplayMediator);
     return true;
 }

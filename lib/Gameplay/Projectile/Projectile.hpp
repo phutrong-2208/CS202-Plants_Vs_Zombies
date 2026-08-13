@@ -5,6 +5,7 @@
 
 enum ProjectileType : int {
     PROJECTILE_PEA,
+    PROJECTILE_FIREPEA,
     PROJECTILE_SNOWPEA,
     PROJECTILE_CACTUS,
     PROJECTILE_STAR,
@@ -71,6 +72,7 @@ public:
 
     virtual ~Projectile() = default;
 
+    void setProjectileData(ProjectileData* data);
     void setTexture(Texture2D *newTexture);
     void setDamage(float _d);
     void setPosition(Vector2 newPos);

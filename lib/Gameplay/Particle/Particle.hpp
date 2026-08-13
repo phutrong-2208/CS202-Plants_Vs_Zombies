@@ -2,7 +2,6 @@
 #define PARTICLE_HPP
 
 #include "Common.hpp"
-#include "raylib.h"
 
 class Particle{
 protected:

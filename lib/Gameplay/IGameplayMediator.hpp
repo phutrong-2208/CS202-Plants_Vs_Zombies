@@ -7,6 +7,8 @@
 #include <Gameplay/Zombies/ZombieType.hpp>
 
 class Zombie;
+class Projectile;
+class Particle;
 
 static const std::map <PlantType, ProjectileType> projectileConvert = {
     {PEASHOOTER, PROJECTILE_PEA},
@@ -35,19 +37,22 @@ public:
     virtual ~IGameplayMediator() = default;
 
     // Plants shooting signals
-    virtual void addProjectile(PlantType plantType, Vector2 position, float damage, bool reverse = false) = 0;
+    virtual void addProjectile(PlantType pType, Vector2 spawnPos, float damage, bool reverse = false) = 0;
     virtual bool hasTarget(PlantType plantType, Vector2 spawnPos, Rectangle bounds) = 0;
-
-    // Projectile toggling signals
     virtual bool touchTarget(Projectile* projectile) = 0;
     virtual void explodeProjectile(Projectile* projectile) = 0;
+    virtual void tryIgniteProjectile(Rectangle area) = 0;
 
     // Zombie killing signals
+    virtual void hypnotizeZombie(Zombie* zombie) = 0;
+    virtual void changeZombieLane(Zombie* zombie) = 0;
+    virtual void killZombiesOfType(ZombieType type) = 0;
     virtual bool hasPlantInArea(Rectangle area) const = 0;
-    virtual bool damagePlantInArea(Rectangle area, float damage) = 0;
-    virtual bool hasZombieInArea(Rectangle area) const = 0;
-    virtual void damageZombiesInArea(Rectangle area, float damage) = 0;
+    virtual bool damagePlantInArea(Rectangle area, float damage, Zombie* attacker = nullptr) = 0;
+    virtual bool hasZombieInArea(Rectangle area, Zombie* exclude = nullptr) const = 0;
+    virtual void damageZombiesInArea(Rectangle area, float damage, Zombie* exclude = nullptr) = 0;
     virtual Zombie* getZombiePriority(Rectangle area) = 0;
+    virtual bool stripArmorInArea(Rectangle area) = 0;
     virtual void freezeZombiesInArea(Rectangle area, float duration) = 0;
 
     // Particles
