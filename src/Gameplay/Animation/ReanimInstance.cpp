@@ -20,6 +20,10 @@ void ReanimInstance::hideTrack(const std::string& trackName) {
     hiddenTracks.insert(trackName);
 }
 
+void ReanimInstance::unhideTrack(const std::string& trackName) {
+    hiddenTracks.erase(trackName);
+}
+
 void ReanimInstance::showOnlyTracks(const std::vector<std::string>& trackNames) {
     visibleTracks.clear();
     visibleTracks.insert(trackNames.begin(), trackNames.end());
@@ -72,7 +76,7 @@ bool ReanimInstance::playClip(const std::string& clipName) {
     return true;
 }
 
-bool ReanimInstance::playClipLayer(const std::string& clipName, int layerIndex) {
+bool ReanimInstance::playClipLayer(const std::string& clipName, int layerIndex, const std::vector<std::string>& showTracks) {
     if (rawAnim == nullptr || layerIndex < 0 || layerIndex >= (int)clipLayers.size()) return false;
     
     const AnimClip* clip = rawAnim->getClip(clipName);
@@ -85,6 +89,11 @@ bool ReanimInstance::playClipLayer(const std::string& clipName, int layerIndex) 
     clipLayers[layerIndex].clipLoopStart = clip->loopStart;
     clipLayers[layerIndex].clipEnd       = clip->endTime;
     clipLayers[layerIndex].looping       = false; 
+    
+    if (!showTracks.empty()) {
+        clipLayers[layerIndex].showTracks.clear();
+        clipLayers[layerIndex].showTracks.insert(showTracks.begin(), showTracks.end());
+    }
     
     return true;
 }
@@ -111,6 +120,7 @@ void ReanimInstance::addClipLayer(const std::string& clipName, const std::vector
     layer.initStartTime     = layer.currentTime;
 
     layer.showTracks.insert(trackNames.begin(), trackNames.end());
+    layer.initShowTracks = layer.showTracks;
     clipLayers.push_back(std::move(layer));
 }
 
@@ -127,6 +137,7 @@ void ReanimInstance::resetToDefault() {
         layer.clipEnd       = layer.initClipEnd;
         layer.currentTime   = layer.initStartTime;
         layer.looping       = true;
+        layer.showTracks    = layer.initShowTracks;
     }
 }
 
@@ -174,14 +185,6 @@ void ReanimInstance::updateTime(float deltaSeconds) {
         advanceClipTime(layer.currentTime, delta,
                         layer.clipLoopStart, layer.clipEnd,
                         layer.looping, duration, globalLoopStart);
-        
-        // Auto-revert if layer was playing a non-looping clip and has reached the end
-        if (!layer.looping && layer.currentTime >= layer.clipEnd) {
-            layer.clipLoopStart = layer.initClipLoopStart;
-            layer.clipEnd       = layer.initClipEnd;
-            layer.currentTime   = layer.initStartTime;
-            layer.looping       = true;
-        }
     }
 }
 
@@ -203,6 +206,14 @@ bool ReanimInstance::isFinished() const {
 
     const float timelineEnd = (clipLoopStart >= 0.0f) ? clipEnd : rawAnim->getDuration();
     return currentTime >= timelineEnd;
+}
+
+bool ReanimInstance::hasClip(const std::string& clipName) const {
+    return rawAnim != nullptr && rawAnim->getClip(clipName) != nullptr;
+}
+
+size_t ReanimInstance::getClipLayersCount() const {
+    return clipLayers.size();
 }
 
 // -----------------------------------------------------------------------

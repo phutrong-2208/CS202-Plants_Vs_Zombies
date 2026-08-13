@@ -19,8 +19,14 @@ void ProjectileManager::toggleProjectiles() {
     for(auto&prj : projectiles){
         if (prj -> isDespawned()) continue;
 
-        if (gameplayMediator && gameplayMediator -> touchTarget(prj.get()))
+        if (prj->isLobbed() && prj->hasImpacted()) {
+            if (gameplayMediator) {
+                gameplayMediator->explodeProjectile(prj.get());
+            }
+            prj->Despawn();
+        } else if (gameplayMediator && gameplayMediator -> touchTarget(prj.get())) {
             prj -> Despawn();
+        }
     }    
     
     projectiles.erase(

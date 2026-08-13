@@ -25,6 +25,7 @@ private:
     std :: vector<ZombiePartLayer> layers;
     float groundY = 0.0f;
     bool landed = false;
+    Color tint = WHITE;
 
 public:
     ZombiePart(
@@ -35,7 +36,8 @@ public:
         float groundY,
         float angularVelocity = 240.0f,
         float scaleRatio = 1.0f,
-        float lifeTime = 3.0f
+        float lifeTime = 3.0f,
+        Color tint = WHITE
     );
 
     ZombiePart(
@@ -46,7 +48,8 @@ public:
         float groundY,
         float angularVelocity = 240.0f,
         float scaleRatio = 1.0f,
-        float lifeTime = 3.0f
+        float lifeTime = 3.0f,
+        Color tint = WHITE
     );
 
     void update(float dt) override;

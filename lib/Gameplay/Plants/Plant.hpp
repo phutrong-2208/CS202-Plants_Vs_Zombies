@@ -23,6 +23,9 @@ private:
     std::string reanimClip;
     std::vector<std::pair<std::string, std::vector<std::string>>> clipLayers;
     std::vector<std::string> hiddenTracks;
+    
+    std::string actionAnim;
+    std::vector<std::pair<std::string, std::vector<std::string>>> actionClipLayers;
 public:
     PlantData() = default;
     PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float cooldown);
@@ -39,6 +42,9 @@ public:
     const std::string& getReanimClip() const;
     const std::vector<std::pair<std::string, std::vector<std::string>>>& getClipLayers() const;
 
+    const std::string& getActionAnim() const;
+    const std::vector<std::pair<std::string, std::vector<std::string>>>& getActionClipLayers() const;
+
     void setReanimScalar(float scalar);
     void setReanimPackage(const std::string& package);
     void setReanimAnim(const std::string& anim);
@@ -46,6 +52,10 @@ public:
     void addClipLayer(const std::string& clip);
     void addClipLayerShowTrack(const std::string& track);
     void addHiddenTrack(const std::string& track);
+    
+    void setActionAnim(const std::string& anim);
+    void addActionClipLayer(const std::string& clip);
+    void addActionClipLayerShowTrack(const std::string& track);
 
     const std::vector<std::string>& getHiddenTracks() const;
 
@@ -75,7 +85,9 @@ public:
     void receiveDamage(int damage);
 
     void triggerAnimation(const std::string& clipName);
+    void triggerActionAnimation();
     virtual void updateTime(float deltaSeconds);
+    virtual void onActionAnimationFinished() {}
     virtual void resetCooldown();
     virtual void performAction(IGameplayMediator* mediator);
 

@@ -34,7 +34,8 @@ void ZombieDeathHandler::initialize(TexturePackage* pack, IGameplayMediator* med
 void ZombieDeathHandler::spawnDeathParticles(
     ZombieType type,
     Rectangle hitbox,
-    float scalar)
+    float scalar,
+    Color tint)
 {
     if (mediator == nullptr || particlePack == nullptr) return;
 
@@ -63,7 +64,8 @@ void ZombieDeathHandler::spawnDeathParticles(
                 groundY,
                 angVel,
                 scalar,
-                3.0f
+                3.0f,
+                tint
             )
         );
     }
@@ -82,7 +84,8 @@ void ZombieDeathHandler::spawnDeathParticles(
                 groundY,
                 angVel,
                 scalar,
-                3.0f
+                3.0f,
+                tint
             )
         );
     }

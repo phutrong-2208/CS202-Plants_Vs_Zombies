@@ -82,6 +82,12 @@ const std::string& PlantData::getReanimClip() const {
 const std::vector<std::pair<std::string, std::vector<std::string>>>& PlantData::getClipLayers() const {
     return clipLayers;
 }
+const std::string& PlantData::getActionAnim() const {
+    return actionAnim;
+}
+const std::vector<std::pair<std::string, std::vector<std::string>>>& PlantData::getActionClipLayers() const {
+    return actionClipLayers;
+}
 
 void PlantData::setReanimScalar(float scalar) {
     reanimScalar = scalar;
@@ -108,6 +114,17 @@ void PlantData::addClipLayerShowTrack(const std::string& track) {
 
 void PlantData::addHiddenTrack(const std::string& track) {
     hiddenTracks.push_back(track);
+}
+void PlantData::setActionAnim(const std::string& anim) {
+    actionAnim = anim;
+}
+void PlantData::addActionClipLayer(const std::string& clip) {
+    actionClipLayers.push_back({clip, {}});
+}
+void PlantData::addActionClipLayerShowTrack(const std::string& track) {
+    if (!actionClipLayers.empty()) {
+        actionClipLayers.back().second.push_back(track);
+    }
 }
 
 const std::vector<std::string>& PlantData::getHiddenTracks() const {
@@ -143,10 +160,30 @@ void Plant::triggerAnimation(const std::string& clipName) {
     animation.setLoopToggle(false);
 }
 
+void Plant::triggerActionAnimation() {
+    if (!plantData) return;
+    
+    const std::string& anim = plantData->getActionAnim();
+    if (!anim.empty()) {
+        if (animation.hasClip(anim)) {
+            animation.playClip(anim);
+            animation.setLoopToggle(false);
+        }
+    }
+    
+    const auto& actionLayers = plantData->getActionClipLayers();
+    for (size_t i = 0; i < actionLayers.size(); ++i) {
+        if (animation.hasClip(actionLayers[i].first)) {
+            animation.playClipLayer(actionLayers[i].first, static_cast<int>(i), actionLayers[i].second);
+        }
+    }
+}
+
 void Plant::updateTime(float deltaSeconds) {
     animation.updateTime(deltaSeconds);
     
     if (!animation.isLooping() && animation.isFinished()) {
+        onActionAnimationFinished();
         animation.resetToDefault();
     }
 

@@ -15,6 +15,25 @@ void World::addProjectile(PlantType pType, Vector2 spawnPos, float damage, bool 
             vel.x = -vel.x;
             projectile->setVelocity(vel);
         }
+        
+        if (projectile->isLobbed()) {
+            Zombie* targetZombie = nullptr;
+            float minTargetX = spawnPos.x + projectile->getRange(); 
+            for (auto& z : zombieManager.getZombies()) {
+                if (!z->isDead() && abs(z->getHitbox().y - spawnPos.y) < 100.0f && z->getHitbox().x > spawnPos.x) {
+                    if (z->getHitbox().x < minTargetX) {
+                        minTargetX = z->getHitbox().x;
+                        targetZombie = z.get();
+                    }
+                }
+            }
+            Vector2 targetPos = {minTargetX, spawnPos.y + 20.0f}; // ground approximation
+            if (targetZombie) {
+                targetPos.y = targetZombie->getHitbox().y + targetZombie->getHitbox().height - 20.0f; // Target their feet area
+            }
+            projectile->setTarget(targetPos);
+        }
+
         projectileManager.addProjectile(std::move(projectile));
     }
 }
@@ -36,16 +55,36 @@ bool World::touchTarget(Projectile* projectile) {
     Zombie* zombie = zombieManager.getZombiePriority(hitbox);
 
     if (zombie != nullptr) {
-        zombie -> receiveDamage(projectile -> getDamage(), this);
-        
         if (projectile->getChillDuration() > 0.0f) {
             zombie->chill(projectile->getChillDuration());
         }
+        
+        zombie -> receiveDamage(projectile -> getDamage(), this);
 
         return true;
     }
 
     return false;
+}
+
+void World::explodeProjectile(Projectile* projectile) {
+    if (!projectile) return;
+    
+    Vector2 splash = projectile->getSplashArea();
+    if (splash.x > 0.0f && splash.y > 0.0f) {
+        Vector2 pos = projectile->getPosition();
+        Rectangle area = {pos.x - splash.x / 2.0f, pos.y - splash.y / 2.0f, splash.x, splash.y};
+        
+        // Damage all zombies in this area
+        for (auto& zombie : zombieManager.getZombies()) {
+            if (!zombie->isDead() && CheckCollisionRecs(zombie->getHitbox(), area)) {
+                if (projectile->getChillDuration() > 0.0f) {
+                    zombie->chill(projectile->getChillDuration());
+                }
+                zombie->receiveDamage(projectile->getDamage(), this);
+            }
+        }
+    }
 }
 
 bool World::hasPlantInArea(Rectangle area) const {
@@ -70,10 +109,6 @@ void World::damageZombiesInArea(Rectangle area, float damage) {
 
 Zombie* World::getZombiePriority(Rectangle area) {
     return zombieManager.getZombiePriority(area);
-}
-
-void World::collectSuns() {
-    // To be implemented
 }
 
 void World::freezeZombiesInArea(Rectangle area, float duration) {

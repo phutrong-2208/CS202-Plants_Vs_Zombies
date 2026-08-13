@@ -40,6 +40,7 @@ public:
 
     // Projectile toggling signals
     virtual bool touchTarget(Projectile* projectile) = 0;
+    virtual void explodeProjectile(Projectile* projectile) = 0;
 
     // Zombie killing signals
     virtual bool hasPlantInArea(Rectangle area) const = 0;
@@ -47,7 +48,6 @@ public:
     virtual bool hasZombieInArea(Rectangle area) const = 0;
     virtual void damageZombiesInArea(Rectangle area, float damage) = 0;
     virtual Zombie* getZombiePriority(Rectangle area) = 0;
-    virtual void collectSuns() = 0;
     virtual void freezeZombiesInArea(Rectangle area, float duration) = 0;
 
     // Particles

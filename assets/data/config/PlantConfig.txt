@@ -9,6 +9,7 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=PeaShooter
 REANIM_ANIM=PeaShooterSingleAnim
 REANIM_CLIP=full_idle
+ACTION_ANIM=anim_shooting
 
 [SUNFLOWER]
 HEALTH=300
@@ -69,6 +70,7 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=SnowPea
 REANIM_ANIM=SnowPeaAnim
 REANIM_CLIP=full_idle
+ACTION_ANIM=anim_shooting
 
 [CHOMPER]
 HEALTH=300
@@ -93,6 +95,7 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=Repeater
 REANIM_ANIM=PeaShooterAnim
 REANIM_CLIP=full_idle
+ACTION_ANIM=anim_shooting
 
 [PUFFSHROOM]
 HEALTH=300
@@ -105,6 +108,7 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=PuffShroom
 REANIM_ANIM=PuffShroomAnim
 REANIM_CLIP=idle
+ACTION_ANIM=anim_shooting
 
 [SUNSHROOM]
 HEALTH=300
@@ -129,6 +133,7 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=FumeShroom
 REANIM_ANIM=FumeShroomAnim
 REANIM_CLIP=idle
+ACTION_ANIM=anim_shooting
 
 [GRAVEBUSTER]
 HEALTH=300
@@ -165,6 +170,7 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=ScaredyShroom
 REANIM_ANIM=ScaredyShroomAnim
 REANIM_CLIP=idle
+ACTION_ANIM=anim_shooting
 
 [ICESHROOM]
 HEALTH=300
@@ -232,6 +238,12 @@ REANIM_CLIP_LAYER=head_idle2
 REANIM_CLIP_LAYER_SHOW_TRACKS=anim_head2, ThreePeater_head2_leaf1, ThreePeater_head2_leaf2, anim_face2, ThreePeater_head2_blink, ThreePeater_mouth2
 REANIM_CLIP_LAYER=head_idle3
 REANIM_CLIP_LAYER_SHOW_TRACKS=anim_head3, ThreePeater_head3_leaf1, ThreePeater_head3_leaf2, ThreePeater_head3_leaf3, anim_face3, ThreePeater_head3_blink, ThreePeater_mouth3
+ACTION_LAYER_CLIP=anim_shoot1
+ACTION_LAYER_SHOW_TRACKS=anim_head1, ThreePeater_head1_leaf1, anim_face1, ThreePeater_head1_blink, ThreePeater_mouth1
+ACTION_LAYER_CLIP=anim_shoot2
+ACTION_LAYER_SHOW_TRACKS=anim_head2, ThreePeater_head2_leaf1, ThreePeater_head2_leaf2, anim_face2, ThreePeater_head2_blink, ThreePeater_mouth2
+ACTION_LAYER_CLIP=anim_shoot3
+ACTION_LAYER_SHOW_TRACKS=anim_head3, ThreePeater_head3_leaf1, ThreePeater_head3_leaf2, ThreePeater_head3_leaf3, anim_face3, ThreePeater_head3_blink, ThreePeater_mouth3
 
 
 [TANGLEKELP]
@@ -358,6 +370,10 @@ REANIM_CLIP_LAYER=head_idle
 REANIM_CLIP_LAYER_SHOW_TRACKS=anim_head_idle, anim_face, idle_mouth, idle_shoot_blink, anim_blink
 REANIM_CLIP_LAYER=splitpea_idle
 REANIM_CLIP_LAYER_SHOW_TRACKS=anim_splitpea_idle, anim_splitpea_shooting, SplitPea_head, SplitPea_mouth, idle_SplitPea_shoot_blink, anim_SplitPea_blink, SplitPea_eyebrows
+ACTION_LAYER_CLIP=anim_shooting
+ACTION_LAYER_SHOW_TRACKS=anim_head_idle, anim_face, idle_mouth, idle_shoot_blink, anim_blink
+ACTION_LAYER_CLIP=anim_splitpea_shooting
+ACTION_LAYER_SHOW_TRACKS=anim_splitpea_idle, anim_splitpea_shooting, SplitPea_head, SplitPea_mouth, idle_SplitPea_shoot_blink, anim_SplitPea_blink, SplitPea_eyebrows
 
 [STARFRUIT]
 HEALTH=300
@@ -370,6 +386,7 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=Starfruit
 REANIM_ANIM=StarfruitAnim
 REANIM_CLIP=idle
+ACTION_ANIM=anim_shooting
 
 [PUMPKIN]
 HEALTH=4000
@@ -400,24 +417,26 @@ HEALTH=300
 SUN_COST=100
 BASE_DAMAGE=40
 BUFF_DAMAGE=40
-COOLDOWN=2.925
+COOLDOWN=5.0
 SEED_RECHARGE=7.5
 REANIM_SCALAR=1.5
 REANIM_PACKAGE=CabbagePult
 REANIM_ANIM=CabbagePultAnim
 REANIM_CLIP=idle
+ACTION_ANIM=anim_shooting
 
 [CORNPULT]
 HEALTH=300
 SUN_COST=100
 BASE_DAMAGE=20
 BUFF_DAMAGE=40
-COOLDOWN=2.925
+COOLDOWN=5.0
 SEED_RECHARGE=7.5
 REANIM_SCALAR=1.5
 REANIM_PACKAGE=CornPult
 REANIM_ANIM=CornPultAnim
 REANIM_CLIP=full_idle
+ACTION_ANIM=anim_shooting
 
 [COFFEEBEAN]
 HEALTH=300
@@ -472,12 +491,13 @@ HEALTH=300
 SUN_COST=300
 BASE_DAMAGE=80
 BUFF_DAMAGE=80
-COOLDOWN=2.925
+COOLDOWN=5.0
 SEED_RECHARGE=7.5
 REANIM_SCALAR=1.5
 REANIM_PACKAGE=MelonPult
 REANIM_ANIM=MelonPultAnim
 REANIM_CLIP=idle
+ACTION_ANIM=anim_shooting
 
 [GATLINGPEA]
 HEALTH=300
@@ -493,6 +513,8 @@ REANIM_CLIP=idle
 REANIM_HIDE_TRACKS=anim_head_idle, anim_face, GatlingPea_mouth, GatlingPea_barrel3, GatlingPea_barrel4, GatlingPea_barrel2, GatlingPea_barrel1, GatlingPea_mouth_overlay, idle_shoot_blink, anim_blink, PeaShooter_eyebrow, GatlingPea_helmet
 REANIM_CLIP_LAYER=head_idle
 REANIM_CLIP_LAYER_SHOW_TRACKS=anim_head_idle, anim_face, GatlingPea_mouth, GatlingPea_barrel3, GatlingPea_barrel4, GatlingPea_barrel2, GatlingPea_barrel1, GatlingPea_mouth_overlay, idle_shoot_blink, anim_blink, PeaShooter_eyebrow, GatlingPea_helmet
+ACTION_LAYER_CLIP=anim_shooting
+ACTION_LAYER_SHOW_TRACKS=anim_head_idle, anim_face, GatlingPea_mouth, GatlingPea_barrel3, GatlingPea_barrel4, GatlingPea_barrel2, GatlingPea_barrel1, GatlingPea_mouth_overlay, idle_shoot_blink, anim_blink, PeaShooter_eyebrow, GatlingPea_helmet
 
 
 [TWINSUNFLOWER]
@@ -518,6 +540,7 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=GloomShroom
 REANIM_ANIM=GloomShroomAnim
 REANIM_CLIP=idle
+ACTION_ANIM=anim_shooting
 
 [CATTAIL]
 HEALTH=300
@@ -530,6 +553,7 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=Cattail
 REANIM_ANIM=CattailAnim
 REANIM_CLIP=idle
+ACTION_ANIM=anim_shooting
 
 [SPIKEROCK]
 HEALTH=900
@@ -560,12 +584,13 @@ HEALTH=300
 SUN_COST=200
 BASE_DAMAGE=80
 BUFF_DAMAGE=80
-COOLDOWN=2.925
+COOLDOWN=5.0
 SEED_RECHARGE=50
 REANIM_SCALAR=1.5
 REANIM_PACKAGE=WinterMelon
 REANIM_ANIM=WinterMelonAnim
 REANIM_CLIP=idle
+ACTION_ANIM=anim_shooting
 
 [COBCANNON]
 HEALTH=300

@@ -105,7 +105,7 @@ void PlantDataset::loadFromFile(const std::string& filepath) {
             currentData->setReanimClip(value);
         } else if (key == "REANIM_CLIP_LAYER") {
             currentData->addClipLayer(value);
-        } else if (key == "REANIM_HIDE_TRACKS" || key == "REANIM_CLIP_LAYER_SHOW_TRACKS") {
+        } else if (key == "REANIM_HIDE_TRACKS" || key == "REANIM_CLIP_LAYER_SHOW_TRACKS" || key == "ACTION_LAYER_SHOW_TRACKS") {
             std::stringstream ss(value);
             std::string trackName;
             while (std::getline(ss, trackName, ',')) {
@@ -117,9 +117,14 @@ void PlantDataset::loadFromFile(const std::string& filepath) {
                     if (end != std::string::npos) trackName = trackName.substr(0, end + 1);
                     
                     if (key == "REANIM_HIDE_TRACKS") currentData->addHiddenTrack(trackName);
-                    else currentData->addClipLayerShowTrack(trackName);
+                    else if (key == "REANIM_CLIP_LAYER_SHOW_TRACKS") currentData->addClipLayerShowTrack(trackName);
+                    else if (key == "ACTION_LAYER_SHOW_TRACKS") currentData->addActionClipLayerShowTrack(trackName);
                 }
             }
+        } else if (key == "ACTION_ANIM") {
+            currentData->setActionAnim(value);
+        } else if (key == "ACTION_LAYER_CLIP") {
+            currentData->addActionClipLayer(value);
         }
     }
 

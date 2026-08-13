@@ -25,6 +25,13 @@ const std::string& ProjectileData::getTextureName() const { return textureName; 
 float ProjectileData::getChillDuration() const { return chillDuration; }
 
 void ProjectileData::setChillDuration(float duration) { chillDuration = duration; }
+void ProjectileData::setLobbed(bool _lobbed) { lobbed = _lobbed; }
+void ProjectileData::setSplashArea(Vector2 area) { splashArea = area; }
+void ProjectileData::setScale(float _scale) { scale = _scale; }
+
+bool ProjectileData::isLobbed() const { return lobbed; }
+Vector2 ProjectileData::getSplashArea() const { return splashArea; }
+float ProjectileData::getScale() const { return scale; }
 
 /////////////////////////////////// 
 ///     PROJECTILE MECHANICS    ///
@@ -63,6 +70,25 @@ void Projectile::setType(ProjectileType t) { type = t; }
 ProjectileType Projectile::getType(void) const { return type; }
 float Projectile::getChillDuration(void) const { return projData ? projData->getChillDuration() : 0.0f; }
 
+bool Projectile::isLobbed() const { return projData ? projData->isLobbed() : false; }
+Vector2 Projectile::getSplashArea() const { return projData ? projData->getSplashArea() : Vector2{0.0f, 0.0f}; }
+bool Projectile::hasImpacted() const { return impacted; }
+
+void Projectile::setTarget(Vector2 target) {
+    if (!isLobbed()) return;
+    targetPos = target;
+    impacted = false;
+    
+    // Parabolic trajectory math
+    float distanceX = targetPos.x - position.x;
+    if (velocity.x == 0.0f) velocity.x = 350.0f; // Prevent division by zero
+    float timeToTarget = distanceX / velocity.x;
+    
+    if (timeToTarget <= 0.0f) timeToTarget = 0.1f;
+    
+    velocity.y = (targetPos.y - position.y - 0.5f * gravity * timeToTarget * timeToTarget) / timeToTarget;
+}
+
 float Projectile :: getDamage(void) const{
     return damage;
 }
@@ -81,9 +107,13 @@ Rectangle Projectile::getHitbox(void) const {
 }
 
 Rectangle Projectile::getCollisionHitbox(void) const {
+    if (isLobbed() && !impacted) {
+        return Rectangle{0, 0, 0, 0}; // Lobbed projectiles don't collide mid-air
+    }
+
     Rectangle hitbox = getHitbox();
-    // Lobbed projectiles fly high but should still hit zombies below them
-    if (velocity.y != 0.0f) {
+    // Normal projectiles can hit things slightly above/below them
+    if (!isLobbed() && velocity.y != 0.0f) {
         hitbox.height *= 4.0f;
     }
     return hitbox;
@@ -101,21 +131,32 @@ void Projectile :: Despawn(void){
 }
 
 void Projectile :: update(float dt){
-    if(despawned || dt <= 0.0f) return;
+    if(despawned || dt <= 0.0f || impacted) return;
 
-    Vector2 movement = {
-        velocity.x * dt,
-        velocity.y * dt
-    };
+    if (isLobbed()) {
+        velocity.y += gravity * dt; // Apply gravity
+        position.x += velocity.x * dt;
+        position.y += velocity.y * dt;
+        
+        // If it passed the target X or reached the ground level (target Y)
+        if (position.x >= targetPos.x || (velocity.y > 0 && position.y >= targetPos.y)) {
+            impacted = true;
+            position.y = targetPos.y; // Snap to ground
+        }
+    } else {
+        Vector2 movement = {
+            velocity.x * dt,
+            velocity.y * dt
+        };
 
-    position.x += movement.x;
-    position.y += movement.y;
+        position.x += movement.x;
+        position.y += movement.y;
 
-    totalDistance += Vector2Length(movement);
+        totalDistance += Vector2Length(movement);
 
-
-    if(totalDistance >= getRange()){
-        Despawn();
+        if(totalDistance >= getRange()){
+            Despawn();
+        }
     }
 }
 
@@ -123,7 +164,10 @@ void Projectile :: draw(void) const{
     if(texture == nullptr) return;
 
     Rectangle src = {0.0f, 0.0f, static_cast<float>(texture -> width), static_cast<float>(texture -> height)};
-    Rectangle dst = getHitbox();
+    
+    float scale = projData ? projData->getScale() : 1.0f;
+    float r = getRadius() * scale;
+    Rectangle dst = {position.x - r, position.y - r, 2.0f * r, 2.0f * r};
 
     DrawTexturePro(*texture, src, dst, Vector2{0.0f, 0.0f}, 0, WHITE);
 }

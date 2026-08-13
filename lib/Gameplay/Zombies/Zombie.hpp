@@ -72,6 +72,7 @@ protected:
     float deathTimer = 0.0f;
     float freezeTimer = 0.0f;
     float chillTimer = 0.0f;
+    float flashTimer = 0.0f;
     bool swallowed = false;
 
     ZombieState state = ZombieState :: WALKING;

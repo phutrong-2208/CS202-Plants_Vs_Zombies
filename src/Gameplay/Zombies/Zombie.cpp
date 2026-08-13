@@ -76,6 +76,10 @@ void Zombie::updateTime(float dt) {
         timeMultiplier = 0.5f;
     }
 
+    if (flashTimer > 0.0f) {
+        flashTimer -= dt;
+    }
+
     animation.updateTime(dt * timeMultiplier);
     if(state == ZombieState::WALKING) hitbox.x -= effectiveSpeed * dt;
     
@@ -92,7 +96,9 @@ void Zombie::updateTime(float dt) {
 void Zombie::setReanimInstance(ReanimInstance anim) { animation = anim; }
 void Zombie::draw() {
     Color tint = WHITE;
-    if (freezeTimer > 0.0f || chillTimer > 0.0f) {
+    if (flashTimer > 0.0f) {
+        tint = Color{200, 200, 200, 255}; // Light grey / white flash effect
+    } else if (freezeTimer > 0.0f || chillTimer > 0.0f) {
         tint = Color{100, 150, 255, 255}; // Blue tint
     }
     
@@ -130,7 +136,11 @@ void Zombie::receiveDamage(float damage, IGameplayMediator* mediator) {
             setState(ZombieState::DYING);
             
             if (deathHandler) {
-                deathHandler->spawnDeathParticles(zombieType, hitbox, zombieData->getReanimScalar());
+                Color deathTint = WHITE;
+                if (chillTimer > 0.0f) {
+                    deathTint = Color{100, 150, 255, 255};
+                }
+                deathHandler->spawnDeathParticles(zombieType, hitbox, 1.0f, deathTint);
             }
             
             // Hide the head/helmet tracks on the body since they just flew off as particles
@@ -141,6 +151,8 @@ void Zombie::receiveDamage(float damage, IGameplayMediator* mediator) {
             animation.hideTrack("anim_hair");
             animation.hideTrack("anim_football");
         }
+    } else {
+        flashTimer = 0.15f; // 150ms flash on hit
     }
 }
 

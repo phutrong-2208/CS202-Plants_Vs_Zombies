@@ -63,12 +63,13 @@ private:
     void addProjectile(PlantType pType, Vector2 spawnPos, float damage, bool reverse = false) override;
     bool hasTarget(PlantType plantType, Vector2 spawnPos, Rectangle bounds) override;
     bool touchTarget(Projectile* projectile) override;
+    void explodeProjectile(Projectile* projectile) override;
     bool hasPlantInArea(Rectangle area) const override;
     bool damagePlantInArea(Rectangle area, float damage) override;
     bool hasZombieInArea(Rectangle area) const override;
     void damageZombiesInArea(Rectangle area, float damage) override;
     Zombie* getZombiePriority(Rectangle area) override;
-    void collectSuns() override;
+    
     void freezeZombiesInArea(Rectangle area, float duration) override;
     void addParticle(std::unique_ptr<Particle> particle) override;
     void spawnExplosionParticles(Vector2 position, PlantType type) override;

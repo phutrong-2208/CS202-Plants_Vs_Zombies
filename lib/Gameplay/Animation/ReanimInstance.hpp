@@ -35,6 +35,7 @@ struct ClipLayer {
     float initStartTime     = 0.0f;
 
     std::unordered_set<std::string> showTracks;  // only render these tracks
+    std::unordered_set<std::string> initShowTracks; // stored for resetToDefault()
 };
 
 class ReanimInstance {
@@ -74,6 +75,7 @@ public:
     void setTexturePackage(TexturePackage* TexPack);
     void setTextureScalar(float scaleFactor);
     void hideTrack(const std::string& trackName);
+    void unhideTrack(const std::string& trackName);
     void showOnlyTracks(const std::vector<std::string>& trackNames);
     Texture2D* getTrackTexture(const std::string& trackName) const;
 
@@ -100,7 +102,8 @@ public:
     // file loop naturally; the reanim file IS one complete idle cycle.
     
     // Plays a clip on a specific layer, overriding its default behavior until finished.
-    bool playClipLayer(const std::string& clipName, int layerIndex);
+    // Optionally filters which tracks are visible during this clip.
+    bool playClipLayer(const std::string& clipName, int layerIndex, const std::vector<std::string>& showTracks = {});
 
     // Resets the primary clip and all clip layers to their initial states.
     // Used after a one-shot animation finishes to return to idle.
@@ -112,6 +115,9 @@ public:
     float getCurrentTime() const;
     bool  isLooping() const;
     bool  isFinished() const;
+
+    bool  hasClip(const std::string& clipName) const;
+    size_t getClipLayersCount() const;
 
     void draw(Rectangle hitbox, Color overrideTint = WHITE) const;
 };

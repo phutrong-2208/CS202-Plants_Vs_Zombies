@@ -13,7 +13,7 @@ private:
 public:
     ZombieDeathHandler() = default;
     void initialize(TexturePackage* pack, IGameplayMediator* med);
-    void spawnDeathParticles(ZombieType type, Rectangle hitbox, float scalar);
+    void spawnDeathParticles(ZombieType type, Rectangle hitbox, float scalar, Color tint = WHITE);
 };
 
 #endif

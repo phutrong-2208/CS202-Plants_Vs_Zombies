@@ -34,10 +34,11 @@ void ProjectileDataset::loadFromFile(const std::string& filepath) {
     std::unique_ptr<ProjectileData> currentData = nullptr;
 
     while (std::getline(file, line)) {
-        // Trim whitespace
+        // Trim whitespace (both ends)
         size_t start = line.find_first_not_of(" \t\r\n");
         if (start == std::string::npos) continue;
-        line = line.substr(start);
+        size_t end = line.find_last_not_of(" \t\r\n");
+        line = line.substr(start, end - start + 1);
 
         // Skip empty lines
         if (line.empty()) continue;
@@ -87,6 +88,18 @@ void ProjectileDataset::loadFromFile(const std::string& filepath) {
             currentData->setTextureName(value);
         } else if (key == "CHILL_DURATION") {
             currentData->setChillDuration(std::stof(value));
+        } else if (key == "LOBBED") {
+            currentData->setLobbed(std::stoi(value) != 0);
+        } else if (key == "SPLASH_WIDTH") {
+            Vector2 splash = currentData->getSplashArea();
+            splash.x = std::stof(value);
+            currentData->setSplashArea(splash);
+        } else if (key == "SPLASH_HEIGHT") {
+            Vector2 splash = currentData->getSplashArea();
+            splash.y = std::stof(value);
+            currentData->setSplashArea(splash);
+        } else if (key == "SCALE") {
+            if (currentData) currentData->setScale(std::stof(value));
         }
     }
 

@@ -3,7 +3,7 @@
 ZombiePart :: ZombiePart(
     ZombiePartType partType, Texture2D* texture, Vector2 position,
     Vector2 velocity, float groundY, float angularVelocity,
-    float scaleRatio, float lifeTime
+    float scaleRatio, float lifeTime, Color tint
 ) : ZombiePart(
         partType,
         std :: vector<ZombiePartLayer>{
@@ -14,7 +14,8 @@ ZombiePart :: ZombiePart(
         groundY,
         angularVelocity,
         scaleRatio,
-        lifeTime
+        lifeTime,
+        tint
     ) {}
 
 ZombiePart :: ZombiePart(
@@ -25,20 +26,14 @@ ZombiePart :: ZombiePart(
     float groundY,
     float angularVelocity,
     float scaleRatio,
-    float lifeTime
-) :
-    Particle(
-        nullptr,
-        position,
-        velocity,
-        Vector2{0.0f, 700.0f},
-        lifeTime,
-        scaleRatio
-    ),
-    partType(partType),
-    layers(std :: move(layers)),
-    groundY(groundY) {
-    angularVeclocity = angularVelocity;
+    float lifeTime,
+    Color tint) : Particle(nullptr, position, velocity, {0.0f, 600.0f}, lifeTime, scaleRatio)
+{
+    this -> partType = partType;
+    this -> layers = std :: move(layers);
+    this -> groundY = groundY;
+    this -> angularVeclocity = angularVelocity;
+    this -> tint = tint;
 }
 
 void ZombiePart :: update(float dt) {
@@ -94,7 +89,7 @@ void ZombiePart :: draw() const {
             {layerPosition.x, layerPosition.y, width, height},
             {width * 0.5f, height * 0.5f},
             rotation + layer.rotation,
-            WHITE
+            tint
         );
     }
 }
