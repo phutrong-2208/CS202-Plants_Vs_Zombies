@@ -19,15 +19,12 @@ void ProjectileData::setTextureName(const std::string& textureName) {
 float ProjectileData::getRadius() const {
     return radius;
 }
-float ProjectileData::getRange() const {
-    return range;
-}
-Vector2 ProjectileData::getVelocity() const {
-    return velocity;
-}
-const std::string& ProjectileData::getTextureName() const {
-    return textureName;
-}
+float ProjectileData::getRange() const { return range; }
+Vector2 ProjectileData::getVelocity() const { return velocity; }
+const std::string& ProjectileData::getTextureName() const { return textureName; }
+float ProjectileData::getChillDuration() const { return chillDuration; }
+
+void ProjectileData::setChillDuration(float duration) { chillDuration = duration; }
 
 /////////////////////////////////// 
 ///     PROJECTILE MECHANICS    ///
@@ -60,9 +57,11 @@ void Projectile :: setDamage(float _d){
 void Projectile :: setPosition(Vector2 newPos){
     position = newPos;
 }
-void Projectile :: setVelocity(Vector2 veloc){
-    velocity = veloc;
-}
+void Projectile::setVelocity(Vector2 newVel) { velocity = newVel; }
+void Projectile::setType(ProjectileType t) { type = t; }
+
+ProjectileType Projectile::getType(void) const { return type; }
+float Projectile::getChillDuration(void) const { return projData ? projData->getChillDuration() : 0.0f; }
 
 float Projectile :: getDamage(void) const{
     return damage;

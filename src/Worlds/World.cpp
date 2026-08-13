@@ -37,6 +37,11 @@ bool World::touchTarget(Projectile* projectile) {
 
     if (zombie != nullptr) {
         zombie -> receiveDamage(projectile -> getDamage(), this);
+        
+        if (projectile->getChillDuration() > 0.0f) {
+            zombie->chill(projectile->getChillDuration());
+        }
+
         return true;
     }
 

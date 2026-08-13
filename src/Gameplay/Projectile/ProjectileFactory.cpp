@@ -85,6 +85,8 @@ void ProjectileDataset::loadFromFile(const std::string& filepath) {
             currentData->setRange(std::stof(value));
         } else if (key == "TEXTURE_NAME") {
             currentData->setTextureName(value);
+        } else if (key == "CHILL_DURATION") {
+            currentData->setChillDuration(std::stof(value));
         }
     }
 
@@ -138,5 +140,7 @@ std::unique_ptr<Projectile> ProjectileFactory::createProjectile(
 
     Texture2D* tex = getProjectileTexture(pType);
 
-    return std::make_unique<Projectile>(spawnPos, data, damage, data->getRange(), tex);
+    auto proj = std::make_unique<Projectile>(spawnPos, data, damage, data->getRange(), tex);
+    proj->setType(pType);
+    return proj;
 }
