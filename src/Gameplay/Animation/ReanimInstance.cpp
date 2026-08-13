@@ -50,6 +50,7 @@ bool ReanimInstance::setDefaultClip(const std::string& clipName) {
         initClipLoopStart = clipLoopStart;
         initClipEnd       = clipEnd;
         initStartTime     = currentTime;
+        looping = true;
         return true;
     }
     return false;

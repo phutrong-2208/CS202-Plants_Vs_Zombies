@@ -22,16 +22,19 @@ private:
     float range = 0.0f;
     Vector2 velocity = {0.0f, 0.0f};
     std::string textureName = "";
+    float chillDuration = 0.0f;
 public:
     void setRadius(float radius);
     void setRange(float range);
     void setVelocity(Vector2 velocity);
     void setTextureName(const std::string& textureName);    
+    void setChillDuration(float duration);
 
     float getRadius() const;
     float getRange() const;
     Vector2 getVelocity() const;
     const std::string& getTextureName() const;
+    float getChillDuration() const;
 };
 
 class Projectile {
@@ -42,6 +45,7 @@ private:
     Vector2 position = {0.0f, 0.0f};
     Vector2 velocity = {0.0f, 0.0f};
     Texture2D *texture = nullptr;
+    ProjectileType type = PROJECTILE_PEA;
 
     bool despawned = false;
 public:
@@ -57,6 +61,9 @@ public:
     void setDamage(float _d);
     void setPosition(Vector2 newPos);
     void setVelocity(Vector2 newVel);
+    void setType(ProjectileType t);
+
+    ProjectileType getType(void) const;
 
 
     float getDamage(void) const;
@@ -66,6 +73,7 @@ public:
     Rectangle getHitbox(void) const;
     Rectangle getCollisionHitbox(void) const;
     Vector2 getVelocity(void) const;
+    float getChillDuration(void) const;
 
     bool isDespawned(void) const;
     void Despawn(void);

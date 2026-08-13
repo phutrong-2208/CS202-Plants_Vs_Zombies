@@ -13,6 +13,7 @@ void Chomper::updateTime(float dt) {
     Plant::updateTime(dt);
     
     // If we were digesting (on cooldown) and just finished, return to idle
+
     if (wasOnCooldown && !isOnCooldown()) {
         animation.resetToDefault();
     }
@@ -23,7 +24,7 @@ void Chomper::performAction(IGameplayMediator* mediator) {
     
     // Only act if not digesting (cooldown == 0)
     if (plantData && cooldownTimer <= 0.0f) {
-        Rectangle sensor = {bounds.x + 20.0f, bounds.y, bounds.width * 1.5f - 20.0f, bounds.height};
+        Rectangle sensor = bounds;
         
         Zombie* target = mediator->getZombiePriority(sensor);
         if (target) {

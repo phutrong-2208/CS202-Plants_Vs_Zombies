@@ -151,7 +151,7 @@ ReanimInstance ZombieFactory::createReanim(
     reanim.setTexturePackage(textureManager->getPackage(packageName));
     reanim.setAnimation(animationManager->getAnimationData(animName));
     for(const std :: string& track : hiddenTracks) reanim.hideTrack(track);
-    reanim.playClip(clipLoopName);
+    reanim.setDefaultClip(clipLoopName);
     return reanim;
 }
 
