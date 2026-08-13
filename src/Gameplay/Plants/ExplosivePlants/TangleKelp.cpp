@@ -4,11 +4,11 @@ PlantType TangleKelp::getType() { return TANGLEKELP; }
 void TangleKelp::performAction(IGameplayMediator* mediator) {
     if (!mediator) return;
     
-    // 1x1 area
+    // 1x1 area, expanded slightly to catch edge zombies
     Rectangle area = {
-        bounds.x,
+        bounds.x - 15.0f,
         bounds.y,
-        bounds.width,
+        bounds.width + 30.0f,
         bounds.height
     };
     

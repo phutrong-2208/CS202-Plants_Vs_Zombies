@@ -12,6 +12,7 @@
 #include "Gameplay/Plants/DefensivePlants/DefensivePlantTypes.hpp"
 #include "Gameplay/Plants/ExplosivePlants/ExplosivePlantTypes.hpp"
 #include "Gameplay/Plants/SunProducePlants/SunPlantTypes.hpp"
+#include "Gameplay/Plants/MeleePlants/MeleePlantTypes.hpp"
 
 
 // Maps section name strings from PlantConfig.txt to PlantType enum values
@@ -91,7 +92,7 @@ void PlantDataset::loadFromFile(const std::string& filepath) {
         } else if (key == "BUFF_DAMAGE") {
             currentData->setBuffDamage(std::stof(value));
         } else if (key == "COOLDOWN") {
-            currentData->setProjectileCooldown(std::stof(value));
+            currentData->setCooldown(std::stof(value));
         } else if (key == "SEED_RECHARGE") {
             currentData->setSeedRecharge(std::stof(value));
         } else if (key == "REANIM_SCALAR") {
@@ -208,7 +209,7 @@ ReanimInstance PlantFactory::createReanim(float scalar, const std::string& packa
     plantReanim.setTextureScalar(scalar);
     plantReanim.setTexturePackage(textureManager -> getPackage(packageName));
     plantReanim.setAnimation(animationManager -> getAnimationData(animName));
-    plantReanim.playClip(clipLoopName); 
+    plantReanim.setDefaultClip(clipLoopName); 
 
     return plantReanim;
 }

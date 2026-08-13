@@ -4,12 +4,12 @@ PlantType IceShroom::getType() { return ICESHROOM; }
 void IceShroom::performAction(IGameplayMediator* mediator) {
     if (!mediator) return;
     
-    // Whole screen area
+    // 3x3 area
     Rectangle area = {
-        0.0f,
-        0.0f,
-        2000.0f,
-        1500.0f
+        bounds.x - bounds.width,
+        bounds.y - bounds.height,
+        bounds.width * 3.0f,
+        bounds.height * 3.0f
     };
     
     mediator->damageZombiesInArea(area, getDamage()); // Usually 20 damage

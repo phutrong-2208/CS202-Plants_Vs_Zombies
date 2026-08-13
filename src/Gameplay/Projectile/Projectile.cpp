@@ -81,6 +81,15 @@ Rectangle Projectile::getHitbox(void) const {
     return Rectangle{position.x - radius, position.y - radius, 2.0f * radius, 2.0f * radius};
 }
 
+Rectangle Projectile::getCollisionHitbox(void) const {
+    Rectangle hitbox = getHitbox();
+    // Lobbed projectiles fly high but should still hit zombies below them
+    if (velocity.y != 0.0f) {
+        hitbox.height *= 4.0f;
+    }
+    return hitbox;
+}
+
 Vector2 Projectile :: getVelocity(void) const{
     return velocity;
 }

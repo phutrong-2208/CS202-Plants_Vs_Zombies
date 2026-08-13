@@ -72,6 +72,7 @@ protected:
     float deathTimer = 0.0f;
     float freezeTimer = 0.0f;
     float chillTimer = 0.0f;
+    bool swallowed = false;
 
     ZombieState state = ZombieState :: WALKING;
     Rectangle hitbox = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -96,7 +97,8 @@ public:
 
     void receiveDamage(float damage, IGameplayMediator* mediator = nullptr);
     bool isDead() const;
-
+    bool isFullyDead() const;
+    bool isDying() const;
     float getHealth() const;
     float getSpeed() const;
     int getAttackDamage() const;
@@ -114,6 +116,9 @@ public:
 
     void freeze(float duration);
     void chill(float duration);
+
+    void setSwallowed(bool isSwallowed);
+    bool isSwallowed() const;
 };
 
 #endif

@@ -1,10 +1,10 @@
 #pragma once
-#include "Gameplay/Plants/ShooterPlants/Chomper.hpp"
+
 #include "Gameplay/Plants/ShooterPlants/PuffShroom.hpp"
 #include "Gameplay/Plants/ShooterPlants/FumeShroom.hpp"
 #include "Gameplay/Plants/ShooterPlants/ScaredyShroom.hpp"
 #include "Gameplay/Plants/ShooterPlants/ThreePeater.hpp"
-#include "Gameplay/Plants/ShooterPlants/Caltrop.hpp"
+
 #include "Gameplay/Plants/ShooterPlants/SeaShroom.hpp"
 #include "Gameplay/Plants/ShooterPlants/SplitPea.hpp"
 #include "Gameplay/Plants/ShooterPlants/Starfruit.hpp"
@@ -14,6 +14,6 @@
 #include "Gameplay/Plants/ShooterPlants/GatlingPea.hpp"
 #include "Gameplay/Plants/ShooterPlants/GloomShroom.hpp"
 #include "Gameplay/Plants/ShooterPlants/Cattail.hpp"
-#include "Gameplay/Plants/ShooterPlants/SpikeRock.hpp"
+
 #include "Gameplay/Plants/ShooterPlants/WinterMelon.hpp"
 #include "Gameplay/Plants/ShooterPlants/CobCannon.hpp"

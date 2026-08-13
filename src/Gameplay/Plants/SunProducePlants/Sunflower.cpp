@@ -29,6 +29,6 @@ void Sunflower::plantSetup() {
 void Sunflower::resetCooldown() {
     if (plantData) {
         // Subsequent suns spawn around the base cooldown (24 seconds) +/- 1s
-        cooldownTimer = plantData->getProjectileCooldown() + GetRandomValue(-100, 100) / 100.0f;
+        cooldownTimer = plantData->getCooldown() + GetRandomValue(-100, 100) / 100.0f;
     }
 }

@@ -8,6 +8,11 @@ enum ProjectileType : int {
     PROJECTILE_SNOWPEA,
     PROJECTILE_CACTUS,
     PROJECTILE_STAR,
+    PROJECTILE_PUFF,
+    PROJECTILE_CABBAGE,
+    PROJECTILE_CORN,
+    PROJECTILE_MELON,
+    PROJECTILE_WINTERMELON,
     PROJECTILE_COUNT
 };
 
@@ -59,6 +64,7 @@ public:
     float getRange(void) const;
     Vector2 getPosition(void) const;
     Rectangle getHitbox(void) const;
+    Rectangle getCollisionHitbox(void) const;
     Vector2 getVelocity(void) const;
 
     bool isDespawned(void) const;

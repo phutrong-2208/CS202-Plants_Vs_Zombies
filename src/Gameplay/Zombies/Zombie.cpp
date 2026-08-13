@@ -97,8 +97,8 @@ void Zombie::draw() {
     }
     
     animation.draw(hitbox, tint);
-    // DrawRectangleLinesEx(getHitbox(), 2.0f, RED);
-    // DrawRectangleLinesEx(getAttackHitbox(), 2.0f, YELLOW);
+    DrawRectangleLinesEx(getHitbox(), 2.0f, RED);
+    DrawRectangleLinesEx(getAttackHitbox(), 2.0f, YELLOW);
 }
 
 void Zombie::receiveDamage(float damage, IGameplayMediator* mediator) {
@@ -124,23 +124,32 @@ void Zombie::receiveDamage(float damage, IGameplayMediator* mediator) {
 
     health = std::max(0.0f, health - damage);
     if(health == 0.0f) {
-        setState(ZombieState::DYING);
-        
-        if (deathHandler) {
-            deathHandler->spawnDeathParticles(zombieType, hitbox, zombieData->getReanimScalar());
+        if (swallowed) {
+            setState(ZombieState::DEAD);
+        } else {
+            setState(ZombieState::DYING);
+            
+            if (deathHandler) {
+                deathHandler->spawnDeathParticles(zombieType, hitbox, zombieData->getReanimScalar());
+            }
+            
+            // Hide the head/helmet tracks on the body since they just flew off as particles
+            animation.hideTrack("anim_head1");
+            animation.hideTrack("anim_head2");
+            animation.hideTrack("anim_cone");
+            animation.hideTrack("anim_bucket");
+            animation.hideTrack("anim_hair");
+            animation.hideTrack("anim_football");
         }
-        
-        // Hide the head/helmet tracks on the body since they just flew off as particles
-        animation.hideTrack("anim_head1");
-        animation.hideTrack("anim_head2");
-        animation.hideTrack("anim_cone");
-        animation.hideTrack("anim_bucket");
-        animation.hideTrack("anim_hair");
-        animation.hideTrack("anim_football");
     }
 }
 
 bool Zombie::isDead() const { return state == ZombieState::DYING || state == ZombieState::DEAD; }
+bool Zombie::isFullyDead() const { return state == ZombieState::DEAD; }
+bool Zombie::isDying() const { return state == ZombieState::DYING; }
+
+void Zombie::setSwallowed(bool isSwallowed) { swallowed = isSwallowed; }
+bool Zombie::isSwallowed() const { return swallowed; }
 float Zombie::getHealth() const { return health; }
 float Zombie::getSpeed() const { return speed; }
 int Zombie::getAttackDamage() const { return attackDamage; }

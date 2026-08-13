@@ -18,7 +18,7 @@ public:
     void update(float dt);
     void draw() const;
 
-    Zombie* getShotFirst(Rectangle area);
+    Zombie* getZombiePriority(Rectangle area);
     bool hasZombieInArea(Rectangle area) const;
     std :: vector<std::unique_ptr<Zombie>>& getZombies();
     bool empty(void) const;

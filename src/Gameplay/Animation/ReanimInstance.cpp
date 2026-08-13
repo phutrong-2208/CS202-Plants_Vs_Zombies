@@ -45,24 +45,46 @@ Texture2D* ReanimInstance::getTrackTexture(const std::string& trackName) const {
     return rawTexPack->GetTexture(frame.getTextureKey());
 }
 
+bool ReanimInstance::setDefaultClip(const std::string& clipName) {
+    if (playClip(clipName)) {
+        initClipLoopStart = clipLoopStart;
+        initClipEnd       = clipEnd;
+        initStartTime     = currentTime;
+        return true;
+    }
+    return false;
+}
+
 bool ReanimInstance::playClip(const std::string& clipName) {
     if (rawAnim == nullptr) return false;
-
-    const AnimClip* clip = rawAnim -> getClip(clipName);
+    const AnimClip* clip = rawAnim->getClip(clipName);
     if (clip == nullptr) {
         TraceLog(LOG_WARNING, "ReanimInstance: clip '%s' not found", clipName.c_str());
         return false;
     }
 
-    clipLoopStart = clip -> loopStart;
-    clipEnd       = clip -> endTime;
-    currentTime   = clip -> startTime;
+    currentTime   = clip->startTime;
+    clipLoopStart = clip->loopStart;
+    clipEnd       = clip->endTime;
+    looping       = false; 
 
-    // Store initial state for resetToDefault()
-    initClipLoopStart = clipLoopStart;
-    initClipEnd       = clipEnd;
-    initStartTime     = currentTime;
+    return true;
+}
 
+bool ReanimInstance::playClipLayer(const std::string& clipName, int layerIndex) {
+    if (rawAnim == nullptr || layerIndex < 0 || layerIndex >= (int)clipLayers.size()) return false;
+    
+    const AnimClip* clip = rawAnim->getClip(clipName);
+    if (clip == nullptr) {
+        TraceLog(LOG_WARNING, "ReanimInstance::playClipLayer: clip '%s' not found", clipName.c_str());
+        return false;
+    }
+    
+    clipLayers[layerIndex].currentTime   = clip->startTime;
+    clipLayers[layerIndex].clipLoopStart = clip->loopStart;
+    clipLayers[layerIndex].clipEnd       = clip->endTime;
+    clipLayers[layerIndex].looping       = false; 
+    
     return true;
 }
 
@@ -70,6 +92,7 @@ void ReanimInstance::addClipLayer(const std::string& clipName, const std::vector
     if (rawAnim == nullptr) return;
 
     const AnimClip* clip = rawAnim->getClip(clipName);
+
     if (clip == nullptr) {
         TraceLog(LOG_WARNING, "ReanimInstance::addClipLayer: clip '%s' not found", clipName.c_str());
         return;
@@ -150,6 +173,14 @@ void ReanimInstance::updateTime(float deltaSeconds) {
         advanceClipTime(layer.currentTime, delta,
                         layer.clipLoopStart, layer.clipEnd,
                         layer.looping, duration, globalLoopStart);
+        
+        // Auto-revert if layer was playing a non-looping clip and has reached the end
+        if (!layer.looping && layer.currentTime >= layer.clipEnd) {
+            layer.clipLoopStart = layer.initClipLoopStart;
+            layer.clipEnd       = layer.initClipEnd;
+            layer.currentTime   = layer.initStartTime;
+            layer.looping       = true;
+        }
     }
 }
 
@@ -323,6 +354,7 @@ std::vector<TrackSnapshot> ReanimInstance::getActiveTrackParts(Rectangle hitbox)
 
             const std::string& trackName = track->getTrackName();
             if (layer.showTracks.find(trackName) == layer.showTracks.end()) continue;
+
 
             Frame frame = track->getInterpolatedFrame(layer.currentTime, layerLoopStart, layerEnd);
             if (frame.alpha <= 0.0f) continue;

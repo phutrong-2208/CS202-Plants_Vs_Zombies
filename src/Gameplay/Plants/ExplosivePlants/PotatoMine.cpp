@@ -4,11 +4,11 @@ PlantType PotatoMine::getType() { return POTATOMINE; }
 void PotatoMine::performAction(IGameplayMediator* mediator) {
     if (!mediator) return;
     
-    // PotatoMine needs a zombie in its 1x1 cell to trigger
+    // PotatoMine needs a zombie in its cell to trigger, expand slightly to catch zombies eating it from the edge
     Rectangle area = {
-        bounds.x,
+        bounds.x - 15.0f,
         bounds.y,
-        bounds.width,
+        bounds.width + 30.0f,
         bounds.height
     };
     

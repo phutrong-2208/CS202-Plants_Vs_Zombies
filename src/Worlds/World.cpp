@@ -4,11 +4,19 @@
 ///     IGAMEPLAYMEDIATOR   ///
 ///////////////////////////////
 
-void World::addProjectile(PlantType plantType, Vector2 position, float damage) {
-    if (projectileConvert.find(plantType) == projectileConvert.end()) return;
+void World::addProjectile(PlantType pType, Vector2 spawnPos, float damage, bool reverse) {
+    if (projectileConvert.find(pType) == projectileConvert.end()) return;
 
-    auto bullet = projectileFactory.createProjectile(projectileConvert.at(plantType), position, damage);
-    projectileManager.addProjectile(std::move(bullet));
+    ProjectileType projType = projectileConvert.at(pType);
+    auto projectile = projectileFactory.createProjectile(projType, spawnPos, damage);
+    if (projectile) {
+        if (reverse) {
+            Vector2 vel = projectile->getVelocity();
+            vel.x = -vel.x;
+            projectile->setVelocity(vel);
+        }
+        projectileManager.addProjectile(std::move(projectile));
+    }
 }
 bool World::hasTarget(PlantType plantType, Vector2 spawnPos, Rectangle bounds) {
     if (projectileConvert.find(plantType) == projectileConvert.end()) return false;
@@ -23,9 +31,9 @@ bool World::hasTarget(PlantType plantType, Vector2 spawnPos, Rectangle bounds) {
 
 bool World::touchTarget(Projectile* projectile) {
     if (projectile == nullptr) return false;
-    Rectangle hitbox = projectile -> getHitbox();
+    Rectangle hitbox = projectile -> getCollisionHitbox();
 
-    Zombie* zombie = zombieManager.getShotFirst(hitbox);
+    Zombie* zombie = zombieManager.getZombiePriority(hitbox);
 
     if (zombie != nullptr) {
         zombie -> receiveDamage(projectile -> getDamage(), this);
@@ -55,6 +63,14 @@ void World::damageZombiesInArea(Rectangle area, float damage) {
     }
 }
 
+Zombie* World::getZombiePriority(Rectangle area) {
+    return zombieManager.getZombiePriority(area);
+}
+
+void World::collectSuns() {
+    // To be implemented
+}
+
 void World::freezeZombiesInArea(Rectangle area, float duration) {
     for (auto& zombie : zombieManager.getZombies()) {
         if (!zombie->isDead() && CheckCollisionRecs(zombie->getHitbox(), area)) {
@@ -66,35 +82,68 @@ void World::freezeZombiesInArea(Rectangle area, float duration) {
 
 void World::spawnExplosionParticles(Vector2 position, PlantType type) {
     TexturePackage* pack = sunPackage;
-    if (!pack) return;
+    if (!pack) {
+        TraceLog(LOG_ERROR, "spawnExplosionParticles: sunPackage is NULL");
+        return;
+    }
 
     if (type == CHERRYBOMB) {
         Texture2D* blastMark = pack->GetTexture("BLASTMARK");
         Texture2D* pow = pack->GetTexture("POW");
+        
         if (blastMark) {
-            auto mark = std::make_unique<Particle>(blastMark, Vector2{position.x, position.y + 40}, Vector2{0, 0}, Vector2{0, 0}, 4.0f, 1.0f);
+            auto mark = std::make_unique<Particle>(blastMark, Vector2{position.x, position.y + 20}, Vector2{0, 0}, Vector2{0, 0}, 4.0f, 1.0f);
             addParticle(std::move(mark));
         }
         if (pow) {
-            auto p = std::make_unique<Particle>(pow, Vector2{position.x, position.y - 40}, Vector2{0, 0}, Vector2{0, 0}, 1.0f, 1.0f);
+            auto p = std::make_unique<Particle>(pow, Vector2{position.x, position.y}, Vector2{0, 0}, Vector2{0, 0}, 1.0f, 1.0f);
             addParticle(std::move(p));
         }
     } else if (type == DOOMSHROOM) {
         Texture2D* blastMark = pack->GetTexture("BLASTMARK");
-        Texture2D* doom = pack->GetTexture("DOOMSHROOM_EXPLOSION_BASE");
+        Texture2D* base = pack->GetTexture("DOOMSHROOM_EXPLOSION_BASE");
+        Texture2D* stem = pack->GetTexture("DOOMSHROOM_EXPLOSION_STEM");
+        Texture2D* top = pack->GetTexture("DOOMSHROOM_EXPLOSION_TOP");
+        Texture2D* doom = pack->GetTexture("DOOM");
+
         if (blastMark) {
             auto mark = std::make_unique<Particle>(blastMark, Vector2{position.x, position.y + 40}, Vector2{0, 0}, Vector2{0, 0}, 10.0f, 1.5f);
             addParticle(std::move(mark));
         }
+        if (base) {
+            auto p = std::make_unique<Particle>(base, Vector2{position.x, position.y + 20}, Vector2{0, 0}, Vector2{0, 0}, 1.5f, 1.0f);
+            addParticle(std::move(p));
+        }
+        if (stem) {
+            auto p = std::make_unique<Particle>(stem, Vector2{position.x, position.y - 80}, Vector2{0, -50}, Vector2{0, 0}, 1.5f, 1.0f);
+            addParticle(std::move(p));
+        }
+        if (top) {
+            auto p = std::make_unique<Particle>(top, Vector2{position.x, position.y - 180}, Vector2{0, -80}, Vector2{0, 0}, 1.5f, 1.0f);
+            addParticle(std::move(p));
+        }
         if (doom) {
-            auto p = std::make_unique<Particle>(doom, Vector2{position.x, position.y - 60}, Vector2{0, 0}, Vector2{0, 0}, 1.5f, 1.0f);
+            auto p = std::make_unique<Particle>(doom, Vector2{position.x, position.y - 250}, Vector2{0, -100}, Vector2{0, 0}, 1.5f, 1.0f);
             addParticle(std::move(p));
         }
     } else if (type == POTATOMINE) {
         Texture2D* spudow = pack->GetTexture("EXPLOSIONSPUDOW");
-        if (spudow) {
-            auto p = std::make_unique<Particle>(spudow, Vector2{position.x, position.y - 20}, Vector2{0, -20}, Vector2{0, 0}, 1.0f, 1.0f);
+        Texture2D* flash = pack->GetTexture("POTATOMINEFLASH");
+        Texture2D* parts = pack->GetTexture("POTATOMINE_PARTICLES");
+
+        if (flash) {
+            auto p = std::make_unique<Particle>(flash, Vector2{position.x, position.y}, Vector2{0, 0}, Vector2{0, 0}, 0.5f, 1.0f);
             addParticle(std::move(p));
+        }
+        if (spudow) {
+            auto p = std::make_unique<Particle>(spudow, Vector2{position.x, position.y - 20}, Vector2{0, 0}, Vector2{0, 0}, 1.0f, 1.0f);
+            addParticle(std::move(p));
+        }
+        if (parts) {
+            for (int i = 0; i < 5; i++) {
+                auto p = std::make_unique<Particle>(parts, Vector2{position.x, position.y}, Vector2{(float)GetRandomValue(-150, 150), (float)GetRandomValue(-200, -50)}, Vector2{0, 300}, 1.0f, 1.0f);
+                addParticle(std::move(p));
+            }
         }
     } else if (type == SQUASH) {
         Texture2D* pow = pack->GetTexture("EXPLOSIONPOWIE");
@@ -240,6 +289,7 @@ World::World(int screenWidth, int screenHeight, AssetManager* assetManager, Leve
     grid.setMediator(this);
     projectileManager.setMediator(this);
     zombieManager.setMediator(this);
+    zombieManager.getDeathHandler().initialize(sunPackage, this);
 }
 
 void World :: update(float dt) {

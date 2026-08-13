@@ -23,26 +23,32 @@ const char* getPlantTextureKey(PlantType type) {
 
 const std :: vector<PlantType>& getAllPlantTypes() {
     static const std :: vector<PlantType> plants = {
-        PEASHOOTER, SUNFLOWER, CHERRYBOMB, WALLNUT, POTATOMINE,
-        SNOWPEA, CHOMPER, REPEATER, PUFFSHROOM, SUNSHROOM,
-        FUMESHROOM, GRAVEBUSTER, HYPNOSHROOM, SCAREDYSHROOM,
-        ICESHROOM, DOOMSHROOM, LILYPAD, SQUASH, THREEPEATER,
-        TANGLEKELP, JALAPENO, CALTROP, TORCHWOOD, TALLNUT,
-        SEASHROOM, PLANTERN, CACTUS, BLOVER, SPLITPEA, STARFRUIT,
-        PUMPKIN, MAGNETSHROOM, CABBAGEPULT, CORNPULT, COFFEEBEAN,
-        GARLIC, UMBRELLALEAF, MARIGOLD, MELONPULT, GATLINGPEA,
-        TWINSUNFLOWER, GLOOMSHROOM, CATTAIL, SPIKEROCK, GOLDMAGNET,
-        WINTERMELON, COBCANNON, IMITATER
+        // SunProducePlants
+        SUNFLOWER, TWINSUNFLOWER, SUNSHROOM, MARIGOLD,
+        
+        // DefensivePlants
+        WALLNUT, TALLNUT, PUMPKIN, GARLIC, UMBRELLALEAF, BLOVER,
+        COFFEEBEAN, GOLDMAGNET, GRAVEBUSTER, HYPNOSHROOM, IMITATER,
+        LILYPAD, MAGNETSHROOM, PLANTERN, TORCHWOOD,
+        
+        // ExplosivePlants
+        CHERRYBOMB, POTATOMINE, DOOMSHROOM, ICESHROOM, SQUASH, JALAPENO, TANGLEKELP,
+        
+        // ShooterPlants
+        PEASHOOTER, SNOWPEA, CHOMPER, REPEATER, PUFFSHROOM, FUMESHROOM, SCAREDYSHROOM,
+        THREEPEATER, CALTROP, SPIKEROCK, SEASHROOM, CACTUS, SPLITPEA, STARFRUIT,
+        CABBAGEPULT, CORNPULT, MELONPULT, WINTERMELON, GATLINGPEA, GLOOMSHROOM,
+        CATTAIL, COBCANNON
     };
     return plants;
 }
 
-PlantData::PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float projectileCooldown) {
+PlantData::PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float cooldown) {
     this -> baseHealth = baseHealth;
     this -> baseDamage = baseDamage;
     this -> buffDamage = buffDamage;
     this -> sunCost = sunCost;
-    this -> projectileCooldown = projectileCooldown;
+    this -> cooldown = cooldown;
 }
 float PlantData::getBaseHealth() const {
     return baseHealth;
@@ -53,8 +59,8 @@ float PlantData::getDamage(bool buffed) const {
 int PlantData::getSunCost() const {
     return sunCost;
 }
-float PlantData::getProjectileCooldown() const {
-    return projectileCooldown;
+float PlantData::getCooldown() const {
+    return cooldown;
 }
 float PlantData::getSeedRecharge() const {
     return seedRecharge;
@@ -112,7 +118,7 @@ void PlantData::setBaseHealth(float health) { baseHealth = health; }
 void PlantData::setBaseDamage(float damage) { baseDamage = damage; }
 void PlantData::setBuffDamage(float damage) { buffDamage = damage; }
 void PlantData::setSunCost(int cost) { sunCost = cost; }
-void PlantData::setProjectileCooldown(float cooldown) { projectileCooldown = cooldown; }
+void PlantData::setCooldown(float cd) { cooldown = cd; }
 void PlantData::setSeedRecharge(float recharge) { seedRecharge = recharge; }
 
 void Plant::plantSetup() {
@@ -120,12 +126,12 @@ void Plant::plantSetup() {
         cooldownTimer = 0.0f;
         health = 0; return;
     }
-    cooldownTimer = plantData->getProjectileCooldown();
+    cooldownTimer = plantData->getCooldown();
     health = plantData->getBaseHealth();
 }
 
 void Plant::performAction(IGameplayMediator* mediator) {
-    if (plantData && plantData->getProjectileCooldown() > 0.0f && getProjectileSpawnPosition().x != 0.0f) {
+    if (plantData && plantData->getCooldown() > 0.0f && getProjectileSpawnPosition().x != 0.0f) {
         if (!mediator->hasTarget(getType(), getProjectileSpawnPosition(), getBounds())) return;
         mediator->addProjectile(getType(), getProjectileSpawnPosition(), getDamage());
         resetCooldown();
@@ -149,7 +155,7 @@ void Plant::updateTime(float deltaSeconds) {
     }
 }
 void Plant::resetCooldown() {
-    cooldownTimer = plantData -> getProjectileCooldown();
+    cooldownTimer = plantData -> getCooldown();
 }
 
 void Plant::setBounds(Rectangle newBounds) {

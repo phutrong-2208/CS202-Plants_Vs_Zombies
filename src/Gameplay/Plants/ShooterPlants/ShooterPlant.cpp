@@ -7,7 +7,7 @@ Vector2 ShooterPlant::getProjectileSpawnPosition() {
 }
 
 void ShooterPlant::performAction(IGameplayMediator* mediator) {
-    if (plantData && plantData->getProjectileCooldown() > 0.0f && getProjectileSpawnPosition().x != 0.0f) {
+    if (plantData && plantData->getCooldown() > 0.0f && getProjectileSpawnPosition().x != 0.0f) {
         if (!mediator->hasTarget(getType(), getProjectileSpawnPosition(), getBounds())) return;
         mediator->addProjectile(getType(), getProjectileSpawnPosition(), getDamage());
         resetCooldown();

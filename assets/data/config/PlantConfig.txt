@@ -75,7 +75,7 @@ HEALTH=300
 SUN_COST=150
 BASE_DAMAGE=1800
 BUFF_DAMAGE=1800
-COOLDOWN=42
+COOLDOWN=15
 SEED_RECHARGE=7.5
 REANIM_SCALAR=1.5
 REANIM_PACKAGE=Chomper
@@ -225,6 +225,13 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=ThreePeater
 REANIM_ANIM=ThreePeaterAnim
 REANIM_CLIP=idle
+REANIM_HIDE_TRACKS=anim_head1, ThreePeater_head1_leaf1, anim_face1, ThreePeater_head1_blink, ThreePeater_mouth1, anim_head2, ThreePeater_head2_leaf1, ThreePeater_head2_leaf2, anim_face2, ThreePeater_head2_blink, ThreePeater_mouth2, anim_head3, ThreePeater_head3_leaf1, ThreePeater_head3_leaf2, ThreePeater_head3_leaf3, anim_face3, ThreePeater_head3_blink, ThreePeater_mouth3
+REANIM_CLIP_LAYER=head_idle1
+REANIM_CLIP_LAYER_SHOW_TRACKS=anim_head1, ThreePeater_head1_leaf1, anim_face1, ThreePeater_head1_blink, ThreePeater_mouth1
+REANIM_CLIP_LAYER=head_idle2
+REANIM_CLIP_LAYER_SHOW_TRACKS=anim_head2, ThreePeater_head2_leaf1, ThreePeater_head2_leaf2, anim_face2, ThreePeater_head2_blink, ThreePeater_mouth2
+REANIM_CLIP_LAYER=head_idle3
+REANIM_CLIP_LAYER_SHOW_TRACKS=anim_head3, ThreePeater_head3_leaf1, ThreePeater_head3_leaf2, ThreePeater_head3_leaf3, anim_face3, ThreePeater_head3_blink, ThreePeater_mouth3
 
 
 [TANGLEKELP]
@@ -252,10 +259,10 @@ REANIM_ANIM=JalapenoAnim
 REANIM_CLIP=idle
 
 [CALTROP]
-HEALTH=300
+HEALTH=450
 SUN_COST=100
-BASE_DAMAGE=20
-BUFF_DAMAGE=20
+BASE_DAMAGE=40
+BUFF_DAMAGE=40
 COOLDOWN=1
 SEED_RECHARGE=7.5
 REANIM_SCALAR=1.5
@@ -525,10 +532,10 @@ REANIM_ANIM=CattailAnim
 REANIM_CLIP=idle
 
 [SPIKEROCK]
-HEALTH=450
-SUN_COST=125
-BASE_DAMAGE=40
-BUFF_DAMAGE=40
+HEALTH=900
+SUN_COST=200
+BASE_DAMAGE=80
+BUFF_DAMAGE=80
 COOLDOWN=1
 SEED_RECHARGE=50
 REANIM_SCALAR=1.5

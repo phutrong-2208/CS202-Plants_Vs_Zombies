@@ -13,7 +13,7 @@ private:
     float baseHealth = 100.0f;
     float baseDamage = 10.0f, buffDamage = 20.0f;
     int sunCost = 100;
-    float projectileCooldown = 0.0f;
+    float cooldown = 0.0f;
     float seedRecharge = 7.5f;
 
     // Reanim metadata
@@ -25,12 +25,12 @@ private:
     std::vector<std::string> hiddenTracks;
 public:
     PlantData() = default;
-    PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float projectileCooldown);
+    PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float cooldown);
       
     float getBaseHealth() const;
     float getDamage(bool buffed) const;
     int getSunCost() const;
-    float getProjectileCooldown() const;
+    float getCooldown() const;
     float getSeedRecharge() const;
 
     float getReanimScalar() const;
@@ -53,7 +53,7 @@ public:
     void setBaseDamage(float damage);
     void setBuffDamage(float damage);
     void setSunCost(int cost);
-    void setProjectileCooldown(float cooldown);
+    void setCooldown(float cd);
     void setSeedRecharge(float recharge);
 };
 

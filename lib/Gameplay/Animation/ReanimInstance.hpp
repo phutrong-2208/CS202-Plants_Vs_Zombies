@@ -77,6 +77,12 @@ public:
     void showOnlyTracks(const std::vector<std::string>& trackNames);
     Texture2D* getTrackTexture(const std::string& trackName) const;
 
+    // Sets the default looping clip and plays it
+    bool setDefaultClip(const std::string& clipName);
+
+    // Plays a specific clip (e.g. "shooting", "chew")
+    bool playClip(const std::string& clipName);
+
     // ---------------------------------------------------------------
     // Clip layers — additional clips that render specific track subsets.
     // Used for multi-part plants where body and head tracks live on
@@ -92,7 +98,9 @@ public:
     // clipName is without the "anim_" prefix, e.g. "idle", "shooting".
     // For the default idle loop, do NOT call playClip — just let the full
     // file loop naturally; the reanim file IS one complete idle cycle.
-    bool playClip(const std::string& clipName);
+    
+    // Plays a clip on a specific layer, overriding its default behavior until finished.
+    bool playClipLayer(const std::string& clipName, int layerIndex);
 
     // Resets the primary clip and all clip layers to their initial states.
     // Used after a one-shot animation finishes to return to idle.

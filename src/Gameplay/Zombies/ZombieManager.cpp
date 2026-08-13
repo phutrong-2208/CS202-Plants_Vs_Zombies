@@ -17,9 +17,9 @@ void ZombieManager :: addZombie(std::unique_ptr<Zombie> zombie) {
 
 void ZombieManager :: update(float dt) {
     for(auto& zombie : zombies) {
-        if(zombie -> isDead()) continue;
+        if(zombie -> isFullyDead()) continue;
 
-        if(gameplayMediator){
+        if(gameplayMediator && !zombie->isDying()){
             zombie -> updateCombat(dt, *gameplayMediator);
         }
 
@@ -31,7 +31,7 @@ void ZombieManager :: update(float dt) {
             zombies.begin(),
             zombies.end(),
             [](const std::unique_ptr<Zombie>& zombie) {
-                return zombie->isDead();
+                return zombie->isFullyDead();
             }
         ),
         zombies.end()
@@ -40,11 +40,11 @@ void ZombieManager :: update(float dt) {
 
 void ZombieManager :: draw() const {
     for(const auto& zombie : zombies) {
-        if(!zombie->isDead()) zombie->draw();
+        if(!zombie->isFullyDead()) zombie->draw();
     }
 }
 
-Zombie* ZombieManager::getShotFirst(Rectangle area) {
+Zombie* ZombieManager::getZombiePriority(Rectangle area) {
     Zombie* target = nullptr;
     float distance = 1e6;
 
