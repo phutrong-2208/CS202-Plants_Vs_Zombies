@@ -3,8 +3,16 @@
 void ZombieManager::setMediator(IGameplayMediator* mediator) {
     gameplayMediator = mediator;
 }
+
+ZombieDeathHandler& ZombieManager::getDeathHandler() {
+    return deathHandler;
+}
+
 void ZombieManager :: addZombie(std::unique_ptr<Zombie> zombie) {
-    if(zombie) zombies.emplace_back(std::move(zombie));
+    if(zombie) {
+        zombie->setDeathHandler(&deathHandler);
+        zombies.emplace_back(std::move(zombie));
+    }
 }
 
 void ZombieManager :: update(float dt) {

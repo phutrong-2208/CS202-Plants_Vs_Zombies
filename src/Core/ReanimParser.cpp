@@ -58,14 +58,23 @@ Frame ReanimTrack::getInterpolatedFrame(float time, float startTime, float endTi
     if (time <= startTime) return frames[startSegment];
     if (time >= endTime) return frames[endSegment];
 
+    // If time is past the very last frame of the track, clamp to the last frame
+    if (time >= frames.back().snap) return frames.back();
 
     // Find the two frames that bracket `time`
     int pos = startSegment;
+    bool found = false;
     for (int k = startSegment; k < endSegment; ++k) {
         if (frames[k].snap <= time && time < frames[k + 1].snap) {
             pos = k;
+            found = true;
             break;
         }
+    }
+
+    // If we somehow didn't find a bracket (e.g. track ends before endSegment), clamp to the end segment
+    if (!found) {
+        return frames[endSegment];
     }
 
     // Step mode when texture changes between the two keyframes
@@ -231,6 +240,8 @@ bool ReanimParser::loadFromFile(const std::string& path) {
 void ReanimParser :: buildClips() {
     clipList.clear();
     const std :: string PREFIX = "anim_";
+
+    // --- Phase 1: discover clips from control tracks ---
     for (const ReanimTrack& track : trackList) {
         const std :: string& tname = track.getTrackName();
         // Only process control tracks (name starts with "anim_")

@@ -225,12 +225,7 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=ThreePeater
 REANIM_ANIM=ThreePeaterAnim
 REANIM_CLIP=idle
-REANIM_EXTRA_CLIP=anim_head1
-REANIM_EXTRA_CLIP=anim_face1
-REANIM_EXTRA_CLIP=anim_head2
-REANIM_EXTRA_CLIP=anim_face2
-REANIM_EXTRA_CLIP=anim_head3
-REANIM_EXTRA_CLIP=anim_face3
+
 
 [TANGLEKELP]
 HEALTH=300
@@ -351,8 +346,11 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=SplitPea
 REANIM_ANIM=SplitPeaAnim
 REANIM_CLIP=idle
-REANIM_EXTRA_CLIP=anim_head_idle
-REANIM_EXTRA_CLIP=anim_splitpea_idle
+REANIM_HIDE_TRACKS=anim_head_idle, anim_face, idle_mouth, idle_shoot_blink, anim_blink, anim_splitpea_idle, anim_splitpea_shooting, SplitPea_head, SplitPea_mouth, idle_SplitPea_shoot_blink, anim_SplitPea_blink, SplitPea_eyebrows
+REANIM_CLIP_LAYER=head_idle
+REANIM_CLIP_LAYER_SHOW_TRACKS=anim_head_idle, anim_face, idle_mouth, idle_shoot_blink, anim_blink
+REANIM_CLIP_LAYER=splitpea_idle
+REANIM_CLIP_LAYER_SHOW_TRACKS=anim_splitpea_idle, anim_splitpea_shooting, SplitPea_head, SplitPea_mouth, idle_SplitPea_shoot_blink, anim_SplitPea_blink, SplitPea_eyebrows
 
 [STARFRUIT]
 HEALTH=300
@@ -485,8 +483,10 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=GatlingPea
 REANIM_ANIM=GatlingPeaAnim
 REANIM_CLIP=idle
-REANIM_EXTRA_CLIP=anim_head_idle
-REANIM_EXTRA_CLIP=anim_face
+REANIM_HIDE_TRACKS=anim_head_idle, anim_face, GatlingPea_mouth, GatlingPea_barrel3, GatlingPea_barrel4, GatlingPea_barrel2, GatlingPea_barrel1, GatlingPea_mouth_overlay, idle_shoot_blink, anim_blink, PeaShooter_eyebrow, GatlingPea_helmet
+REANIM_CLIP_LAYER=head_idle
+REANIM_CLIP_LAYER_SHOW_TRACKS=anim_head_idle, anim_face, GatlingPea_mouth, GatlingPea_barrel3, GatlingPea_barrel4, GatlingPea_barrel2, GatlingPea_barrel1, GatlingPea_mouth_overlay, idle_shoot_blink, anim_blink, PeaShooter_eyebrow, GatlingPea_helmet
+
 
 [TWINSUNFLOWER]
 HEALTH=300

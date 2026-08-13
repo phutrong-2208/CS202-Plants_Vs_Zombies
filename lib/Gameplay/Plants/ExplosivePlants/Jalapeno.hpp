@@ -3,4 +3,5 @@
 class Jalapeno : public ExplosivePlant {
 public:
     PlantType getType() override;
+    void performAction(IGameplayMediator* mediator) override;
 };

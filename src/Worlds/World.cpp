@@ -43,6 +43,90 @@ bool World::damagePlantInArea(Rectangle area, float damage) {
     return grid.damagePlantInArea(area, damage);
 }
 
+bool World::hasZombieInArea(Rectangle area) const {
+    return zombieManager.hasZombieInArea(area);
+}
+
+void World::damageZombiesInArea(Rectangle area, float damage) {
+    for (auto& zombie : zombieManager.getZombies()) {
+        if (!zombie->isDead() && CheckCollisionRecs(zombie->getHitbox(), area)) {
+            zombie->receiveDamage(damage, this);
+        }
+    }
+}
+
+void World::freezeZombiesInArea(Rectangle area, float duration) {
+    for (auto& zombie : zombieManager.getZombies()) {
+        if (!zombie->isDead() && CheckCollisionRecs(zombie->getHitbox(), area)) {
+            // Need to implement freeze in Zombie first!
+            zombie->freeze(duration);
+        }
+    }
+}
+
+void World::spawnExplosionParticles(Vector2 position, PlantType type) {
+    TexturePackage* pack = sunPackage;
+    if (!pack) return;
+
+    if (type == CHERRYBOMB) {
+        Texture2D* blastMark = pack->GetTexture("BLASTMARK");
+        Texture2D* pow = pack->GetTexture("POW");
+        if (blastMark) {
+            auto mark = std::make_unique<Particle>(blastMark, Vector2{position.x, position.y + 40}, Vector2{0, 0}, Vector2{0, 0}, 4.0f, 1.0f);
+            addParticle(std::move(mark));
+        }
+        if (pow) {
+            auto p = std::make_unique<Particle>(pow, Vector2{position.x, position.y - 40}, Vector2{0, 0}, Vector2{0, 0}, 1.0f, 1.0f);
+            addParticle(std::move(p));
+        }
+    } else if (type == DOOMSHROOM) {
+        Texture2D* blastMark = pack->GetTexture("BLASTMARK");
+        Texture2D* doom = pack->GetTexture("DOOMSHROOM_EXPLOSION_BASE");
+        if (blastMark) {
+            auto mark = std::make_unique<Particle>(blastMark, Vector2{position.x, position.y + 40}, Vector2{0, 0}, Vector2{0, 0}, 10.0f, 1.5f);
+            addParticle(std::move(mark));
+        }
+        if (doom) {
+            auto p = std::make_unique<Particle>(doom, Vector2{position.x, position.y - 60}, Vector2{0, 0}, Vector2{0, 0}, 1.5f, 1.0f);
+            addParticle(std::move(p));
+        }
+    } else if (type == POTATOMINE) {
+        Texture2D* spudow = pack->GetTexture("EXPLOSIONSPUDOW");
+        if (spudow) {
+            auto p = std::make_unique<Particle>(spudow, Vector2{position.x, position.y - 20}, Vector2{0, -20}, Vector2{0, 0}, 1.0f, 1.0f);
+            addParticle(std::move(p));
+        }
+    } else if (type == SQUASH) {
+        Texture2D* pow = pack->GetTexture("EXPLOSIONPOWIE");
+        if (pow) {
+            auto p = std::make_unique<Particle>(pow, Vector2{position.x, position.y + 20}, Vector2{0, 0}, Vector2{0, 0}, 1.0f, 1.0f);
+            addParticle(std::move(p));
+        }
+    } else if (type == JALAPENO) {
+        Texture2D* blast = pack->GetTexture("BOSSEXPLOSION1");
+        if (blast) {
+            for (int i = -4; i <= 4; ++i) {
+                auto p = std::make_unique<Particle>(blast, Vector2{position.x + i * 80, position.y}, Vector2{0, 0}, Vector2{0, 0}, 1.0f, 1.0f);
+                addParticle(std::move(p));
+            }
+        }
+    } else if (type == ICESHROOM) {
+        Texture2D* cloud = pack->GetTexture("EXPLOSIONCLOUD");
+        if (cloud) {
+            for (int i = 0; i < 5; ++i) {
+                auto p = std::make_unique<Particle>(cloud, Vector2{position.x, position.y}, Vector2{(float)(GetRandomValue(-100, 100)), (float)(GetRandomValue(-100, 100))}, Vector2{0, 0}, 1.0f, 1.0f);
+                addParticle(std::move(p));
+            }
+        }
+    } else if (type == TANGLEKELP) {
+        Texture2D* pow = pack->GetTexture("EXPLOSIONCLOUD"); // Splash approximation
+        if (pow) {
+            auto p = std::make_unique<Particle>(pow, Vector2{position.x, position.y + 20}, Vector2{0, -50}, Vector2{0, 50}, 1.0f, 0.5f);
+            addParticle(std::move(p));
+        }
+    }
+}
+
 void World::addParticle(std::unique_ptr<Particle> particle) {
     particleManager.addParticle(std::move(particle));
 }

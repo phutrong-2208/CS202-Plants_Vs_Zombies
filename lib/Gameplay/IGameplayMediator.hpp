@@ -31,9 +31,13 @@ public:
     // Zombie killing signals
     virtual bool hasPlantInArea(Rectangle area) const = 0;
     virtual bool damagePlantInArea(Rectangle area, float damage) = 0;
+    virtual bool hasZombieInArea(Rectangle area) const = 0;
+    virtual void damageZombiesInArea(Rectangle area, float damage) = 0;
+    virtual void freezeZombiesInArea(Rectangle area, float duration) = 0;
 
     // Particles
     virtual void addParticle(std::unique_ptr<Particle> particle) = 0;
+    virtual void spawnExplosionParticles(Vector2 position, PlantType type) = 0;
     virtual void spawnSun(Vector2 position, float targetY, int value) = 0;
 
     // Wave spawning

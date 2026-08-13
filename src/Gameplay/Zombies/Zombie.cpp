@@ -44,6 +44,14 @@ void Zombie::zombieSetup() {
     attackDamage = zombieData->getAttackDamage();
 }
 
+void Zombie::setZombieType(ZombieType type) {
+    zombieType = type;
+}
+
+void Zombie::setDeathHandler(ZombieDeathHandler* handler) {
+    deathHandler = handler;
+}
+
 void Zombie::setZombieData(ZombieData* data) {
     zombieData = data;
     zombieSetup();
@@ -52,8 +60,24 @@ void Zombie::setZombieData(ZombieData* data) {
 void Zombie::updateTime(float dt) {
     if(state == ZombieState::DEAD) return;
 
-    animation.updateTime(dt);
-    if(state == ZombieState::WALKING) hitbox.x -= speed * dt;
+    if (freezeTimer > 0.0f) {
+        freezeTimer -= dt;
+    } else if (chillTimer > 0.0f) {
+        chillTimer -= dt;
+    }
+
+    float effectiveSpeed = speed;
+    float timeMultiplier = 1.0f;
+    if (freezeTimer > 0.0f) {
+        effectiveSpeed = 0.0f;
+        timeMultiplier = 0.0f;
+    } else if (chillTimer > 0.0f) {
+        effectiveSpeed = speed * 0.5f;
+        timeMultiplier = 0.5f;
+    }
+
+    animation.updateTime(dt * timeMultiplier);
+    if(state == ZombieState::WALKING) hitbox.x -= effectiveSpeed * dt;
     
     const float ZOMBIE_DEATH_COUNTDOWN = 3.0f;
     if (state == ZombieState::DYING) {
@@ -66,22 +90,53 @@ void Zombie::updateTime(float dt) {
 }
 
 void Zombie::setReanimInstance(ReanimInstance anim) { animation = anim; }
-void Zombie::draw() {    
-    animation.draw(hitbox);
-    DrawRectangleLinesEx(getHitbox(), 2.0f, RED);
-    DrawRectangleLinesEx(getAttackHitbox(), 2.0f, YELLOW);
+void Zombie::draw() {
+    Color tint = WHITE;
+    if (freezeTimer > 0.0f || chillTimer > 0.0f) {
+        tint = Color{100, 150, 255, 255}; // Blue tint
+    }
+    
+    animation.draw(hitbox, tint);
+    // DrawRectangleLinesEx(getHitbox(), 2.0f, RED);
+    // DrawRectangleLinesEx(getAttackHitbox(), 2.0f, YELLOW);
 }
 
 void Zombie::receiveDamage(float damage, IGameplayMediator* mediator) {
-    if(state == ZombieState::DEAD || state == ZombieState::DYING || damage <= 0.0f) return;
+    if(state == ZombieState :: DYING || state == ZombieState :: DEAD) return;
+    
+    // Shield logic ...
+    float prevDamage = damage;
+    if(zombieData -> getArmorHealth() > 0) {
+        float armorHealth = zombieData -> getArmorHealth();
+        zombieData -> setArmorHealth(std::max(0.0f, armorHealth - damage));
+        damage = std::max(0.0f, damage - armorHealth);
+    }
+
+    if(prevDamage > 0 && damage == 0) return;
+
+    if(zombieData -> getAlternateHealth() > 0) {
+        float altHealth = zombieData -> getAlternateHealth();
+        zombieData -> setAlternateHealth(std::max(0.0f, altHealth - damage));
+        damage = std::max(0.0f, damage - altHealth);
+    }
+
+    if(prevDamage > 0 && damage == 0) return;
 
     health = std::max(0.0f, health - damage);
     if(health == 0.0f) {
         setState(ZombieState::DYING);
         
-        if (mediator == nullptr) return;
+        if (deathHandler) {
+            deathHandler->spawnDeathParticles(zombieType, hitbox, zombieData->getReanimScalar());
+        }
         
-        ZombieDeathHandler::spawnDeathParticles(animation, hitbox, mediator);
+        // Hide the head/helmet tracks on the body since they just flew off as particles
+        animation.hideTrack("anim_head1");
+        animation.hideTrack("anim_head2");
+        animation.hideTrack("anim_cone");
+        animation.hideTrack("anim_bucket");
+        animation.hideTrack("anim_hair");
+        animation.hideTrack("anim_football");
     }
 }
 
@@ -134,11 +189,24 @@ void Zombie :: updateCombat(float dt, IGameplayMediator& mediator){
         return;
     }
 
-    attackTimer += dt;
+    float effectiveDt = dt;
+    if (freezeTimer > 0.0f) effectiveDt = 0.0f;
+    else if (chillTimer > 0.0f) effectiveDt = dt * 0.5f;
+
+    attackTimer += effectiveDt;
     if (zombieData != nullptr && attackTimer >= zombieData -> getAttackInterval()){
         mediator.damagePlantInArea(getAttackHitbox(), attackDamage);
         attackTimer = 0.0f;
     }
+}
+
+void Zombie::freeze(float duration) {
+    freezeTimer = duration;
+    chillTimer = std::max(chillTimer, duration + 5.0f); // Automatically chill for 5s after freeze
+}
+
+void Zombie::chill(float duration) {
+    chillTimer = std::max(chillTimer, duration);
 }
 
 

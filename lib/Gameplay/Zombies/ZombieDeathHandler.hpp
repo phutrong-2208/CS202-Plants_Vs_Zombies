@@ -3,11 +3,17 @@
 
 #include "Gameplay/Animation/ReanimInstance.hpp"
 #include "Gameplay/IGameplayMediator.hpp"
+#include <Core/TexturePackage.hpp>
 #include <raylib.h>
 
 class ZombieDeathHandler {
+private:
+    TexturePackage* particlePack = nullptr;
+    IGameplayMediator* mediator = nullptr;
 public:
-    static void spawnDeathParticles(const ReanimInstance& animation, Rectangle hitbox, IGameplayMediator* mediator);
+    ZombieDeathHandler() = default;
+    void initialize(TexturePackage* pack, IGameplayMediator* med);
+    void spawnDeathParticles(ZombieType type, Rectangle hitbox, float scalar);
 };
 
 #endif

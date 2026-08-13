@@ -6,6 +6,7 @@
 #include <Gameplay/Animation/ReanimInstance.hpp>
 #include <Gameplay/Zombies/ZombieType.hpp>
 #include <Gameplay/IGameplayMediator.hpp>
+#include <Gameplay/Zombies/ZombieDeathHandler.hpp>
 
 enum class ZombieState {
     WALKING,
@@ -61,7 +62,6 @@ public:
     void setHiddenTracks(std::vector<std::string> tracks);
 };
 
-
 class Zombie {
 protected:
     float health = 0;
@@ -70,11 +70,15 @@ protected:
 
     float attackTimer = 0.0f;
     float deathTimer = 0.0f;
+    float freezeTimer = 0.0f;
+    float chillTimer = 0.0f;
 
     ZombieState state = ZombieState :: WALKING;
     Rectangle hitbox = {0.0f, 0.0f, 0.0f, 0.0f};
     ReanimInstance animation;
     ZombieData* zombieData = nullptr;
+    ZombieType zombieType = ZOMBIE_COUNT;
+    ZombieDeathHandler* deathHandler = nullptr;
 
     void zombieSetup();
     virtual void onStateChanged(ZombieState newState);
@@ -84,6 +88,8 @@ public:
     virtual ~Zombie() = default;
 
     virtual void updateTime(float dt);
+    void setZombieType(ZombieType type);
+    void setDeathHandler(ZombieDeathHandler* handler);
     void setZombieData(ZombieData* data);
     void setReanimInstance(ReanimInstance anim);
     void draw();
@@ -105,6 +111,9 @@ public:
     
     void performAttack(IGameplayMediator& mediator);
     void updateCombat(float dt, IGameplayMediator& mediator);
+
+    void freeze(float duration);
+    void chill(float duration);
 };
 
 #endif

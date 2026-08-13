@@ -73,8 +73,8 @@ const std::string& PlantData::getReanimClip() const {
     return reanimClip;
 }
 
-const std::vector<std::string>& PlantData::getReanimExtraClips() const {
-    return reanimExtraClips;
+const std::vector<std::pair<std::string, std::vector<std::string>>>& PlantData::getClipLayers() const {
+    return clipLayers;
 }
 
 void PlantData::setReanimScalar(float scalar) {
@@ -90,8 +90,22 @@ void PlantData::setReanimClip(const std::string& clip) {
     reanimClip = clip;
 }
 
-void PlantData::addReanimExtraClip(const std::string& clip) {
-    reanimExtraClips.push_back(clip);
+void PlantData::addClipLayer(const std::string& clip) {
+    clipLayers.push_back({clip, {}});
+}
+
+void PlantData::addClipLayerShowTrack(const std::string& track) {
+    if (!clipLayers.empty()) {
+        clipLayers.back().second.push_back(track);
+    }
+}
+
+void PlantData::addHiddenTrack(const std::string& track) {
+    hiddenTracks.push_back(track);
+}
+
+const std::vector<std::string>& PlantData::getHiddenTracks() const {
+    return hiddenTracks;
 }
 
 void PlantData::setBaseHealth(float health) { baseHealth = health; }
@@ -102,11 +116,12 @@ void PlantData::setProjectileCooldown(float cooldown) { projectileCooldown = coo
 void PlantData::setSeedRecharge(float recharge) { seedRecharge = recharge; }
 
 void Plant::plantSetup() {
-    cooldownTimer = 0.0f;
     if (plantData == nullptr) {
+        cooldownTimer = 0.0f;
         health = 0; return;
     }
-    health = plantData -> getBaseHealth();
+    cooldownTimer = plantData->getProjectileCooldown();
+    health = plantData->getBaseHealth();
 }
 
 void Plant::performAction(IGameplayMediator* mediator) {
@@ -124,13 +139,9 @@ void Plant::triggerAnimation(const std::string& clipName) {
 
 void Plant::updateTime(float deltaSeconds) {
     animation.updateTime(deltaSeconds);
-    for (auto& extra : extraAnimations) {
-        extra.updateTime(deltaSeconds);
-    }
     
     if (!animation.isLooping() && animation.isFinished()) {
-        if (plantData) animation.playClip(plantData->getReanimClip());
-        animation.setLoopToggle(true);
+        animation.resetToDefault();
     }
 
     if(cooldownTimer > 0.0f){
@@ -167,18 +178,13 @@ PlantType Plant::getType() {
 
 void Plant::draw(Rectangle hitbox) {
     animation.draw(hitbox);
-    for (auto& extra : extraAnimations) {
-        extra.draw(hitbox);
-    }
     DrawRectangleLinesEx(getHitbox(), 2.0f, GREEN);
 }
 void Plant::setReanimInstance(ReanimInstance anim) {
     animation = std::move(anim);
 }
 
-void Plant::addExtraReanimInstance(ReanimInstance anim) {
-    extraAnimations.push_back(std::move(anim));
-}
+
 void Plant::setPlantData(PlantData* pData) {
     plantData = pData;
 

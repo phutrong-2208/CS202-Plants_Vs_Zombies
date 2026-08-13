@@ -21,7 +21,8 @@ private:
     std::string reanimPackage;
     std::string reanimAnim;
     std::string reanimClip;
-    std::vector<std::string> reanimExtraClips;
+    std::vector<std::pair<std::string, std::vector<std::string>>> clipLayers;
+    std::vector<std::string> hiddenTracks;
 public:
     PlantData() = default;
     PlantData(float baseHealth, float baseDamage, float buffDamage, int sunCost, float projectileCooldown);
@@ -36,13 +37,17 @@ public:
     const std::string& getReanimPackage() const;
     const std::string& getReanimAnim() const;
     const std::string& getReanimClip() const;
-    const std::vector<std::string>& getReanimExtraClips() const;
+    const std::vector<std::pair<std::string, std::vector<std::string>>>& getClipLayers() const;
 
     void setReanimScalar(float scalar);
     void setReanimPackage(const std::string& package);
     void setReanimAnim(const std::string& anim);
     void setReanimClip(const std::string& clip);
-    void addReanimExtraClip(const std::string& clip);
+    void addClipLayer(const std::string& clip);
+    void addClipLayerShowTrack(const std::string& track);
+    void addHiddenTrack(const std::string& track);
+
+    const std::vector<std::string>& getHiddenTracks() const;
 
     void setBaseHealth(float health);
     void setBaseDamage(float damage);
@@ -60,7 +65,7 @@ protected:
 
     PlantData* plantData = nullptr;
     ReanimInstance animation;
-    std::vector<ReanimInstance> extraAnimations;
+
     Rectangle bounds = {0.0f, 0.0f, 0.0f, 0.0f};
 
     virtual void plantSetup();
@@ -82,7 +87,7 @@ public:
     virtual PlantType getType();
     
     void setReanimInstance(ReanimInstance anim);
-    void addExtraReanimInstance(ReanimInstance anim);
+
     void setPlantData(PlantData* pData);
     virtual void draw(Rectangle hitbox);
     

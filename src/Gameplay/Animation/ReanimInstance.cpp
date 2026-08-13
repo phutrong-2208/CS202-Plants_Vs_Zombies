@@ -25,6 +25,7 @@ void ReanimInstance::showOnlyTracks(const std::vector<std::string>& trackNames) 
     visibleTracks.insert(trackNames.begin(), trackNames.end());
     useVisibleTrackFilter = true;
 }
+
 // Clip selection (optional — call this when you want to play a specific
 // named animation segment, e.g. "shooting", "die".
 // For the default idle loop, do NOT call playClip — just let the full
@@ -56,37 +57,99 @@ bool ReanimInstance::playClip(const std::string& clipName) {
     clipLoopStart = clip -> loopStart;
     clipEnd       = clip -> endTime;
     currentTime   = clip -> startTime;
+
+    // Store initial state for resetToDefault()
+    initClipLoopStart = clipLoopStart;
+    initClipEnd       = clipEnd;
+    initStartTime     = currentTime;
+
     return true;
+}
+
+void ReanimInstance::addClipLayer(const std::string& clipName, const std::vector<std::string>& trackNames) {
+    if (rawAnim == nullptr) return;
+
+    const AnimClip* clip = rawAnim->getClip(clipName);
+    if (clip == nullptr) {
+        TraceLog(LOG_WARNING, "ReanimInstance::addClipLayer: clip '%s' not found", clipName.c_str());
+        return;
+    }
+
+    ClipLayer layer;
+    layer.currentTime   = clip->startTime;
+    layer.clipLoopStart = clip->loopStart;
+    layer.clipEnd       = clip->endTime;
+    layer.looping       = true;
+
+    // Store initial state for resetToDefault()
+    layer.initClipLoopStart = layer.clipLoopStart;
+    layer.initClipEnd       = layer.clipEnd;
+    layer.initStartTime     = layer.currentTime;
+
+    layer.showTracks.insert(trackNames.begin(), trackNames.end());
+    clipLayers.push_back(std::move(layer));
+}
+
+void ReanimInstance::resetToDefault() {
+    // Restore primary clip to initial state
+    clipLoopStart = initClipLoopStart;
+    clipEnd       = initClipEnd;
+    currentTime   = initStartTime;
+    looping       = true;
+
+    // Restore all clip layers to initial state
+    for (auto& layer : clipLayers) {
+        layer.clipLoopStart = layer.initClipLoopStart;
+        layer.clipEnd       = layer.initClipEnd;
+        layer.currentTime   = layer.initStartTime;
+        layer.looping       = true;
+    }
 }
 
 // -----------------------------------------------------------------------
 // Playback
 // -----------------------------------------------------------------------
 
+// Helper: advance a single time value within a clip range
+static void advanceClipTime(float& time, float deltaSpeed,
+                            float loopStart, float end,
+                            bool isLooping, float fullDuration, float globalLoopStart) {
+    time += deltaSpeed;
+
+    if (loopStart >= 0.0f) {
+        if (isLooping && end > loopStart && time >= end) {
+            float range = end - loopStart;
+            time = loopStart + std::fmod(time - loopStart, range);
+        }
+        if (!isLooping) {
+            time = std::min(time, end);
+        }
+    } else {
+        if (isLooping && time >= fullDuration) {
+            time = std::fmod(time, fullDuration);
+        }
+        if (!isLooping) {
+            time = std::min(time, fullDuration);
+        }
+    }
+}
+
 void ReanimInstance::updateTime(float deltaSeconds) {
     if (rawAnim == nullptr) return;
 
-    currentTime += deltaSeconds * speed;
+    const float delta = deltaSeconds * speed;
+    const float duration = rawAnim->getDuration();
+    const float globalLoopStart = rawAnim->getLoopStartTime();
 
-    // If a specific clip has been selected, loop within [clipLoopStart, clipEnd].
-    // Otherwise (clipLoopStart == -1) loop the entire file — this is the normal
-    // case for idle animations where the whole file IS the animation cycle.
-    if (clipLoopStart >= 0.0f) {
-        if (looping && clipEnd > clipLoopStart && currentTime >= clipEnd) {
-            float range = clipEnd - clipLoopStart;
-            currentTime = clipLoopStart + std::fmod(currentTime - clipLoopStart, range);
-        }
-        if (!looping) {
-            currentTime = std::min(currentTime, clipEnd);
-        }
-    } else {
-        const float duration = rawAnim->getDuration();
-        if (looping && currentTime >= duration) {
-            currentTime = std::fmod(currentTime, duration);
-        }
-        if (!looping) {
-            currentTime = std::min(currentTime, duration);
-        }
+    // Advance primary clip
+    advanceClipTime(currentTime, delta, clipLoopStart, clipEnd,
+                    looping, duration, globalLoopStart);
+
+    // Advance all clip layers
+    for (auto& layer : clipLayers) {
+        advanceClipTime(layer.currentTime, delta,
+                        layer.clipLoopStart, layer.clipEnd,
+                        layer.looping, duration, globalLoopStart);
     }
 }
 
@@ -111,7 +174,60 @@ bool ReanimInstance::isFinished() const {
 }
 
 // -----------------------------------------------------------------------
-// Rendering
+// Rendering helpers
+// -----------------------------------------------------------------------
+
+// Draw a single track at the given time using the given clip bounds.
+static void drawTrack(const ReanimTrack* track, float time,
+                      float loopStart, float timelineEnd,
+                      float scalar, Rectangle hitbox,
+                      TexturePackage* texPack, Color overrideTint) {
+    Frame frame = track->getInterpolatedFrame(time, loopStart, timelineEnd);
+    if (frame.alpha <= 0.0f) return;
+
+    Texture2D* currentTex = texPack->GetTexture(frame.getTextureKey());
+    if (currentTex == nullptr) return;
+
+    const float kx = frame.skewX * DEG2RAD;
+    const float ky = frame.skewY * DEG2RAD;
+
+    const float a  =  frame.scaleX * cosf(kx) * scalar;
+    const float b_ =  frame.scaleX * sinf(kx) * scalar;
+    const float c  = -frame.scaleY * sinf(ky) * scalar;
+    const float d  =  frame.scaleY * cosf(ky) * scalar;
+    const float tx =  hitbox.x + frame.newX * scalar;
+    const float ty =  hitbox.y + frame.newY * scalar;
+
+    const float mat[16] = {
+        a,    b_,   0.0f, 0.0f,
+        c,    d,    0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        tx,   ty,   0.0f, 1.0f
+    };
+
+    rlPushMatrix();
+    rlMultMatrixf(mat);
+
+    const float w = (float)currentTex->width;
+    const float h = (float)currentTex->height;
+
+    const unsigned char alphaByte = (unsigned char)(frame.alpha * overrideTint.a);
+    const Color tint = {overrideTint.r, overrideTint.g, overrideTint.b, alphaByte};
+
+    DrawTexturePro(
+        *currentTex,
+        {0, 0, w, h},  
+        {0, 0, w, h},
+        {0, 0},
+        0.0f,
+        tint
+    );
+
+    rlPopMatrix();
+}
+
+// -----------------------------------------------------------------------
+// Main draw
 // -----------------------------------------------------------------------
 
 void ReanimInstance::draw(Rectangle hitbox, Color overrideTint) const {
@@ -120,69 +236,41 @@ void ReanimInstance::draw(Rectangle hitbox, Color overrideTint) const {
         return;
     }
 
-    // loopStart: used as the "rest pose" time for tracks that are invisible
-    // at currentTime.  When a clip is active we use its loopStart; otherwise
-    // we use the file-wide heuristic (most common first-visible snap).
     const float loopStart = (clipLoopStart >= 0.0f) ? clipLoopStart : rawAnim->getLoopStartTime();
     const float timelineEnd = (clipLoopStart >= 0.0f) ? clipEnd : rawAnim->getDuration();
     const int   trackCount = rawAnim->getTrackCount();
 
+    // --- Pass 1: Render primary clip (body tracks) ---
     for (int i = 0; i < trackCount; ++i) {
         const ReanimTrack* track = rawAnim->getTrack(i);
         if (track == nullptr) continue;
 
-        const std :: string trackName = track -> getTrackName();
-        if(hiddenTracks.find(trackName) != hiddenTracks.end()) continue;
-        if(useVisibleTrackFilter &&
-           visibleTracks.find(trackName) == visibleTracks.end()) continue;
+        const std::string trackName = track->getTrackName();
+        if (hiddenTracks.find(trackName) != hiddenTracks.end()) continue;
+        if (useVisibleTrackFilter && visibleTracks.find(trackName) == visibleTracks.end()) continue;
 
-        Frame frame = track -> getInterpolatedFrame(currentTime, loopStart, timelineEnd);
-        if (frame.alpha <= 0.0f) continue;
+        drawTrack(track, currentTime, loopStart, timelineEnd,
+                  scalar, hitbox, rawTexPack, overrideTint);
+    }
 
-        Texture2D* currentTex = rawTexPack->GetTexture(frame.getTextureKey());
-        if (currentTex == nullptr) continue;
+    // --- Pass 2: Render each clip layer (head tracks, etc.) ---
+    for (const auto& layer : clipLayers) {
+        const float layerLoopStart = (layer.clipLoopStart >= 0.0f)
+                                     ? layer.clipLoopStart : rawAnim->getLoopStartTime();
+        const float layerEnd = (layer.clipLoopStart >= 0.0f)
+                               ? layer.clipEnd : rawAnim->getDuration();
 
-        const float kx = frame.skewX * DEG2RAD;
-        const float ky = frame.skewY * DEG2RAD;
+        for (int i = 0; i < trackCount; ++i) {
+            const ReanimTrack* track = rawAnim->getTrack(i);
+            if (track == nullptr) continue;
 
-        const float a  =  frame.scaleX * cosf(kx) * scalar;
-        const float b_ =  frame.scaleX * sinf(kx) * scalar;
-        const float c  = -frame.scaleY * sinf(ky) * scalar;
-        const float d  =  frame.scaleY * cosf(ky) * scalar;
-        const float tx =  hitbox.x + frame.newX * scalar;
-        const float ty =  hitbox.y + frame.newY * scalar;
+            const std::string& trackName = track->getTrackName();
+            // Only render tracks that belong to this layer
+            if (layer.showTracks.find(trackName) == layer.showTracks.end()) continue;
 
-        // Column-major (OpenGL / rlgl):
-        // | a   c   0  tx |
-        // | b_  d   0  ty |
-        // | 0   0   1   0 |
-        // | 0   0   0   1 |
-        const float mat[16] = {
-            a,    b_,   0.0f, 0.0f,   // column 0
-            c,    d,    0.0f, 0.0f,   // column 1
-            0.0f, 0.0f, 1.0f, 0.0f,   // column 2
-            tx,   ty,   0.0f, 1.0f    // column 3 (translation)
-        };
-
-        rlPushMatrix();
-        rlMultMatrixf(mat);
-
-        const float w = (float)currentTex->width;
-        const float h = (float)currentTex->height;
-
-        const unsigned char alphaByte = (unsigned char)(frame.alpha * overrideTint.a);
-        const Color tint = {overrideTint.r, overrideTint.g, overrideTint.b, alphaByte};
-
-        DrawTexturePro(
-            *currentTex,
-            {0, 0, w, h},  
-            {0, 0, w, h},
-            {0, 0},
-            0.0f,
-            tint
-        );
-
-        rlPopMatrix();
+            drawTrack(track, layer.currentTime, layerLoopStart, layerEnd,
+                      scalar, hitbox, rawTexPack, overrideTint);
+        }
     }
 }
 
@@ -194,6 +282,7 @@ std::vector<TrackSnapshot> ReanimInstance::getActiveTrackParts(Rectangle hitbox)
     const float timelineEnd = (clipLoopStart >= 0.0f) ? clipEnd       : rawAnim->getDuration();
     const int   trackCount  = rawAnim->getTrackCount();
 
+    // Primary clip tracks
     for (int i = 0; i < trackCount; ++i) {
         const ReanimTrack* track = rawAnim->getTrack(i);
         if (track == nullptr) continue;
@@ -220,5 +309,40 @@ std::vector<TrackSnapshot> ReanimInstance::getActiveTrackParts(Rectangle hitbox)
         snap.alpha     = frame.alpha;
         result.push_back(snap);
     }
+
+    // Clip layer tracks
+    for (const auto& layer : clipLayers) {
+        const float layerLoopStart = (layer.clipLoopStart >= 0.0f)
+                                     ? layer.clipLoopStart : rawAnim->getLoopStartTime();
+        const float layerEnd = (layer.clipLoopStart >= 0.0f)
+                               ? layer.clipEnd : rawAnim->getDuration();
+
+        for (int i = 0; i < trackCount; ++i) {
+            const ReanimTrack* track = rawAnim->getTrack(i);
+            if (track == nullptr) continue;
+
+            const std::string& trackName = track->getTrackName();
+            if (layer.showTracks.find(trackName) == layer.showTracks.end()) continue;
+
+            Frame frame = track->getInterpolatedFrame(layer.currentTime, layerLoopStart, layerEnd);
+            if (frame.alpha <= 0.0f) continue;
+
+            Texture2D* tex = rawTexPack->GetTexture(frame.getTextureKey());
+            if (tex == nullptr) continue;
+
+            TrackSnapshot snap;
+            snap.trackName = trackName;
+            snap.texture   = tex;
+            snap.worldX    = hitbox.x + frame.newX * scalar;
+            snap.worldY    = hitbox.y + frame.newY * scalar;
+            snap.scaleX    = frame.scaleX * scalar;
+            snap.scaleY    = frame.scaleY * scalar;
+            snap.skewX     = frame.skewX;
+            snap.skewY     = frame.skewY;
+            snap.alpha     = frame.alpha;
+            result.push_back(snap);
+        }
+    }
+
     return result;
 }

@@ -102,8 +102,23 @@ void PlantDataset::loadFromFile(const std::string& filepath) {
             currentData->setReanimAnim(value);
         } else if (key == "REANIM_CLIP") {
             currentData->setReanimClip(value);
-        } else if (key == "REANIM_EXTRA_CLIP") {
-            currentData->addReanimExtraClip(value);
+        } else if (key == "REANIM_CLIP_LAYER") {
+            currentData->addClipLayer(value);
+        } else if (key == "REANIM_HIDE_TRACKS" || key == "REANIM_CLIP_LAYER_SHOW_TRACKS") {
+            std::stringstream ss(value);
+            std::string trackName;
+            while (std::getline(ss, trackName, ',')) {
+                // Trim spaces and carriage returns
+                size_t start = trackName.find_first_not_of(" \t\r\n");
+                if (start != std::string::npos) {
+                    trackName = trackName.substr(start);
+                    size_t end = trackName.find_last_not_of(" \t\r\n");
+                    if (end != std::string::npos) trackName = trackName.substr(0, end + 1);
+                    
+                    if (key == "REANIM_HIDE_TRACKS") currentData->addHiddenTrack(trackName);
+                    else currentData->addClipLayerShowTrack(trackName);
+                }
+            }
         }
     }
 
@@ -209,17 +224,16 @@ std::unique_ptr <Plant> PlantFactory::createPlant(PlantType pType) {
     if (data) {
         plantPtr->setPlantData(data);
 
-        // Set up animation from the data-driven reanim metadata
-        plantPtr->setReanimInstance(
-            createReanim(data->getReanimScalar(), data->getReanimPackage(),
-                         data->getReanimAnim(), data->getReanimClip())
-        );
-        for (const auto& extraClip : data->getReanimExtraClips()) {
-            plantPtr->addExtraReanimInstance(
-                createReanim(data->getReanimScalar(), data->getReanimPackage(),
-                             data->getReanimAnim(), extraClip)
-            );
+        // Set up main animation from the data-driven reanim metadata
+        ReanimInstance mainAnim = createReanim(data->getReanimScalar(), data->getReanimPackage(),
+                                               data->getReanimAnim(), data->getReanimClip());
+        for (const std::string& trackName : data->getHiddenTracks()) {
+            mainAnim.hideTrack(trackName);
         }
+        for (const auto& layerPair : data->getClipLayers()) {
+            mainAnim.addClipLayer(layerPair.first, layerPair.second);
+        }
+        plantPtr->setReanimInstance(std::move(mainAnim));
     }
 
     return plantPtr;

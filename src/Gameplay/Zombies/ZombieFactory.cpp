@@ -166,6 +166,7 @@ std::unique_ptr<Zombie> ZombieFactory::createZombie(
     if(!data) return nullptr;
 
     std::unique_ptr<Zombie> zombie = creator->second();
+    zombie->setZombieType(type);
     zombie->setZombieData(data);
     zombie->setHitbox(hitbox);
     zombie->setReanimInstance(

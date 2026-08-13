@@ -1,126 +1,88 @@
 #include "Gameplay/Zombies/ZombieDeathHandler.hpp"
 #include "Gameplay/Particle/ZombiePart.hpp"
 #include <memory>
-#include <cstring>
 
-// Maps track name prefixes/patterns to a ZombiePartType.
-// Order matters: first match wins.
-struct TrackTypeRule {
-    const char* prefix;
-    ZombiePartType partType;
+struct ZombieParticleAssets {
+    const char* headKey;
+    const char* armKey;
 };
 
-static constexpr TrackTypeRule TRACK_TYPE_RULES[] = {
-    // Heads / faces (must come before generic 'head' to catch numbered variants)
-    { "anim_head",          ZombiePartType::HEAD    },
-    { "anim_hair",          ZombiePartType::HEAD    },
-    { "anim_jaw",           ZombiePartType::HEAD    },
-    { "anim_face",          ZombiePartType::HEAD    },
-    { "anim_Zombie_must",   ZombiePartType::HEAD    },
-
-    // Hats / helmets
-    { "anim_cone",          ZombiePartType::HELMET  },
-    { "anim_bucket",        ZombiePartType::HELMET  },
-    { "anim_football",      ZombiePartType::HELMET  },
-    { "anim_dancer_hat",    ZombiePartType::HELMET  },
-    { "anim_minerhat",      ZombiePartType::HELMET  },
-
-    // Arms / hands
-    { "anim_arm",           ZombiePartType::ARM     },
-    { "anim_hand",          ZombiePartType::ARM     },
-
-    // Legs / feet
-    { "anim_leg",           ZombiePartType::LEG     },
-    { "anim_foot",          ZombiePartType::LEG     },
-
-    // Shields / equipment
-    { "anim_paper",         ZombiePartType::SHIELD  },
-    { "anim_screendoor",    ZombiePartType::SHIELD  },
-    { "anim_ladder",        ZombiePartType::SHIELD  },
-
-    // Balloon — treated as an object that flies up
-    { "anim_balloon",       ZombiePartType::OBJECT  },
-
-    // Catch-all for body parts / misc objects
-    { "anim_body",          ZombiePartType::OBJECT  },
-    { "anim_pelvis",        ZombiePartType::OBJECT  },
-    { "anim_tie",           ZombiePartType::OBJECT  },
-    { "anim_coat",          ZombiePartType::OBJECT  },
-    { "anim_sled",          ZombiePartType::OBJECT  },
-    { "anim_zamboni",       ZombiePartType::OBJECT  },
-    { "anim_pole",          ZombiePartType::OBJECT  },
-};
-
-static ZombiePartType classifyTrack(const std::string& name) {
-    for (const auto& rule : TRACK_TYPE_RULES) {
-        if (name.compare(0, std::strlen(rule.prefix), rule.prefix) == 0) {
-            return rule.partType;
-        }
+static ZombieParticleAssets getAssetsForType(ZombieType type) {
+    switch (type) {
+        case FOOTBALL_ZOMBIE:      return {"ZOMBIEFOOTBALLHEAD", "ZOMBIEARM"};
+        case BOBSLED_TEAM_ZOMBIE:  return {"ZOMBIEBOBSLEDHEAD", "ZOMBIEARM"};
+        case DANCING_ZOMBIE:       return {"ZOMBIEDANCERHEAD", "ZOMBIEARM"};
+        case BACKUP_DANCER_ZOMBIE: return {"ZOMBIEBACKUPDANCERHEAD", "ZOMBIEARM"};
+        case DOLPHIN_RIDER_ZOMBIE: return {"ZOMBIEDOLPHINRIDERHEAD", "ZOMBIEARM"};
+        case POLE_VAULTING_ZOMBIE: return {"ZOMBIEPOLEVAULTERHEAD", "ZOMBIEARM"};
+        case POGO_ZOMBIE:          return {"ZOMBIEPOGOHEAD", "ZOMBIEARM"};
+        case LADDER_ZOMBIE:        return {"ZOMBIELADDERHEAD", "ZOMBIEARM"};
+        case DIGGER_ZOMBIE:        return {"ZOMBIEDIGGERHEAD", "ZOMBIEDIGGERARM"};
+        case IMP_ZOMBIE:           return {"ZOMBIEIMPHEAD", "ZOMBIEARM"};
+        case BALLOON_ZOMBIE:       return {"ZOMBIEBALLOONHEAD", "ZOMBIEARM"};
+        case YETI_ZOMBIE:          return {"ZOMBIEYETIHEAD", "ZOMBIEARM"};
+        case JACK_IN_THE_BOX_ZOMBIE: return {"ZOMBIEHEAD", "ZOMBIEJACKBOXARM"};
+        default:                   return {"ZOMBIEHEAD", "ZOMBIEARM"};
     }
-    return ZombiePartType::OBJECT; // safe default
+}
+
+void ZombieDeathHandler::initialize(TexturePackage* pack, IGameplayMediator* med) {
+    particlePack = pack;
+    mediator = med;
 }
 
 void ZombieDeathHandler::spawnDeathParticles(
-    const ReanimInstance& animation,
+    ZombieType type,
     Rectangle hitbox,
-    IGameplayMediator* mediator)
+    float scalar)
 {
-    if (mediator == nullptr) return;
+    if (mediator == nullptr || particlePack == nullptr) return;
 
-    // Snapshot every visible track with its actual world-space transform.
-    const auto parts = animation.getActiveTrackParts(hitbox);
+    ZombieParticleAssets assets = getAssetsForType(type);
+    
+    Texture2D* headTex = particlePack->GetTexture(assets.headKey);
+    Texture2D* armTex  = particlePack->GetTexture(assets.armKey);
 
-    for (const TrackSnapshot& snap : parts) {
-        // Skip non-body control tracks (they typically have no texture anyway,
-        // but guard just in case).
-        if (snap.texture == nullptr) continue;
-        if (snap.alpha <= 0.0f)      continue;
+    const float groundY = hitbox.y + hitbox.height;
+    
+    // The visual center of the head/arm relative to the hitbox
+    Vector2 headPos = { hitbox.x + hitbox.width * 0.5f, hitbox.y - 20.0f };
+    Vector2 armPos  = { hitbox.x + hitbox.width * 0.5f, hitbox.y + 30.0f };
 
-        const ZombiePartType partType = classifyTrack(snap.trackName);
-
-        // Velocity: heads / helmets fly higher; limbs tumble sideways.
-        float vx, vy, angVel;
-        switch (partType) {
-            case ZombiePartType::HEAD:
-            case ZombiePartType::HELMET:
-                vx     = static_cast<float>(GetRandomValue(-80, 80));
-                vy     = static_cast<float>(GetRandomValue(-320, -180));
-                angVel = static_cast<float>(GetRandomValue(-480, 480));
-                break;
-            case ZombiePartType::ARM:
-                vx     = static_cast<float>(GetRandomValue(-120, 120));
-                vy     = static_cast<float>(GetRandomValue(-200, -80));
-                angVel = static_cast<float>(GetRandomValue(-600, 600));
-                break;
-            case ZombiePartType::SHIELD:
-                vx     = static_cast<float>(GetRandomValue(-150, 150));
-                vy     = static_cast<float>(GetRandomValue(-250, -100));
-                angVel = static_cast<float>(GetRandomValue(-300, 300));
-                break;
-            default:
-                vx     = static_cast<float>(GetRandomValue(-60, 60));
-                vy     = static_cast<float>(GetRandomValue(-160, -40));
-                angVel = static_cast<float>(GetRandomValue(-240, 240));
-                break;
-        }
-
-        // Parts spawn at their actual screen position (world-space from snapshot).
-        const Vector2 spawnPos = { snap.worldX, snap.worldY };
-        const float   groundY  = hitbox.y + hitbox.height;
-
-        // Scale: keep the original reanim scalar already baked into snap.scaleX.
-        const float scale = (snap.scaleX + snap.scaleY) * 0.5f;
-
+    if (headTex) {
+        float vx = static_cast<float>(GetRandomValue(-80, 80));
+        float vy = static_cast<float>(GetRandomValue(-320, -180));
+        float angVel = static_cast<float>(GetRandomValue(-480, 480));
+        
         mediator->addParticle(
             std::make_unique<ZombiePart>(
-                partType,
-                snap.texture,
-                spawnPos,
+                ZombiePartType::HEAD,
+                headTex,
+                headPos,
                 Vector2{ vx, vy },
                 groundY,
                 angVel,
-                (scale > 0.0f ? scale : 1.0f),
-                3.0f            // lifetime seconds
+                scalar,
+                3.0f
+            )
+        );
+    }
+    
+    if (armTex) {
+        float vx = static_cast<float>(GetRandomValue(-120, 120));
+        float vy = static_cast<float>(GetRandomValue(-200, -80));
+        float angVel = static_cast<float>(GetRandomValue(-600, 600));
+        
+        mediator->addParticle(
+            std::make_unique<ZombiePart>(
+                ZombiePartType::ARM,
+                armTex,
+                armPos,
+                Vector2{ vx, vy },
+                groundY,
+                angVel,
+                scalar,
+                3.0f
             )
         );
     }

@@ -20,6 +20,23 @@ struct TrackSnapshot {
     float       alpha    = 1.0f;
 };
 
+// A clip layer renders a subset of tracks using its own clip time range.
+// Used for multi-part plants (e.g. GatlingPea body + head) where body
+// and head occupy non-overlapping segments on the same reanim timeline.
+struct ClipLayer {
+    float currentTime   = 0.0f;
+    float clipLoopStart = -1.0f;
+    float clipEnd       = 0.0f;
+    bool  looping       = true;
+
+    // Initial clip bounds — stored for resetToDefault()
+    float initClipLoopStart = -1.0f;
+    float initClipEnd       = 0.0f;
+    float initStartTime     = 0.0f;
+
+    std::unordered_set<std::string> showTracks;  // only render these tracks
+};
+
 class ReanimInstance {
 private:
     float currentTime = 0.0f;
@@ -37,20 +54,34 @@ private:
     float clipLoopStart = -1.0f;  // -1 = "no clip set"
     float clipEnd       =  0.0f;
 
+    // Initial clip state — stored for resetToDefault()
+    float initClipLoopStart = -1.0f;
+    float initClipEnd       = 0.0f;
+    float initStartTime     = 0.0f;
+
     ReanimParser*   rawAnim    = nullptr;
     TexturePackage* rawTexPack = nullptr;
-    std :: unordered_set<std :: string> hiddenTracks;
-    std :: unordered_set<std :: string> visibleTracks;
+    std::unordered_set<std::string> hiddenTracks;
+    std::unordered_set<std::string> visibleTracks;
     bool useVisibleTrackFilter = false;
+
+    // Additional clip layers for multi-part plants
+    std::vector<ClipLayer> clipLayers;
 
 public:
     // Setup
     void setAnimation(ReanimParser* Anim);
     void setTexturePackage(TexturePackage* TexPack);
     void setTextureScalar(float scaleFactor);
-    void hideTrack(const std :: string& trackName);
-    void showOnlyTracks(const std :: vector<std :: string>& trackNames);
+    void hideTrack(const std::string& trackName);
+    void showOnlyTracks(const std::vector<std::string>& trackNames);
     Texture2D* getTrackTexture(const std::string& trackName) const;
+
+    // ---------------------------------------------------------------
+    // Clip layers — additional clips that render specific track subsets.
+    // Used for multi-part plants where body and head tracks live on
+    // non-overlapping timeline segments within the same reanim file.
+    void addClipLayer(const std::string& clipName, const std::vector<std::string>& trackNames);
 
     // Returns a snapshot of every visible track at the given hitbox origin.
     // Used by ZombieDeathHandler to spawn parts at their real screen positions.
@@ -59,9 +90,13 @@ public:
     // ---------------------------------------------------------------
     // Clip selection — call once after setAnimation().
     // clipName is without the "anim_" prefix, e.g. "idle", "shooting".
-    // Returns false if the clip was not found (keeps previous state).
-    // ---------------------------------------------------------------
-    bool playClip(const std :: string& clipName);
+    // For the default idle loop, do NOT call playClip — just let the full
+    // file loop naturally; the reanim file IS one complete idle cycle.
+    bool playClip(const std::string& clipName);
+
+    // Resets the primary clip and all clip layers to their initial states.
+    // Used after a one-shot animation finishes to return to idle.
+    void resetToDefault();
 
     void  updateTime(float deltaSeconds);
     void  setSpeed(float newSpeed);
