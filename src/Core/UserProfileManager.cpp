@@ -92,6 +92,7 @@ namespace {
         LevelID highestReached{1, 1};
         std :: bitset<PLANT_COUNT> unlockedPlants;
         unlockedPlants.set(static_cast<size_t>(PEASHOOTER));
+        int highestScore = 0;
         std :: string line;
 
         while(std :: getline(file, line)) {
@@ -113,11 +114,16 @@ namespace {
             else if(key == "UNLOCKED_PLANTS") {
                 unlockedPlants = parseUnlockedPlants(value);
             }
+            else if(key == "HIGHEST_SCORE") {
+                try { highestScore = std::max(0, std::stoi(value)); }
+                catch(const std :: exception&) {}
+            }
         }
 
         auto profile = std :: make_unique<UserProfile>(profileName);
         profile -> setHighestUnlockedLevel(highestReached);
         profile -> setUnlockedPlants(unlockedPlants);
+        profile -> setHighestSurvivalScore(highestScore);
         return profile;
     }
 
@@ -135,6 +141,7 @@ namespace {
         file << "# User profile data.\n\n";
         file << "NAME=" << profile.getProfileName() << "\n";
         file << "HIGHEST_REACHED=" << level.world << ',' << level.stage << "\n";
+        file << "HIGHEST_SCORE=" << profile.getHighestSurvivalScore() << "\n";
         file << "UNLOCKED_PLANTS=";
 
         bool firstPlant = true;

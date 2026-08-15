@@ -116,6 +116,9 @@ public:
 
     void setUserProfileManager(UserProfileManager* user); 
 
+    WaveManager& getWaveManager() { return waveManager; }
+    int getZombieCount() { return (int)zombieManager.getZombies().size(); }
+
     void setResult(WorldResult result);
     WorldResult getResult() const;
     const LevelID& getLevelID() const;

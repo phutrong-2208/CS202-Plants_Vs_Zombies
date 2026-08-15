@@ -3,9 +3,9 @@
 
 #include <filesystem>
 
-GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager* manager, LevelID levelID, UserProfile* user) {
+GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager* manager, LevelID levelID, UserProfile* user, GameMode gm) : gameMode(gm) {
     setAssetManager(manager);
-    world = std::make_unique<World>(
+    world = std :: make_unique<World>(
         screenWidth, screenHeight, assetManager, levelID
     );
     textManager = assetManager -> getTextManager();
@@ -22,36 +22,94 @@ GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager
     choosePlants.setChooserPackage(assetManager -> getTextureManager() -> getPackage("PlantChooser"));
     choosePlants.setPacketPackage(assetManager -> getTextureManager() -> getPackage("PlantSeedPackets"));
     choosePlants.setTextManager(assetManager -> getTextManager());
-    choosePlants.setSunCosts(world->getAllSunCosts());
+    choosePlants.setSunCosts(world -> getAllSunCosts());
     choosePlants.setAvailablePlants(getAllPlantTypes());
     choosePlants.setMaxSlots(6);
     choosePlants.setSeedBank(&seedBank);
     choosePlants.setUnlockedPlants(user -> getUnlockedPlants());
+
+    if (gameMode == GameMode::SURVIVAL_ENDLESS) {
+        endlessController = std :: make_unique<EndlessController>();
+        endlessController -> attachToWaveManager(&world->getWaveManager());
+        endlessController -> launch();
+    }
 }
 
 void GameplayScreen :: update(float dt) {
     if (world) {
-        world -> update(dt);
-        if(world -> isReady()) seedBank.update(dt);
+        if (endlessController) {
+            
+            world -> update(dt);
+            if(world -> isReady()) seedBank.update(dt);
 
-        if(!resultRequested && world -> getResult() != WorldResult :: RUNNING) {
-            resultRequested = true;
-
-            ScreenData resultData;
-            resultData.wResult = world -> getResult();
-            resultData.levelID = world -> getLevelID();
-            resultData.rewardPlant = world -> getRewardPlant();
-
-            if(resultData.wResult == WorldResult :: WON) {
-                applyWinProgress(resultData);
+            const auto currentEndlessPhase = endlessController -> getPhase();
+            if (currentEndlessPhase == EndlessController :: Phase :: WAVE_RUNNING
+                && prevEndlessPhase != EndlessController :: Phase :: WAVE_RUNNING) {
+                world -> setResult(WorldResult :: RUNNING);
             }
+            prevEndlessPhase = currentEndlessPhase;
 
-            requestTransition(
-                ScreenAction :: PUSH,
-                ScreenID :: GAME_RESULT,
-                resultData
+            endlessController -> update(
+                dt,
+                world -> isWaveFinished(),
+                world -> getZombieCount() == 0,
+                world -> getResult() == WorldResult :: LOST
             );
+            
+
+            if(!resultRequested &&
+               endlessController -> getPhase() == EndlessController :: Phase :: GAME_OVER) {
+                resultRequested = true;
+
+                ScreenData resultData;
+                resultData.wResult = WorldResult :: LOST;
+                resultData.gameMode = GameMode :: SURVIVAL_ENDLESS;
+                resultData.survivalScore = endlessController -> getScore();
+                resultData.flagsCleared = endlessController -> getFlagsCleared();
+                saveEndlessRecord(resultData);
+
+                requestTransition(
+                    ScreenAction :: PUSH,
+                    ScreenID :: GAME_RESULT,
+                    resultData
+                );
+            }
         }
+        else {
+            world -> update(dt);
+            if(world -> isReady()) seedBank.update(dt);
+
+            if(!resultRequested && world -> getResult() != WorldResult :: RUNNING) {
+                resultRequested = true;
+
+                ScreenData resultData;
+                resultData.wResult = world -> getResult();
+                resultData.levelID = world -> getLevelID();
+                resultData.rewardPlant = world -> getRewardPlant();
+
+                if(resultData.wResult == WorldResult :: WON) {
+                    applyWinProgress(resultData);
+                }
+
+                requestTransition(
+                    ScreenAction :: PUSH,
+                    ScreenID :: GAME_RESULT,
+                    resultData
+                );
+            }
+        }
+    }
+}
+
+void GameplayScreen :: saveEndlessRecord(const ScreenData& resultData) {
+    if(!userProfileManager) return;
+
+    UserProfile* profile = userProfileManager -> getActiveProfile();
+    if(!profile) return;
+
+    if(resultData.survivalScore > profile -> getHighestSurvivalScore()) {
+        profile -> setHighestSurvivalScore(resultData.survivalScore);
+        userProfileManager -> saveProfiles();
     }
 }
 
@@ -110,20 +168,29 @@ void GameplayScreen :: draw() {
 
     if (world && world -> isReady()) {
         drawSunHUD();
-        waveHUD.draw(
-            world -> getWaveProgress(),
-            world -> getCurrentWave(),
-            world -> getTotalWaves(),
-            world -> isWaveFinished(),
-            screenWidth,
-            screenHeight
-        );
+        if (endlessController) {
+            int highest = 0;
+            if (userProfileManager && userProfileManager -> getActiveProfile()) {
+                highest = userProfileManager -> getActiveProfile() -> getHighestSurvivalScore();
+            }
+            endlessHUD.draw(*endlessController, highest, textManager, screenWidth, screenHeight);
+        }
+        else {
+            waveHUD.draw(
+                world -> getWaveProgress(),
+                world -> getCurrentWave(),
+                world -> getTotalWaves(),
+                world -> isWaveFinished(),
+                screenWidth,
+                screenHeight
+            );
+        }
     }
 
     drawPauseButton();
 }
 
-Rectangle GameplayScreen::getPauseButtonBounds() const {
+Rectangle GameplayScreen :: getPauseButtonBounds() const {
     return {
         static_cast<float>(screenWidth) - 58.0f,
         14.0f, 44.0f, 44.0f

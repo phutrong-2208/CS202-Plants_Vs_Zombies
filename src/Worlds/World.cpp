@@ -335,7 +335,7 @@ void World :: spawnSkySun() {
     spawnSun(position, targetY, currentLevel -> getSkySunValue());
 }
 
-World::World(int screenWidth, int screenHeight, AssetManager* assetManager, LevelID levelID) {
+World :: World(int screenWidth, int screenHeight, AssetManager* assetManager, LevelID levelID) {
     if (assetManager == nullptr) {
         TraceLog(LOG_ERROR, "Asset Manager was not found");
         return;
@@ -352,7 +352,7 @@ World::World(int screenWidth, int screenHeight, AssetManager* assetManager, Leve
         if(levelLanes[lane] != LaneType :: INACTIVE) activeLanes.push_back(lane);
     }
 
-    map = std::make_unique<DayMap>(
+    map = std :: make_unique<DayMap>(
         assetManager,
         grassLaneCount,
         currentLevel -> usesSodRollIntro()

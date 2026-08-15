@@ -1,5 +1,6 @@
 #include "Screens/MainMenuScreen.hpp"
 #include "Core/UserProfileManager.hpp"
+#include <cstdio>
 
 namespace {
     constexpr float MAIN_MENU_WIDTH = 800.0f;
@@ -108,19 +109,19 @@ void MainMenuScreen :: loadHoverButtons(TexturePackage* package) {
             {406.0f, 173.1f, 313.0f, 84.4f},
             {406.0f, 173.1f},
             package -> GetTexture("SELECTORSCREEN_SURVIVAL_HIGHLIGHT"),
-            MainMenuAction :: SURVIVAL
+            MainMenuAction :: MINI_GAMES
         },
         {
             {410.0f, 257.5f, 286.0f, 70.5f},
             {410.0f, 257.5f},
             package -> GetTexture("SELECTORSCREEN_CHALLENGES_HIGHLIGHT"),
-            MainMenuAction :: MINI_GAMES
+            MainMenuAction :: PUZZLE
         },
         {
             {413.0f, 328.0f, 266.0f, 123.0f},
             {413.0f, 328.0f},
             package -> GetTexture("SELECTORSCREEN_VASEBREAKER_HIGHLIGHT"),
-            MainMenuAction :: PUZZLE
+            MainMenuAction :: SURVIVAL
         }
     }};
 }
@@ -218,11 +219,7 @@ bool MainMenuScreen :: loadSceneAnimations(ReanimParser* parser, TexturePackage*
     return true;
 }
 
-void MainMenuScreen :: drawLevelNumber(
-    int value,
-    Vector2 position,
-    float scale
-) const {
+void MainMenuScreen :: drawLevelNumber(int value, Vector2 position, float scale) const {
     if(levelNumbersTexture == nullptr || value < 0) return;
 
     const std :: string digits = std :: to_string(value);
@@ -396,6 +393,17 @@ void MainMenuScreen :: executeAction(MainMenuAction target){
         }
         case MainMenuAction :: OPTION:
             requestTransition(ScreenAction :: PUSH, ScreenID :: PAUSE_MENU); break;
+        case MainMenuAction :: SURVIVAL: {
+            ScreenData gameplayData;
+            gameplayData.gameMode = GameMode :: SURVIVAL_ENDLESS;
+            gameplayData.levelID = {1, 5};
+            requestTransition(
+                ScreenAction :: REPLACE,
+                ScreenID :: GAME_PLAY,
+                gameplayData
+            );
+            break;
+        }
         default:
             break;
     }

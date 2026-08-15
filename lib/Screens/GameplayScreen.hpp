@@ -7,6 +7,8 @@
 #include <UI/ChoosePlants.hpp>
 #include <UI/SeedBank.hpp>
 #include <UI/WaveHUD.hpp>
+#include <UI/EndlessHUD.hpp>
+#include <Gameplay/Endless/EndlessController.hpp>
 
 class GameplayScreen : public Screen {
 private:
@@ -14,8 +16,14 @@ private:
     ChoosePlants choosePlants;
     SeedBank seedBank;
     WaveHUD waveHUD;
+    EndlessHUD endlessHUD;
+    std::unique_ptr<EndlessController> endlessController;
+    GameMode gameMode = GameMode::ADVENTURE;
     TextManager* textManager = nullptr;
     bool resultRequested = false;
+
+    // Tracks previous phase to detect WAVE_RUNNING transitions (reset world result once)
+    EndlessController :: Phase prevEndlessPhase = EndlessController :: Phase :: BETWEEN_WAVES;
     int screenWidth  = 800;
     int screenHeight = 600;
 
@@ -23,6 +31,7 @@ private:
     void drawPauseButton() const;
     Rectangle getPauseButtonBounds() const;
     void applyWinProgress(const ScreenData& resultData);
+    void saveEndlessRecord(const ScreenData& resultData);
 
 public:
     GameplayScreen(
@@ -30,7 +39,8 @@ public:
         int screenHeight,
         AssetManager* manager,
         LevelID levelID = {1, 1},
-        UserProfile *user = nullptr
+        UserProfile *user = nullptr,
+        GameMode gameMode = GameMode::ADVENTURE
     );
 
     void update(float dt) override;
