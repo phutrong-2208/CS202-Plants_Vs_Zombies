@@ -483,7 +483,7 @@ bool World :: tryPlacePlant(Vector2 position, PlantType plantType) {
 
     int r, c;
     std :: tie(r, c) = grid.getCellID(position);
-    if (r < 0 || c < 0 || grid.getPlant(r, c))
+    if (r < 0 || c < 0)
         return false;
 
     if(currentLevel -> getLanes()[r] == LaneType :: INACTIVE){

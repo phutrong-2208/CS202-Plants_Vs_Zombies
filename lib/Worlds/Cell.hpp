@@ -6,7 +6,6 @@
 
 class Cell {
 private:
-    std::unique_ptr<Plant> basePlant = nullptr; // Lilypad
     std::unique_ptr<Plant> plant = nullptr;     // Normal plant
     std::unique_ptr<Plant> pumpkin = nullptr;   // Pumpkin
 public:
@@ -22,7 +21,6 @@ public:
     bool placePlant(std::unique_ptr<Plant> newPlant);
     Plant* getPlant() const;
     Plant* getPumpkin() const;
-    Plant* getBasePlant() const;
     
     // Check and remove dead plants
     void checkDeadPlants();

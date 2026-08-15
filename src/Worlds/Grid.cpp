@@ -92,11 +92,9 @@ void Grid::sendPlantActions() {
             Cell& cell = garden[row][col];
             Plant* pumpkin = cell.getPumpkin();
             Plant* plant = cell.getPlant();
-            Plant* base = cell.getBasePlant();
             
             if (pumpkin && !pumpkin->isDead() && !pumpkin->isOnCooldown()) pumpkin->performAction(gameplayMediator);
             if (plant && !plant->isDead() && !plant->isOnCooldown()) plant->performAction(gameplayMediator);
-            if (base && !base->isDead() && !base->isOnCooldown()) base->performAction(gameplayMediator);
         }
     }
 }
@@ -139,11 +137,10 @@ Plant* Grid::getPlantInArea(Rectangle area) const {
             const Cell& cell = garden[row][col];
             Plant* pumpkin = cell.getPumpkin();
             Plant* plant = cell.getPlant();
-            Plant* base = cell.getBasePlant();
             
+            // Outer armor pumpkin absorbs damage first
             if (pumpkin && !pumpkin->isDead() && CheckCollisionRecs(area, pumpkin->getHitbox())) return pumpkin;
             if (plant && !plant->isDead() && CheckCollisionRecs(area, plant->getHitbox())) return plant;
-            if (base && !base->isDead() && CheckCollisionRecs(area, base->getHitbox())) return base;
         }
     }
 

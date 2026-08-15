@@ -207,6 +207,14 @@ Rectangle Zombie::getHitbox() const {
 }
 Rectangle Zombie::getAttackHitbox() const {
     const Rectangle bodyHitbox = getHitbox();
+    if (isHypnotized) {
+        return {
+            bodyHitbox.x + bodyHitbox.width * 0.8f,
+            bodyHitbox.y,
+            bodyHitbox.width * 0.4f,
+            bodyHitbox.height
+        };
+    }
     return {
         bodyHitbox.x - bodyHitbox.width * 0.2f,
         bodyHitbox.y,
