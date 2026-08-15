@@ -27,7 +27,12 @@ private:
     int screenWidth  = 800;
     int screenHeight = 600;
 
+    TexturePackage* shovelPackage = nullptr;
+    bool isShovelSelected = false;
+
     void drawSunHUD() const;
+    void drawShovel() const;
+    Rectangle getShovelBounds() const;
     void drawPauseButton() const;
     Rectangle getPauseButtonBounds() const;
     void applyWinProgress(const ScreenData& resultData);

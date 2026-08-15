@@ -45,6 +45,9 @@ void ChoosePlants :: setAvailablePlants(const std::vector<PlantType>& plants) {
 
 void ChoosePlants :: setSeedBank(SeedBank * _sBank) {
     seedBank = _sBank;
+    if (seedBank) {
+        seedBank -> setSunCosts(sunCosts);
+    }
     syncSeedBank();
 }
 
@@ -54,6 +57,9 @@ void ChoosePlants :: setTextManager(TextManager* manager) {
 
 void ChoosePlants :: setSunCosts(const std::map<PlantType, int>& costs) {
     sunCosts = costs;
+    if (seedBank) {
+        seedBank -> setSunCosts(costs);
+    }
 }
 
 void ChoosePlants :: setMaxSlots(int maxPlants) {
@@ -127,7 +133,13 @@ void ChoosePlants :: draw() const {
 
         if (isSelected(plant)) {
             DrawRectangleRec(rect, (Color){0, 0, 0, 90});
-            DrawRectangleLinesEx(rect, 4.0f, LIME);
+            Texture2D* glow = packetPackage ? packetPackage -> GetTexture("SEEDPACKETGLOW") : nullptr;
+            if (glow) {
+                Rectangle glowRect = { rect.x - 4.0f, rect.y - 4.0f, rect.width + 8.0f, rect.height + 8.0f };
+                DrawTexturePro(*glow, {0, 0, (float)glow -> width, (float)glow -> height}, glowRect, {0, 0}, 0.0f, WHITE);
+            } else {
+                DrawRectangleLinesEx(rect, 4.0f, LIME);
+            }
         }
 
         // Sun cost overlay at the bottom of the packet
@@ -135,8 +147,13 @@ void ChoosePlants :: draw() const {
             auto costIt = sunCosts.find(plant);
             if (costIt != sunCosts.end()) {
                 const std::string costStr = std::to_string(costIt->second);
-                const Rectangle costRect = { rect.x, rect.y + rect.height - 20.0f, rect.width, 20.0f };
-                textManager->drawCenteredText(UI_FONT, costStr.c_str(), costRect, 13.0f, 0.5f, Color{255, 230, 50, 255});
+                const Rectangle costRect = {
+                    rect.x + rect.width - 32.0f,
+                    rect.y + rect.height - 20.0f,
+                    30.0f,
+                    18.0f
+                };
+                textManager->drawCenteredText(UI_FONT, costStr.c_str(), costRect, 13.0f, 0.5f, BLACK);
             }
         }
     }

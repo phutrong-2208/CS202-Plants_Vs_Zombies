@@ -32,6 +32,9 @@
 //World Results
 #include "Gameplay/WorldResult.hpp"
 
+// LawnMowers
+#include <Gameplay/LawnMower.hpp>
+
 //User's Profile
 #include "Core/UserProfile.hpp"
 #include "Core/UserProfileManager.hpp"
@@ -52,6 +55,7 @@ private:
     UserProfileManager *userManager = nullptr;
     AssetManager* assetManager = nullptr;
     std :: vector<int> activeLanes;
+    std :: vector<LawnMower> lawnMowers;
     
     int sunAmount = 50;
     float skySunTimer = 0.0f;
@@ -97,10 +101,13 @@ public:
         LevelID levelID = {1, 1}
     );
 
+    void initLawnMowers();
     void update(float dt);
     void draw();
-    void drawPlacementPreview(int selectedPlantId) const;
+    void drawPlacementPreview(int selectedPlantId, bool isShovelActive = false) const;
     bool tryPlacePlant(Vector2 position, PlantType plantType);
+    void removePlant(int row, int col);
+    const Grid& getGrid() const { return grid; }
     bool handleParticleClick(Vector2 position);
     
     int getSunAmount() const;

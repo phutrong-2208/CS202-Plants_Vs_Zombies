@@ -28,6 +28,8 @@ GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager
     choosePlants.setSeedBank(&seedBank);
     choosePlants.setUnlockedPlants(user -> getUnlockedPlants());
 
+    shovelPackage = assetManager -> getTextureManager() -> getPackage("Shovel");
+
     if (gameMode == GameMode::SURVIVAL_ENDLESS) {
         endlessController = std :: make_unique<EndlessController>();
         endlessController -> attachToWaveManager(&world->getWaveManager());
@@ -162,12 +164,13 @@ void GameplayScreen :: draw() {
     }
 
     if (world and (world -> isChoosingPlants() || world -> isReady())) {
-        world -> drawPlacementPreview(seedBank.selectedPlantId());
+        world -> drawPlacementPreview(seedBank.selectedPlantId(), isShovelSelected);
         seedBank.draw();
     }
 
     if (world && world -> isReady()) {
         drawSunHUD();
+        drawShovel();
         if (endlessController) {
             int highest = 0;
             if (userProfileManager && userProfileManager -> getActiveProfile()) {
@@ -188,6 +191,41 @@ void GameplayScreen :: draw() {
     }
 
     drawPauseButton();
+}
+
+Rectangle GameplayScreen :: getShovelBounds() const {
+    return {
+        10.0f,
+        static_cast<float>(screenHeight) - 80.0f,
+        70.0f,
+        70.0f
+    };
+}
+
+void GameplayScreen :: drawShovel() const {
+    if (!shovelPackage) return;
+    const Rectangle bounds = getShovelBounds();
+    Texture2D* bankTex = shovelPackage -> GetTexture("SHOVELBANK");
+    Texture2D* shovelTex = shovelPackage -> GetTexture("SHOVEL");
+
+    if (bankTex) {
+        DrawTexturePro(*bankTex, {0, 0, (float)bankTex -> width, (float)bankTex -> height},
+                       bounds, {0, 0}, 0.0f, WHITE);
+    } else {
+        DrawRectangleRounded(bounds, 0.2f, 4, Color{70, 50, 30, 220});
+        DrawRectangleRoundedLinesEx(bounds, 0.2f, 4, 2.0f, Color{220, 190, 120, 255});
+    }
+
+    if (!isShovelSelected && shovelTex) {
+        Rectangle iconDst = { bounds.x + 8.0f, bounds.y + 8.0f, bounds.width - 16.0f, bounds.height - 16.0f };
+        DrawTexturePro(*shovelTex, {0, 0, (float)shovelTex -> width, (float)shovelTex -> height},
+                       iconDst, {0, 0}, 0.0f, WHITE);
+    } else if (isShovelSelected && shovelTex) {
+        Vector2 mouse = GetMousePosition();
+        Rectangle mouseDst = { mouse.x - 12.0f, mouse.y - 48.0f, 58.0f, 58.0f };
+        DrawTexturePro(*shovelTex, {0, 0, (float)shovelTex -> width, (float)shovelTex -> height},
+                       mouseDst, {0, 0}, 0.0f, WHITE);
+    }
 }
 
 Rectangle GameplayScreen :: getPauseButtonBounds() const {
@@ -251,6 +289,12 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
         return;
     }
 
+    if (inputEvent.inputType == RawInputEvent::InputType::RIGHT_MOUSE_CLICKED) {
+        isShovelSelected = false;
+        seedBank.clearSelection();
+        return;
+    }
+
     if (inputEvent.inputType == RawInputEvent::InputType::LEFT_MOUSE_CLICKED) {
         if (CheckCollisionPointRec(inputEvent.position, getPauseButtonBounds())) {
             requestTransition(ScreenAction::PUSH, ScreenID::PAUSE_MENU);
@@ -274,7 +318,28 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
             return;
         }
 
+        // Shovel Bank click
+        if (CheckCollisionPointRec(inputEvent.position, getShovelBounds())) {
+            isShovelSelected = !isShovelSelected;
+            if (isShovelSelected) seedBank.clearSelection();
+            return;
+        }
+
         if (seedBank.handleMouseClick(inputEvent.position)) {
+            isShovelSelected = false;
+            return;
+        }
+
+        // Shoveling a plant on the lawn
+        if (isShovelSelected) {
+            int r, c;
+            std::tie(r, c) = world->getGrid().getCellID(inputEvent.position);
+            if (r >= 0 && c >= 0) {
+                world->removePlant(r, c);
+                isShovelSelected = false;
+            } else {
+                isShovelSelected = false;
+            }
             return;
         }
 

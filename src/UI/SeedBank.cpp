@@ -108,7 +108,13 @@ void SeedBank :: draw() const {
         }
 
         if (i == selectedSlot) {
-            DrawRectangleLinesEx(slotRect, 3, LIME);
+            Texture2D* glow = packetPackage ? packetPackage -> GetTexture("SEEDPACKETGLOW") : nullptr;
+            if (glow) {
+                Rectangle glowRect = { slotRect.x - 4.0f, slotRect.y - 4.0f, slotRect.width + 8.0f, slotRect.height + 8.0f };
+                DrawTexturePro(*glow, {0, 0, (float)glow -> width, (float)glow -> height}, glowRect, {0, 0}, 0.0f, WHITE);
+            } else {
+                DrawRectangleLinesEx(slotRect, 3, LIME);
+            }
         }
 
         // Sun cost badge drawn directly on the bottom of the packet
@@ -117,12 +123,12 @@ void SeedBank :: draw() const {
             if (costIt != sunCosts.end()) {
                 const std::string costStr = std::to_string(costIt->second);
                 const Rectangle costRect = {
-                    slotRect.x,
+                    slotRect.x + slotRect.width - 32.0f,
                     slotRect.y + slotRect.height - 20.0f,
-                    slotRect.width,
-                    20.0f
+                    30.0f,
+                    18.0f
                 };
-                textManager->drawCenteredText("Luckiest_Guy", costStr.c_str(), costRect, 14.0f, 0.5f, Color{255, 230, 50, 255});
+                textManager->drawCenteredText("LUCKIEST_GUY", costStr.c_str(), costRect, 13.0f, 0.5f, BLACK);
             }
         }
 
@@ -148,6 +154,10 @@ int SeedBank :: selectedPlantId() const {
     }
 
     return (int)slots[selectedSlot];
+}
+
+void SeedBank :: clearSelection() {
+    selectedSlot = -1;
 }
 
 Rectangle SeedBank :: getSlotRect(int slotIndex) const {

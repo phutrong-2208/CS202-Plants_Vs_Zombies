@@ -40,6 +40,7 @@ public:
     bool isCoolingDown(PlantType type) const;
 
     int selectedPlantId() const;
+    void clearSelection();
 };
 
 #endif

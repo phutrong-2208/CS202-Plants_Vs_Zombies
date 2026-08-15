@@ -423,6 +423,23 @@ World :: World(int screenWidth, int screenHeight, AssetManager* assetManager, Le
     projectileManager.setMediator(this);
     zombieManager.setMediator(this);
     zombieManager.getDeathHandler().initialize(sunPackage, this);
+    this->assetManager = assetManager;
+
+    initLawnMowers();
+}
+
+void World::initLawnMowers() {
+    if (!assetManager) return;
+    TexturePackage* lmPack = assetManager->getTextureManager()->getPackage("LawnMower");
+    ReanimParser* lmAnim = assetManager->getAnimationManager()->getAnimationData("LawnMowerAnim");
+    lawnMowers.clear();
+    for (int r = 0; r < 5; ++r) {
+        LawnMower lm;
+        Rectangle cell0 = grid.getCellRect(r, 0);
+        Vector2 pos = { cell0.x - 55.0f, cell0.y + 20.0f };
+        lm.init(r, pos, lmPack, lmAnim);
+        lawnMowers.push_back(std::move(lm));
+    }
 }
 
 void World :: update(float dt) {
@@ -437,6 +454,9 @@ void World :: update(float dt) {
     grid.updateTime(dt);
     projectileManager.update(dt);
     zombieManager.update(dt);
+    for (auto& lm : lawnMowers) {
+        lm.update(dt, this);
+    }
     particleManager.update(dt);
     waveManager.update(dt, *this);
 
@@ -453,28 +473,49 @@ void World ::draw() {
     if (isReady() == false)
         return;
 
+    for (const auto& lm : lawnMowers) {
+        lm.draw();
+    }
     grid.draw();
     projectileManager.simulate();
     zombieManager.draw();
     particleManager.draw();
 }
 
-void World :: drawPlacementPreview(int selectedPlantId) const { //need to improved
-    if (!map || isReady() == false || selectedPlantId < 0)
+void World :: drawPlacementPreview(int selectedPlantId, bool isShovelActive) const {
+    if (!map || isReady() == false || (selectedPlantId < 0 && !isShovelActive))
         return;
 
     Vector2 mouse = GetMousePosition();
     int hovR, hovC;
     std :: tie(hovR, hovC) = grid.getCellID(mouse);
 
-    if(currentLevel -> getLanes()[grid.getCellID(mouse).first] == LaneType :: INACTIVE){
+    if (hovR < 0 || hovC < 0) return;
+
+    if (currentLevel && currentLevel -> getLanes()[hovR] == LaneType :: INACTIVE) {
         return;
     }
 
-    if (hovR != -1 && hovC != -1) {
-        Rectangle rect = grid.getCellRect(hovR, hovC);
-        DrawRectangleLinesEx(rect, 3, LIME);
+    // 1. Draw white fade on the entire hovered row
+    for (int c = 0; c < 9; ++c) {
+        Rectangle rRect = grid.getCellRect(hovR, c);
+        DrawRectangleRec(rRect, Color{255, 255, 255, 38});
     }
+
+    // 2. Draw white fade on the entire hovered column
+    for (int r = 0; r < 5; ++r) {
+        Rectangle cRect = grid.getCellRect(r, hovC);
+        DrawRectangleRec(cRect, Color{255, 255, 255, 38});
+    }
+
+    // 3. Highlight target intersection cell
+    Rectangle cellRect = grid.getCellRect(hovR, hovC);
+    DrawRectangleRec(cellRect, Color{255, 255, 255, 75});
+    DrawRectangleLinesEx(cellRect, 2.0f, Color{255, 255, 255, 220});
+}
+
+void World::removePlant(int row, int col) {
+    grid.removePlant(row, col);
 }
 
 bool World :: tryPlacePlant(Vector2 position, PlantType plantType) {
@@ -565,7 +606,7 @@ PlantType World :: getRewardPlant() const {
 void World :: updateWorldState() {
     if(wResult != WorldResult :: RUNNING) return;
 
-    if(zombieManager.hasZombieReachedHouse(0.0f)){
+    if(zombieManager.hasZombieReachedHouse(-45.0f)){
         wResult = WorldResult :: LOST;
     }
     else if(waveManager.hasSpawnAll() and zombieManager.empty()){
