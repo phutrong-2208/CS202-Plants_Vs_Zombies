@@ -48,7 +48,6 @@ Frame ReanimTrack::getInterpolatedFrame(float time, float startTime, float endTi
     if (frames.empty() || startTime > endTime) return {};
 
     // --- find the bracketing frame indices for [startTime, endTime - 1/fps] ---
-    // Use a linear scan so we're robust to non-uniform snap spacing.
     int startSegment = 0, endSegment = (int)frames.size() - 1;
     for (int k = 0; k < (int)frames.size(); ++k) {
         if (frames[k].snap <= startTime) startSegment = k;
