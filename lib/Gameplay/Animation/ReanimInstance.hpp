@@ -73,6 +73,13 @@ private:
     std::unordered_map<std::string, std::string> textureOverrides;
 
 public:
+    ReanimInstance() = default;
+    ReanimInstance(float scaleFactor, TexturePackage* texPack, ReanimParser* anim) {
+        setTextureScalar(scaleFactor);
+        setTexturePackage(texPack);
+        setAnimation(anim);
+    }
+
     // Setup
     void setAnimation(ReanimParser* Anim);
     void setTexturePackage(TexturePackage* TexPack);

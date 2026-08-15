@@ -19,6 +19,5 @@ void CherryBomb::performAction(IGameplayMediator* mediator) {
     } else if (!animationStarted) {
         triggerActionAnimation();
         animationStarted = true;
-        cooldownTimer = 999.0f; // Wait for animation to finish
     }
 }

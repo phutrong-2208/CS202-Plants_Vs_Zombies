@@ -40,6 +40,7 @@ public:
         ZombieType type,
         Rectangle hitbox
     );
+    ReanimInstance createCharredReanim();
 };
 
 #endif

@@ -1,4 +1,4 @@
-﻿#ifndef ZOMBIE_TYPE_HPP
+#ifndef ZOMBIE_TYPE_HPP
 #define ZOMBIE_TYPE_HPP
 
 enum ZombieType : int {
@@ -31,6 +31,7 @@ enum ZombieType : int {
     GARGANTUAR_ZOMBIE,
     IMP_ZOMBIE,
     ZOMBOSS_ZOMBIE,
+    ZOMBIE_CHARRED,
     ZOMBIE_COUNT
 };
 

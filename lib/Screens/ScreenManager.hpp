@@ -4,8 +4,6 @@
 #include "Common.hpp"
 #include "Screens/Screen.hpp"
 
-class UserProfileManager;
-
 class ScreenManager {
 private:
     std::vector<std::unique_ptr<Screen>> screenStorage;

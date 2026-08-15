@@ -285,9 +285,18 @@ void ReanimParser :: buildClips() {
     }
 }
 
+static bool startsWith(const std::string& str, const std::string& prefix) {
+    return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
+}
+
 const AnimClip* ReanimParser :: getClip(const std :: string& name) const {
+    const std::string stripped = startsWith(name, "anim_") ? name.substr(5) : name;
+    const std::string prefixed = startsWith(name, "anim_") ? name : ("anim_" + name);
+
     for (const AnimClip& c : clipList) {
-        if (c.name == name) return &c;
+        if (c.name == name || c.name == stripped || c.name == prefixed) {
+            return &c;
+        }
     }
     return nullptr;
 }

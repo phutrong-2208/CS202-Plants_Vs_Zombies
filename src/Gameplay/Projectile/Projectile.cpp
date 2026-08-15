@@ -62,6 +62,15 @@ void Projectile :: setTexture(Texture2D* newTexture){
     texture = newTexture;
 }
 
+void Projectile::setReanimInstance(ReanimInstance anim) {
+    reanim = std::move(anim);
+    hasReanim = true;
+}
+
+bool Projectile::getHasReanim() const {
+    return hasReanim;
+}
+
 void Projectile :: setDamage(float _d){
     damage = std :: max(0.0f, _d);
 }
@@ -137,6 +146,10 @@ void Projectile :: Despawn(void){
 void Projectile :: update(float dt){
     if(despawned || dt <= 0.0f || impacted) return;
 
+    if (hasReanim) {
+        reanim.updateTime(dt);
+    }
+
     if (isLobbed()) {
         velocity.y += gravity * dt; // Apply gravity
         position.x += velocity.x * dt;
@@ -165,12 +178,18 @@ void Projectile :: update(float dt){
 }
 
 void Projectile :: draw(void) const{
+    float scale = projData ? projData->getScale() : 1.0f;
+    float r = getRadius() * scale;
+
+    if (hasReanim) {
+        Rectangle dst = {position.x - r - 15.0f, position.y - r - 10.0f, 2.0f * r + 30.0f, 2.0f * r + 20.0f};
+        const_cast<ReanimInstance&>(reanim).draw(dst, WHITE);
+        return;
+    }
+
     if(texture == nullptr) return;
 
     Rectangle src = {0.0f, 0.0f, static_cast<float>(texture -> width), static_cast<float>(texture -> height)};
-    
-    float scale = projData ? projData->getScale() : 1.0f;
-    float r = getRadius() * scale;
     Rectangle dst = {position.x - r, position.y - r, 2.0f * r, 2.0f * r};
 
     DrawTexturePro(*texture, src, dst, Vector2{0.0f, 0.0f}, 0, WHITE);

@@ -1,10 +1,9 @@
-﻿#ifndef WAVE_MANAGER_HPP
+#ifndef WAVE_MANAGER_HPP
 #define WAVE_MANAGER_HPP
 
 #include <Common.hpp>
 #include <Gameplay/Levels/WaveConfig.hpp>
-
-class IGameplayMediator;
+#include <Gameplay/IGameplayMediator.hpp>
 
 class WaveManager {
 private:

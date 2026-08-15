@@ -1,4 +1,5 @@
 #include <Worlds/World.hpp>
+#include <Gameplay/Particle/ReanimParticle.hpp>
 
 ///////////////////////////////
 ///     IGAMEPLAYMEDIATOR   ///
@@ -95,6 +96,14 @@ void World::tryIgniteProjectile(Rectangle area) {
             ProjectileData* fireData = projectileFactory.getProjectileData(PROJECTILE_FIREPEA);
             projectile->setProjectileData(fireData);
             projectile->setTexture(projectileFactory.getProjectileTexture(PROJECTILE_FIREPEA));
+
+            ReanimParser* firePeaAnim = assetManager ? assetManager->getAnimationManager()->getAnimationData("FirePeaAnim") : nullptr;
+            TexturePackage* projPack = assetManager ? assetManager->getTextureManager()->getPackage("Projectile") : nullptr;
+            if (firePeaAnim && projPack) {
+                ReanimInstance fireInstance(1.0f, projPack, firePeaAnim);
+                fireInstance.setLoopToggle(true);
+                projectile->setReanimInstance(std::move(fireInstance));
+            }
         }
     }
 }
@@ -149,7 +158,12 @@ bool World::hasZombieInArea(Rectangle area, Zombie* exclude) const {
 void World::damageZombiesInArea(Rectangle area, float damage, Zombie* exclude) {
     for (auto& zombie : zombieManager.getZombies()) {
         if (!zombie->isDead() && zombie.get() != exclude && CheckCollisionRecs(zombie->getHitbox(), area)) {
-            zombie->receiveDamage(damage, this);
+            if (damage >= 500.0f) {
+                ReanimInstance charredAnim = zombieFactory.createCharredReanim();
+                zombie->triggerCharred(std::move(charredAnim));
+            } else {
+                zombie->receiveDamage(damage, this);
+            }
         }
     }
 }
@@ -197,6 +211,7 @@ void World::spawnExplosionParticles(Vector2 position, PlantType type) {
         }
     } else if (type == DOOMSHROOM) {
         Texture2D* blastMark = pack->GetTexture("BLASTMARK");
+        Texture2D* bossExp = pack->GetTexture("BOSSEXPLOSION3");
         Texture2D* base = pack->GetTexture("DOOMSHROOM_EXPLOSION_BASE");
         Texture2D* stem = pack->GetTexture("DOOMSHROOM_EXPLOSION_STEM");
         Texture2D* top = pack->GetTexture("DOOMSHROOM_EXPLOSION_TOP");
@@ -205,6 +220,10 @@ void World::spawnExplosionParticles(Vector2 position, PlantType type) {
         if (blastMark) {
             auto mark = std::make_unique<Particle>(blastMark, Vector2{position.x, position.y + 40}, Vector2{0, 0}, Vector2{0, 0}, 10.0f, 1.5f);
             addParticle(std::move(mark));
+        }
+        if (bossExp) {
+            auto exp = std::make_unique<Particle>(bossExp, Vector2{position.x, position.y - 40}, Vector2{0, 0}, Vector2{0, 0}, 1.2f, 1.8f);
+            addParticle(std::move(exp));
         }
         if (base) {
             auto p = std::make_unique<Particle>(base, Vector2{position.x, position.y + 20}, Vector2{0, 0}, Vector2{0, 0}, 1.5f, 1.0f);
@@ -223,10 +242,15 @@ void World::spawnExplosionParticles(Vector2 position, PlantType type) {
             addParticle(std::move(p));
         }
     } else if (type == POTATOMINE) {
+        Texture2D* blastMark = pack->GetTexture("BLASTMARK");
         Texture2D* spudow = pack->GetTexture("EXPLOSIONSPUDOW");
         Texture2D* flash = pack->GetTexture("POTATOMINEFLASH");
         Texture2D* parts = pack->GetTexture("POTATOMINE_PARTICLES");
 
+        if (blastMark) {
+            auto mark = std::make_unique<Particle>(blastMark, Vector2{position.x, position.y + 10}, Vector2{0, 0}, Vector2{0, 0}, 3.0f, 0.6f);
+            addParticle(std::move(mark));
+        }
         if (flash) {
             auto p = std::make_unique<Particle>(flash, Vector2{position.x, position.y}, Vector2{0, 0}, Vector2{0, 0}, 0.5f, 1.0f);
             addParticle(std::move(p));
@@ -242,27 +266,38 @@ void World::spawnExplosionParticles(Vector2 position, PlantType type) {
             }
         }
     } else if (type == SQUASH) {
-        Texture2D* pow = pack->GetTexture("EXPLOSIONPOWIE");
-        if (pow) {
-            auto p = std::make_unique<Particle>(pow, Vector2{position.x, position.y + 20}, Vector2{0, 0}, Vector2{0, 0}, 1.0f, 1.0f);
-            addParticle(std::move(p));
-        }
+
     } else if (type == JALAPENO) {
-        Texture2D* blast = pack->GetTexture("BOSSEXPLOSION1");
-        if (blast) {
-            for (int i = -4; i <= 4; ++i) {
-                auto p = std::make_unique<Particle>(blast, Vector2{position.x + i * 80, position.y}, Vector2{0, 0}, Vector2{0, 0}, 1.0f, 1.0f);
-                addParticle(std::move(p));
+        ReanimParser* fireAnim = assetManager ? assetManager->getAnimationManager()->getAnimationData("fireAnim") : nullptr;
+        if (fireAnim && pack) {
+            std::pair<int, int> cellId = grid.getCellID(position);
+            int row = cellId.first;
+            if (row < 0 || row >= 5) {
+                float minDist = 9999.0f;
+                row = 0;
+                for (int r = 0; r < 5; ++r) {
+                    Rectangle cr = grid.getCellRect(r, 0);
+                    float dist = fabsf((cr.y + cr.height * 0.5f) - position.y);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        row = r;
+                    }
+                }
+            }
+            for (int col = 0; col < 9; ++col) {
+                Rectangle cellRect = grid.getCellRect(row, col);
+                float fireX = cellRect.x + cellRect.width * 0.5f;
+                float fireY = cellRect.y + cellRect.height * 0.5f;
+                ReanimInstance fireInstance(1.8f, pack, fireAnim);
+                Rectangle fireBounds = {cellRect.x - 20.0f, cellRect.y - 45.0f, cellRect.width + 40.0f, cellRect.height + 55.0f};
+                float delay = 0.0f; // All ignite across the whole line immediately!
+                float duration = 0.65f + col * 0.08f; // Extinguish sequentially from left to right!
+                auto fireP = std::make_unique<ReanimParticle>(std::move(fireInstance), Vector2{fireX, fireY}, fireBounds, duration, "anim_flame", delay, 1.0f, WHITE, true);
+                addParticle(std::move(fireP));
             }
         }
     } else if (type == ICESHROOM) {
-        Texture2D* cloud = pack->GetTexture("EXPLOSIONCLOUD");
-        if (cloud) {
-            for (int i = 0; i < 5; ++i) {
-                auto p = std::make_unique<Particle>(cloud, Vector2{position.x, position.y}, Vector2{(float)(GetRandomValue(-100, 100)), (float)(GetRandomValue(-100, 100))}, Vector2{0, 0}, 1.0f, 1.0f);
-                addParticle(std::move(p));
-            }
-        }
+
     } else if (type == TANGLEKELP) {
         Texture2D* pow = pack->GetTexture("EXPLOSIONCLOUD"); // Splash approximation
         if (pow) {
@@ -340,6 +375,8 @@ World :: World(int screenWidth, int screenHeight, AssetManager* assetManager, Le
         TraceLog(LOG_ERROR, "Asset Manager was not found");
         return;
     }
+
+    this->assetManager = assetManager;
 
     currentLevel = std :: make_unique<Level>(levelID);
     sunAmount = currentLevel -> getStartingSun();

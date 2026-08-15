@@ -1,25 +1,28 @@
 #include "Gameplay/Plants/ExplosivePlants/IceShroom.hpp"
 PlantType IceShroom::getType() { return ICESHROOM; }
 
+void IceShroom::updateTime(float deltaSeconds) {
+    Plant::updateTime(deltaSeconds);
+    if (animationStarted && !readyToExplode && health > 0) {
+        fuseTimer -= deltaSeconds;
+        if (fuseTimer <= 0.0f) {
+            readyToExplode = true;
+        }
+    }
+}
+
 void IceShroom::performAction(IGameplayMediator* mediator) {
     if (!mediator) return;
     
     if (readyToExplode) {
-        // 3x3 area
-        Rectangle area = {
-            bounds.x - bounds.width,
-            bounds.y - bounds.height,
-            bounds.width * 3.0f,
-            bounds.height * 3.0f
-        };
+        // Screen-wide effect freezing all zombies across the entire lawn
+        Rectangle screenArea = {-200.0f, -200.0f, 1800.0f, 1200.0f};
         
-        mediator->damageZombiesInArea(area, getDamage()); // Usually 20 damage
-        mediator->freezeZombiesInArea(area, 4.0f); // Freeze for 4 seconds
+        mediator->damageZombiesInArea(screenArea, getDamage()); // 20 damage
+        mediator->freezeZombiesInArea(screenArea, 5.0f); // Freeze all zombies for 5 seconds
         mediator->spawnExplosionParticles({bounds.x + bounds.width * 0.5f, bounds.y + bounds.height * 0.5f}, ICESHROOM);
         health = 0; // Die
     } else if (!animationStarted) {
-        triggerActionAnimation();
         animationStarted = true;
-        cooldownTimer = 999.0f; // Wait for animation to finish
     }
 }

@@ -3,9 +3,8 @@
 
 #include <Core/AssetManager.hpp>
 #include <Core/InputManager.hpp>
+#include <Core/UserProfileManager.hpp>
 #include <Screens/ScreenTransition.hpp>
-
-class UserProfileManager;
 
 class Screen {
 protected:

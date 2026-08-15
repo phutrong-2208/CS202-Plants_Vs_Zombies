@@ -2,6 +2,7 @@
 #define PROJECTILE_HPP
 
 #include "Common.hpp"
+#include "Gameplay/Animation/ReanimInstance.hpp"
 
 enum ProjectileType : int {
     PROJECTILE_PEA,
@@ -57,6 +58,9 @@ private:
     Texture2D *texture = nullptr;
     ProjectileType type = PROJECTILE_PEA;
 
+    bool hasReanim = false;
+    ReanimInstance reanim;
+
     bool despawned = false;
 
     // Lobbed mechanics
@@ -74,6 +78,8 @@ public:
 
     void setProjectileData(ProjectileData* data);
     void setTexture(Texture2D *newTexture);
+    void setReanimInstance(ReanimInstance anim);
+    bool getHasReanim() const;
     void setDamage(float _d);
     void setPosition(Vector2 newPos);
     void setVelocity(Vector2 newVel);

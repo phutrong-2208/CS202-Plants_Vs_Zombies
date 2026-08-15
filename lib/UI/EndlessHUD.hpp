@@ -2,8 +2,7 @@
 #define ENDLESS_HUD_HPP
 
 #include <Gameplay/Endless/EndlessController.hpp>
-
-class TextManager;
+#include <Core/TextManager.hpp>
 
 class EndlessHUD {
 public:

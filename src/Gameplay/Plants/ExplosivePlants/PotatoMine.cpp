@@ -3,11 +3,12 @@ PlantType PotatoMine::getType() { return POTATOMINE; }
 
 void PotatoMine::updateTime(float deltaSeconds) {
     Plant::updateTime(deltaSeconds);
+    
     if (!armed && health > 0) {
         armTimer -= deltaSeconds;
         if (armTimer <= 0.0f) {
             armed = true;
-            triggerAnimation("anim_armed");
+            animation.setDefaultClip("anim_armed");
         }
     }
 }
@@ -30,6 +31,5 @@ void PotatoMine::performAction(IGameplayMediator* mediator) {
     } else if (mediator->hasZombieInArea(area) && !animationStarted) {
         triggerAnimation("anim_mashed"); // Mashed is the explode animation for PotatoMine
         animationStarted = true;
-        cooldownTimer = 999.0f; // Wait for animation to finish
     }
 }

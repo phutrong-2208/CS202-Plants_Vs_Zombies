@@ -83,6 +83,7 @@ protected:
     ZombieDeathHandler* deathHandler = nullptr;
 
     bool isHypnotized = false;
+    bool isCharred = false;
 
     void zombieSetup();
     virtual void onStateChanged(ZombieState newState);
@@ -99,6 +100,8 @@ public:
     
     void setSwallowed(bool isSwallowed);
     void setHypnotized(bool hypnotized);
+    void triggerCharred(ReanimInstance charredAnim);
+    bool getIsCharred() const { return isCharred; }
     void draw();
 
     void receiveDamage(float damage, IGameplayMediator* mediator = nullptr);

@@ -57,6 +57,16 @@ void Zombie::setZombieData(ZombieData* data) {
     zombieSetup();
 }
 
+void Zombie::triggerCharred(ReanimInstance charredAnim) {
+    isCharred = true;
+    health = 0.0f;
+    deathTimer = 0.0f;
+    setState(ZombieState::DYING);
+    animation = std::move(charredAnim);
+    animation.playClip("anim_crumble");
+    animation.setLoopToggle(false);
+}
+
 void Zombie::updateTime(float dt) {
     if(state == ZombieState::DEAD) return;
 
@@ -87,7 +97,11 @@ void Zombie::updateTime(float dt) {
     if (state == ZombieState::DYING) {
         deathTimer += dt;
 
-        if (deathTimer >= ZOMBIE_DEATH_COUNTDOWN) {
+        if (isCharred) {
+            if (animation.isFinished() || deathTimer >= ZOMBIE_DEATH_COUNTDOWN) {
+                setState(ZombieState::DEAD);
+            }
+        } else if (deathTimer >= ZOMBIE_DEATH_COUNTDOWN) {
             setState(ZombieState::DEAD);
         }
     }
@@ -98,13 +112,22 @@ void Zombie::draw() {
     Color tint = WHITE;
     if (flashTimer > 0.0f) {
         tint = Color{200, 200, 200, 255}; // Light grey / white flash effect
-    } else if (freezeTimer > 0.0f || chillTimer > 0.0f) {
-        tint = Color{100, 150, 255, 255}; // Blue tint
+    } else if (freezeTimer > 0.0f) {
+        tint = Color{80, 180, 255, 255}; // Deep frozen ice tint
+    } else if (chillTimer > 0.0f) {
+        tint = Color{120, 160, 255, 255}; // Chilled blue tint
     } else if (isHypnotized) {
         tint = Color{200, 100, 255, 255}; // Purple tint
     }
     
     animation.draw(hitbox, tint);
+
+    if (freezeTimer > 0.0f) {
+        Rectangle zHitbox = getHitbox();
+        DrawRectangleRec(zHitbox, Color{100, 200, 255, 70});
+        DrawRectangleLinesEx(zHitbox, 2.0f, Color{160, 230, 255, 200});
+    }
+
     DrawRectangleLinesEx(getHitbox(), 2.0f, RED);
     DrawRectangleLinesEx(getAttackHitbox(), 2.0f, YELLOW);
 }
@@ -134,7 +157,7 @@ void Zombie::receiveDamage(float damage, IGameplayMediator* mediator) {
     if(health == 0.0f) {
         if (swallowed) {
             setState(ZombieState::DEAD);
-        } else {
+        } else if (!isCharred) {
             setState(ZombieState::DYING);
             
             if (deathHandler) {

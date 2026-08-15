@@ -7,8 +7,6 @@
 #include <Gameplay/Zombies/ZombieType.hpp>
 
 class Zombie;
-class Projectile;
-class Particle;
 
 static const std::map <PlantType, ProjectileType> projectileConvert = {
     {PEASHOOTER, PROJECTILE_PEA},

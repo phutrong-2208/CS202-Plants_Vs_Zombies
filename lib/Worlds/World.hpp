@@ -50,6 +50,7 @@ private:
     ParticleManager particleManager;
     WaveManager waveManager;
     UserProfileManager *userManager = nullptr;
+    AssetManager* assetManager = nullptr;
     std :: vector<int> activeLanes;
     
     int sunAmount = 50;

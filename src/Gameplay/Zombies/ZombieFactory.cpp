@@ -30,7 +30,9 @@ namespace {
         {"CATAPULT_ZOMBIE", CATAPULT_ZOMBIE},
         {"GARGANTUAR_ZOMBIE", GARGANTUAR_ZOMBIE},
         {"IMP_ZOMBIE", IMP_ZOMBIE},
-        {"ZOMBOSS_ZOMBIE", ZOMBOSS_ZOMBIE}
+        {"ZOMBOSS_ZOMBIE", ZOMBOSS_ZOMBIE},
+        {"ZOMBIE_CHARRED", ZOMBIE_CHARRED},
+        {"CHARRED_ZOMBIE", ZOMBIE_CHARRED}
     };
 
     std :: vector<std :: string> splitCommaSeparated(const std :: string& value) {
@@ -179,4 +181,17 @@ std::unique_ptr<Zombie> ZombieFactory::createZombie(
         )
     );
     return zombie;
+}
+
+ReanimInstance ZombieFactory::createCharredReanim() {
+    if (!zombieDataStorage) return ReanimInstance();
+    ZombieData* data = zombieDataStorage->getZombieData(ZOMBIE_CHARRED);
+    if (!data) return ReanimInstance();
+    return createReanim(
+        data->getReanimScalar(),
+        data->getReanimPackage(),
+        data->getReanimAnim(),
+        data->getReanimClip(),
+        data->getHiddenTracks()
+    );
 }
