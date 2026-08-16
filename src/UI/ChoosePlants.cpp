@@ -142,15 +142,15 @@ void ChoosePlants :: draw() const {
             }
         }
 
-        // Sun cost overlay at the bottom of the packet
+        // Sun cost overlay at the bottom of the packet (centralized)
         if (textManager) {
             auto costIt = sunCosts.find(plant);
             if (costIt != sunCosts.end()) {
                 const std::string costStr = std::to_string(costIt->second);
                 const Rectangle costRect = {
-                    rect.x + rect.width - 32.0f,
-                    rect.y + rect.height - 20.0f,
-                    30.0f,
+                    rect.x,
+                    rect.y + rect.height - 18.0f,
+                    rect.width,
                     18.0f
                 };
                 textManager->drawCenteredText(UI_FONT, costStr.c_str(), costRect, 13.0f, 0.5f, BLACK);

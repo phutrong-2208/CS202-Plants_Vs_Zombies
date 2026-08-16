@@ -25,11 +25,22 @@ void PotatoMine::performAction(IGameplayMediator* mediator) {
     };
     
     if (readyToExplode) {
-        mediator->damageZombiesInArea(area, getDamage());
+        mediator->damageZombiesInArea(area, getDamage(), nullptr, true);
         mediator->spawnExplosionParticles({bounds.x + bounds.width * 0.5f, bounds.y + bounds.height * 0.5f}, POTATOMINE);
         health = 0; // Die
     } else if (mediator->hasZombieInArea(area) && !animationStarted) {
         triggerAnimation("anim_mashed"); // Mashed is the explode animation for PotatoMine
         animationStarted = true;
     }
+}
+
+void PotatoMine::draw(Rectangle hitbox) {
+    // With REANIM_SCALAR = 1.1, offset to position it centered in cell and grounded on lawn
+    Rectangle renderHitbox = {
+        hitbox.x + 12.0f,
+        hitbox.y + 18.0f,
+        hitbox.width,
+        hitbox.height
+    };
+    animation.draw(renderHitbox);
 }

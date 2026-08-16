@@ -155,10 +155,10 @@ bool World::hasZombieInArea(Rectangle area, Zombie* exclude) const {
     return zombieManager.hasZombieInArea(area, exclude);
 }
 
-void World::damageZombiesInArea(Rectangle area, float damage, Zombie* exclude) {
+void World::damageZombiesInArea(Rectangle area, float damage, Zombie* exclude, bool isExplosion) {
     for (auto& zombie : zombieManager.getZombies()) {
         if (!zombie->isDead() && zombie.get() != exclude && CheckCollisionRecs(zombie->getHitbox(), area)) {
-            if (damage >= 500.0f) {
+            if (isExplosion) {
                 ReanimInstance charredAnim = zombieFactory.createCharredReanim();
                 zombie->triggerCharred(std::move(charredAnim));
             } else {

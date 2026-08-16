@@ -8,4 +8,5 @@ public:
     PlantType getType() override;
     void updateTime(float deltaSeconds) override;
     void performAction(IGameplayMediator* mediator) override;
+    void draw(Rectangle hitbox) override;
 };

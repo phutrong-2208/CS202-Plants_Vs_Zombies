@@ -117,15 +117,15 @@ void SeedBank :: draw() const {
             }
         }
 
-        // Sun cost badge drawn directly on the bottom of the packet
+        // Sun cost badge drawn directly on the bottom of the packet (centralized)
         if (textManager) {
             auto costIt = sunCosts.find(slots[i]);
             if (costIt != sunCosts.end()) {
                 const std::string costStr = std::to_string(costIt->second);
                 const Rectangle costRect = {
-                    slotRect.x + slotRect.width - 32.0f,
-                    slotRect.y + slotRect.height - 20.0f,
-                    30.0f,
+                    slotRect.x,
+                    slotRect.y + slotRect.height - 18.0f,
+                    slotRect.width,
                     18.0f
                 };
                 textManager->drawCenteredText("LUCKIEST_GUY", costStr.c_str(), costRect, 13.0f, 0.5f, BLACK);

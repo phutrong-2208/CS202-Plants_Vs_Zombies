@@ -1,5 +1,6 @@
 #include "Gameplay/Plants/ExplosivePlants/Squash.hpp"
 #include "Gameplay/Zombies/Zombie.hpp"
+#include <cmath>
 
 PlantType Squash::getType() { return SQUASH; }
 
@@ -20,9 +21,13 @@ void Squash::updateTime(float deltaSeconds) {
             squashState = SquashState::JUMPING_UP;
             animation.playClip("anim_jumpup");
             animation.setLoopToggle(false);
+            jumpOffsetY = 0.0f;
         }
     } else if (squashState == SquashState::JUMPING_UP) {
         animation.updateTime(deltaSeconds);
+        // Smooth vertical jump arc upward
+        jumpOffsetY = std::max(-75.0f, jumpOffsetY - deltaSeconds * 190.0f);
+
         if (animation.isFinished()) {
             squashState = SquashState::JUMPING_DOWN;
             animation.playClip("anim_jumpdown");
@@ -30,7 +35,11 @@ void Squash::updateTime(float deltaSeconds) {
         }
     } else if (squashState == SquashState::JUMPING_DOWN) {
         animation.updateTime(deltaSeconds);
-        if (animation.isFinished()) {
+        // Rapid fall down to slam into the ground
+        jumpOffsetY = std::min(0.0f, jumpOffsetY + deltaSeconds * 300.0f);
+
+        if (animation.isFinished() || jumpOffsetY >= 0.0f) {
+            jumpOffsetY = 0.0f;
             squashState = SquashState::SQUASHED;
             stateTimer = squashedLingerDuration;
 
@@ -44,14 +53,16 @@ void Squash::updateTime(float deltaSeconds) {
                     maxX - minX,
                     bounds.height + 100.0f
                 };
-                lastMediator->damageZombiesInArea(crushArea, 1800.0f);
-                lastMediator->spawnExplosionParticles({bounds.x + bounds.width * 0.5f, bounds.y + bounds.height * 0.5f}, SQUASH);
+                
+                // isExplosion = false -> Normal zombie decapitation death particles!
+                lastMediator->damageZombiesInArea(crushArea, plantData -> getDamage(false), nullptr, false);
                 damageDealt = true;
             }
         }
     } else if (squashState == SquashState::SQUASHED) {
-        // Hold the squashed pose on the ground without advancing animation or resetting to idle
+        // Hold the squashed flattened frame on the ground without looping back to idle
         stateTimer -= deltaSeconds;
+        jumpOffsetY = 0.0f;
         if (stateTimer <= 0.0f) {
             squashState = SquashState::DONE;
             health = 0; // Dies and gets removed from the cell after linger delay
@@ -86,22 +97,18 @@ void Squash::performAction(IGameplayMediator* mediator) {
             }
             animation.setLoopToggle(false);
             squashState = SquashState::LOOKING;
-            stateTimer = 0.15f;
+            stateTimer = 0.25f;
             animationStarted = true;
         }
-    } else if ((squashState == SquashState::SQUASHED || (squashState == SquashState::JUMPING_DOWN && animation.isFinished())) && !damageDealt) {
-        float minX = std::min(bounds.x - bounds.width * 1.5f, targetX - 80.0f);
-        float maxX = std::max(bounds.x + bounds.width * 2.5f, targetX + 120.0f);
-        Rectangle crushArea = {
-            minX,
-            bounds.y - 50.0f,
-            maxX - minX,
-            bounds.height + 100.0f
-        };
-        mediator->damageZombiesInArea(crushArea, 1800.0f);
-        mediator->spawnExplosionParticles({bounds.x + bounds.width * 0.5f, bounds.y + bounds.height * 0.5f}, SQUASH);
-        damageDealt = true;
-        squashState = SquashState::SQUASHED;
-        stateTimer = squashedLingerDuration;
     }
+}
+
+void Squash::draw(Rectangle hitbox) {
+    Rectangle renderHitbox = {
+        hitbox.x,
+        hitbox.y + jumpOffsetY,
+        hitbox.width,
+        hitbox.height
+    };
+    animation.draw(renderHitbox);
 }

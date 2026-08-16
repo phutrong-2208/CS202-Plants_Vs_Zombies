@@ -76,7 +76,7 @@ private:
     virtual bool hasPlantInArea(Rectangle area) const override;
     virtual bool damagePlantInArea(Rectangle area, float damage, Zombie* attacker = nullptr) override;
     virtual bool hasZombieInArea(Rectangle area, Zombie* exclude = nullptr) const override;
-    virtual void damageZombiesInArea(Rectangle area, float damage, Zombie* exclude = nullptr) override;
+    virtual void damageZombiesInArea(Rectangle area, float damage, Zombie* exclude = nullptr, bool isExplosion = false) override;
     virtual Zombie* getZombiePriority(Rectangle area) override;
     virtual bool stripArmorInArea(Rectangle area) override;
     virtual void freezeZombiesInArea(Rectangle area, float duration) override;

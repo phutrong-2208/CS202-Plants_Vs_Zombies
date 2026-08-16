@@ -13,7 +13,7 @@ void Jalapeno::performAction(IGameplayMediator* mediator) {
             bounds.height
         };
         
-        mediator->damageZombiesInArea(area, getDamage());
+        mediator->damageZombiesInArea(area, getDamage(), nullptr, true);
         mediator->spawnExplosionParticles({bounds.x + bounds.width * 0.5f, bounds.y + bounds.height * 0.5f}, JALAPENO);
         health = 0; // Die
     } else if (!animationStarted) {
