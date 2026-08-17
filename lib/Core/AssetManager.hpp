@@ -4,6 +4,8 @@
 #include <Core/TextureManager.hpp>
 #include <Core/AnimationManager.hpp>
 #include <Core/TextManager.hpp>
+#include <Core/SoundManager.hpp>
+#include <Core/MusicManager.hpp>
 #include <filesystem>
 
 class AssetManager {
@@ -11,7 +13,9 @@ private:
     enum class AssetTaskType {
         TEXTURE,
         MASKED_TEXTURE,
-        REANIM
+        REANIM,
+        SOUND,
+        MUSIC
     };
 
     struct AssetLoadTask {
@@ -25,6 +29,8 @@ private:
     std::unique_ptr <TextureManager> textureManager;
     std::unique_ptr <AnimationManager> animationManager;
     std::unique_ptr <TextManager> textManager;
+    std::unique_ptr <SoundManager> soundManager;
+    std::unique_ptr <MusicManager> musicManager;
 
     std::vector<AssetLoadTask> loadingQueue;
     std::size_t nextTaskIndex = 0;
@@ -41,12 +47,15 @@ public:
 
     void beginLoading();
     void updateLoading(double timeBudgetMs);
+    void updateAudio();
     float getLoadingProgress() const;
     bool isLoadingFinished() const;
 
     TextureManager* getTextureManager() const;
     AnimationManager* getAnimationManager() const;
     TextManager* getTextManager() const;
+    SoundManager* getSoundManager() const;
+    MusicManager* getMusicManager() const;
 };
 
 #endif

@@ -17,6 +17,16 @@ namespace {
                extension == ".GIF";
     }
 
+    bool isAudioExtension(const std::string& extension) {
+        return extension == ".WAV" ||
+               extension == ".OGG" ||
+               extension == ".MP3" ||
+               extension == ".FLAC" ||
+               extension == ".QOA" ||
+               extension == ".XM" ||
+               extension == ".MOD";
+    }
+
     std::filesystem::path findMaskPath(const std::filesystem::path& texturePath) {
         const std::string stem = texturePath.stem().string();
         const auto maskPath = texturePath.parent_path() / (stem + "_.png");
@@ -85,58 +95,81 @@ void AssetManager::prepareLoadingQueue() {
 
     const std::filesystem::path assetDir =
         std::filesystem::path(PROJECT_DIR) / "assets/texture";
-    if (!std::filesystem::exists(assetDir)) {
-        loadingFinished = true;
-        return;
-    }
+    if (std::filesystem::exists(assetDir)) {
+        for (const auto& category : std::filesystem::directory_iterator(assetDir)) {
+            if (!category.is_directory()) continue;
 
-    for (const auto& category : std::filesystem::directory_iterator(assetDir)) {
-        if (!category.is_directory()) continue;
+            for (const auto& entity : std::filesystem::directory_iterator(category.path())) {
+                if (!entity.is_directory()) continue;
 
-        for (const auto& entity : std::filesystem::directory_iterator(category.path())) {
-            if (!entity.is_directory()) continue;
+                const std::string entityName = entity.path().filename().string();
+                if (entityName == "LoadMenu") continue;
 
-            const std::string entityName = entity.path().filename().string();
-            if (entityName == "LoadMenu") continue;
+                textureManager->addPackage(entityName, std::make_unique<TexturePackage>());
 
-            textureManager->addPackage(entityName, std::make_unique<TexturePackage>());
+                for (const auto& entry : std::filesystem::recursive_directory_iterator(entity.path())) {
+                    if (entry.is_directory()) continue;
 
-            for (const auto& entry : std::filesystem::recursive_directory_iterator(entity.path())) {
-                if (entry.is_directory()) continue;
+                    const std::filesystem::path path = entry.path();
+                    const std::string extension = toUpperKey(path.extension().string());
+                    const std::string stem = path.stem().string();
 
-                const std::filesystem::path path = entry.path();
-                const std::string extension = toUpperKey(path.extension().string());
-                const std::string stem = path.stem().string();
+                    if (isTextureExtension(extension)) {
+                        if (isAlphaMaskFile(path)) continue;
 
-                if (isTextureExtension(extension)) {
-                    if (isAlphaMaskFile(path)) continue;
+                        AssetLoadTask task;
+                        task.packageName = entityName;
+                        task.key = toUpperKey(stem);
+                        task.path = path;
 
-                    AssetLoadTask task;
-                    task.packageName = entityName;
-                    task.key = toUpperKey(stem);
-                    task.path = path;
-
-                    const std::filesystem::path maskPath = findMaskPath(path);
-                    if ((extension == ".JPG" || extension == ".JPEG") && !maskPath.empty()) {
-                        task.type = AssetTaskType::MASKED_TEXTURE;
-                        task.maskPath = maskPath;
-                    } else {
-                        task.type = AssetTaskType::TEXTURE;
+                        const std::filesystem::path maskPath = findMaskPath(path);
+                        if ((extension == ".JPG" || extension == ".JPEG") && !maskPath.empty()) {
+                            task.type = AssetTaskType::MASKED_TEXTURE;
+                            task.maskPath = maskPath;
+                        } else {
+                            task.type = AssetTaskType::TEXTURE;
+                        }
+                        loadingQueue.push_back(std::move(task));
+                        continue;
                     }
-                    loadingQueue.push_back(std::move(task));
-                    continue;
-                }
 
-                if (extension == ".REANIM") {
-                    AssetLoadTask task;
-                    task.type = AssetTaskType::REANIM;
-                    task.key = stem + "Anim";
-                    task.path = path;
-                    loadingQueue.push_back(std::move(task));
+                    if (extension == ".REANIM") {
+                        AssetLoadTask task;
+                        task.type = AssetTaskType::REANIM;
+                        task.key = stem + "Anim";
+                        task.path = path;
+                        loadingQueue.push_back(std::move(task));
+                    }
                 }
             }
         }
     }
+
+    const auto queueAudioDirectory = [this](
+        const std::filesystem::path& directory,
+        AssetTaskType type
+    ) {
+        if(!std::filesystem::exists(directory)) return;
+
+        for(const auto& entry : std::filesystem::recursive_directory_iterator(directory)) {
+            if(entry.is_directory()) continue;
+
+            const std::filesystem::path path = entry.path();
+            const std::string extension = toUpperKey(path.extension().string());
+            if(!isAudioExtension(extension)) continue;
+
+            AssetLoadTask task;
+            task.type = type;
+            task.key = toUpperKey(path.stem().string());
+            task.path = path;
+            loadingQueue.push_back(std::move(task));
+        }
+    };
+
+    const std::filesystem::path assetsRoot =
+        std::filesystem::path(PROJECT_DIR) / "assets";
+    queueAudioDirectory(assetsRoot / "sound", AssetTaskType::SOUND);
+    queueAudioDirectory(assetsRoot / "music", AssetTaskType::MUSIC);
 
     loadingFinished = loadingQueue.empty();
 }
@@ -153,6 +186,10 @@ void AssetManager::loadNextTask() {
         if (parser->loadFromFile(task.path.string())) {
             animationManager->addAnimationData(task.key, std::move(parser));
         }
+    } else if(task.type == AssetTaskType::SOUND) {
+        soundManager -> addSound(task.key, task.path.string());
+    } else if(task.type == AssetTaskType::MUSIC) {
+        musicManager -> addMusic(task.key, task.path.string());
     } else {
         TexturePackage* package = textureManager->getPackage(task.packageName);
         if (package != nullptr) {
@@ -200,6 +237,8 @@ AssetManager::AssetManager() {
     textureManager = std::make_unique <TextureManager> ();
     animationManager = std::make_unique <AnimationManager> ();
     textManager = std::make_unique <TextManager> ();
+    soundManager = std::make_unique <SoundManager> ();
+    musicManager = std::make_unique <MusicManager> ();
 }
 
 void AssetManager::beginLoading() {
@@ -223,6 +262,10 @@ void AssetManager::updateLoading(double timeBudgetMs) {
     } while (!loadingFinished);
 }
 
+void AssetManager :: updateAudio() {
+    if(musicManager) musicManager -> update();
+}
+
 float AssetManager::getLoadingProgress() const {
     if (!loadingStarted) return 0.0f;
     if (loadingQueue.empty()) return 1.0f;
@@ -243,4 +286,10 @@ AnimationManager* AssetManager::getAnimationManager() const {
 }
 TextManager* AssetManager::getTextManager() const {
     return textManager.get();
+}
+SoundManager* AssetManager :: getSoundManager() const {
+    return soundManager.get();
+}
+MusicManager* AssetManager :: getMusicManager() const {
+    return musicManager.get();
 }

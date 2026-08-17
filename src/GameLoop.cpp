@@ -3,6 +3,7 @@
 void GameLoop::initGame() {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(1200, 900, "Plants Vs Zombies");
+    InitAudioDevice();
     SetTargetFPS(60);
 
     assetManager = std :: make_unique<AssetManager>();
@@ -37,6 +38,7 @@ void GameLoop::runGame() {
     }
 
     screenManager->update(GetFrameTime());
+    assetManager -> updateAudio();
 
     BeginDrawing();
         ClearBackground(BLACK);
@@ -52,5 +54,6 @@ void GameLoop::closeGame() {
     inputManager.reset();
     assetManager.reset();
 
+    if(IsAudioDeviceReady()) CloseAudioDevice();
     CloseWindow();
 }
