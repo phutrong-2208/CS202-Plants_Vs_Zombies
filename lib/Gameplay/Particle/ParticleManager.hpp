@@ -14,6 +14,7 @@ public:
     void draw(void) const;
 
     int handleClick(Vector2 position);
+    int collectAll();
 };  
 
 

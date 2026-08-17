@@ -8,6 +8,7 @@ namespace {
     constexpr float SLOT_WIDTH = 70.0f;
     constexpr float SLOT_HEIGHT = 92.0f;
     constexpr float SLOT_GAP = 4.0f;
+    constexpr float BANK_WIDTH = 837.0f;
 
 }
 
@@ -36,7 +37,8 @@ void SeedBank :: setSeedRechargeTimes(const std::map<PlantType, float>& recharge
 }
 
 void SeedBank :: setSlots(const std::vector<PlantType>& selectedPlants) {
-    slots = selectedPlants;
+    const size_t slotCount = std::min(selectedPlants.size(), static_cast<size_t>(MAX_SLOTS));
+    slots.assign(selectedPlants.begin(), selectedPlants.begin() + slotCount);
     selectedSlot = -1;
 }
 
@@ -84,11 +86,35 @@ void SeedBank :: draw() const {
     Texture2D* seedPacket = chooserPackage ? chooserPackage -> GetTexture("SEEDPACKET_LARGER") : nullptr;
 
     if (seedBank) {
-        Rectangle src = {0.0f, 0.0f, (float)seedBank -> width, (float)seedBank -> height};
-        Rectangle dst = {BANK_X, BANK_Y, 541, 110};
-        DrawTexturePro(*seedBank, src, dst, {0, 0}, 0, WHITE);
+        const float sourceWidth = static_cast<float>(seedBank -> width);
+        const float sourceHeight = static_cast<float>(seedBank -> height);
+        const float leftSourceWidth = 72.0f;
+        const float rightSourceWidth = 12.0f;
+        const float middleSourceWidth = sourceWidth - leftSourceWidth - rightSourceWidth;
+        const float leftDestinationWidth = 90.0f;
+        const float rightDestinationWidth = 15.0f;
+        const float middleDestinationWidth = BANK_WIDTH - leftDestinationWidth - rightDestinationWidth;
+
+        DrawTexturePro(
+            *seedBank,
+            {0.0f, 0.0f, leftSourceWidth, sourceHeight},
+            {BANK_X, BANK_Y, leftDestinationWidth, 110.0f},
+            {0.0f, 0.0f}, 0.0f, WHITE
+        );
+        DrawTexturePro(
+            *seedBank,
+            {leftSourceWidth, 0.0f, middleSourceWidth, sourceHeight},
+            {BANK_X + leftDestinationWidth, BANK_Y, middleDestinationWidth, 110.0f},
+            {0.0f, 0.0f}, 0.0f, WHITE
+        );
+        DrawTexturePro(
+            *seedBank,
+            {sourceWidth - rightSourceWidth, 0.0f, rightSourceWidth, sourceHeight},
+            {BANK_X + BANK_WIDTH - rightDestinationWidth, BANK_Y, rightDestinationWidth, 110.0f},
+            {0.0f, 0.0f}, 0.0f, WHITE
+        );
     } else {
-        DrawRectangle(BANK_X, BANK_Y, 490, 98, (Color){82, 56, 30, 230});
+        DrawRectangle(BANK_X, BANK_Y, BANK_WIDTH, 98, (Color){82, 56, 30, 230});
     }
 
     for (int i = 0; i < (int)slots.size(); ++i) {

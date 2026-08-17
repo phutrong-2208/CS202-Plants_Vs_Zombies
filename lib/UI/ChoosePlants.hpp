@@ -21,7 +21,7 @@ private:
     std::vector<PlantType> availablePlants;
     std::vector<PlantType> selectedPlants;
     std::map<PlantType, int> sunCosts;
-    int maxSlots = 6;
+    int maxSlots = 10;
     bool done = false;
 
     std :: bitset<PLANT_COUNT> unlockedPlants;

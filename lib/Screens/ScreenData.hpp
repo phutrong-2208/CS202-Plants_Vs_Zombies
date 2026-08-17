@@ -6,7 +6,7 @@
 #include "Gameplay/Levels/Level.hpp"
 #include "Gameplay/Plants/Plant.hpp"
 
-enum class GameMode { ADVENTURE, SURVIVAL_ENDLESS };
+enum class GameMode {ADVENTURE, SURVIVAL_ENDLESS, AI_PVZ};
 
 struct ScreenData{
     WorldResult wResult = WorldResult :: RUNNING;

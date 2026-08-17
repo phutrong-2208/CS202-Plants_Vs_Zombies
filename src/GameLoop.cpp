@@ -20,7 +20,8 @@ void GameLoop::initGame() {
 
 
 bool GameLoop::isRunning() {
-    return !WindowShouldClose();
+    return !WindowShouldClose() &&
+        screenManager && !screenManager -> isQuitRequested();
 }
 
 void GameLoop::runGame() {

@@ -19,14 +19,25 @@ GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager
     seedBank.setTextManager(assetManager -> getTextManager());
     seedBank.setSeedRechargeTimes(world -> getAllSeedRecharges());
 
+    aiPvZMode = gameMode == GameMode :: AI_PVZ;
+    if(aiPvZMode) {
+        world -> setPlayerControlsZombies(true);
+        plantAI.setWorld(world.get());
+        conveyorBelt.setTexturePackage(assetManager -> getTextureManager() -> getPackage("ConveyorBelt"));
+        conveyorBelt.setPacketPackage(assetManager -> getTextureManager() -> getPackage("ZombiePacket"));
+        conveyorBelt.setZombiePool(getAllZombiePacketTypes());
+        conveyorBelt.setSpawnIntervalRange(12.0f, 20.0f);
+        conveyorBelt.start(0);
+    }
+
     choosePlants.setChooserPackage(assetManager -> getTextureManager() -> getPackage("PlantChooser"));
     choosePlants.setPacketPackage(assetManager -> getTextureManager() -> getPackage("PlantSeedPackets"));
     choosePlants.setTextManager(assetManager -> getTextManager());
     choosePlants.setSunCosts(world -> getAllSunCosts());
     choosePlants.setAvailablePlants(getAllPlantTypes());
-    choosePlants.setMaxSlots(6);
+    choosePlants.setMaxSlots(10);
     choosePlants.setSeedBank(&seedBank);
-    choosePlants.setUnlockedPlants(user -> getUnlockedPlants());
+    if(user) choosePlants.setUnlockedPlants(user -> getUnlockedPlants());
 
     shovelPackage = assetManager -> getTextureManager() -> getPackage("Shovel");
 
@@ -79,7 +90,14 @@ void GameplayScreen :: update(float dt) {
         }
         else {
             world -> update(dt);
-            if(world -> isReady()) seedBank.update(dt);
+            if(aiPvZMode && world -> isChoosingPlants()) world -> finishChoosingPlants();
+            if(world -> isReady()) {
+                if(aiPvZMode) {
+                    plantAI.update(dt);
+                    conveyorBelt.update(dt);
+                }
+                else seedBank.update(dt);
+            }
 
             if(!resultRequested && world -> getResult() != WorldResult :: RUNNING) {
                 resultRequested = true;
@@ -87,9 +105,10 @@ void GameplayScreen :: update(float dt) {
                 ScreenData resultData;
                 resultData.wResult = world -> getResult();
                 resultData.levelID = world -> getLevelID();
-                resultData.rewardPlant = world -> getRewardPlant();
+                resultData.gameMode = gameMode;
+                resultData.rewardPlant = aiPvZMode ? PLANT_COUNT : world -> getRewardPlant();
 
-                if(resultData.wResult == WorldResult :: WON) {
+                if(resultData.wResult == WorldResult :: WON && !aiPvZMode) {
                     applyWinProgress(resultData);
                 }
 
@@ -155,22 +174,37 @@ void GameplayScreen :: applyWinProgress(const ScreenData& resultData) {
 }
 
 void GameplayScreen :: draw() {
-    if (world) {
+    if (world && aiPvZMode) {
+        world -> drawBeforeZombies();
+        if(world -> isChoosingPlants() || world -> isReady()) conveyorBelt.draw();
+        world -> drawZombiesAndParticles();
+    }
+    else if (world) {
         world -> draw();
     }
 
-    if (world && world -> isChoosingPlants()) {
+    if (world && world -> isChoosingPlants() && !aiPvZMode) {
         choosePlants.draw();
     }
 
     if (world and (world -> isChoosingPlants() || world -> isReady())) {
-        world -> drawPlacementPreview(seedBank.selectedPlantId(), isShovelSelected);
-        seedBank.draw();
+        if(aiPvZMode) {
+            world -> drawZombiePlacementPreview(
+                conveyorBelt.selectedZombieType() != ZOMBIE_COUNT
+            );
+        }
+        else {
+            world -> drawPlacementPreview(seedBank.selectedPlantId(), isShovelSelected);
+            seedBank.draw();
+        }
     }
 
     if (world && world -> isReady()) {
-        drawSunHUD();
-        drawShovel();
+        if(!aiPvZMode) {
+            drawSunHUD();
+            drawShovel();
+        }
+        else drawAIPvZCurrencyHUD();
         if (endlessController) {
             int highest = 0;
             if (userProfileManager && userProfileManager -> getActiveProfile()) {
@@ -178,7 +212,7 @@ void GameplayScreen :: draw() {
             }
             endlessHUD.draw(*endlessController, highest, textManager, screenWidth, screenHeight);
         }
-        else {
+        else if(!aiPvZMode) {
             waveHUD.draw(
                 world -> getWaveProgress(),
                 world -> getCurrentWave(),
@@ -284,6 +318,21 @@ void GameplayScreen :: drawSunHUD() const {
     textManager->drawCenteredText("Luckiest_Guy", sunText.c_str(), textRect, 20.0f, 1.0f, BLACK);
 }
 
+void GameplayScreen :: drawAIPvZCurrencyHUD() const {
+    if(!world || !textManager) return;
+
+    const Rectangle panel = {865.0f, 10.0f, 260.0f, 52.0f};
+    DrawRectangleRounded(panel, 0.12f, 8, Color{35, 28, 42, 225});
+    DrawRectangleRoundedLinesEx(panel, 0.12f, 8, 2.0f, Color{165, 115, 205, 255});
+
+    DrawCircle(891, 35, 12.0f, Color{255, 210, 0, 255});
+    DrawCircleLines(891, 35, 12.0f, Color{220, 160, 0, 255});
+    textManager -> drawCenteredText(
+        "LUCKIEST_GUY", TextFormat("AI SUN: %d", world -> getSunAmount()),
+        {910.0f, 19.0f, 200.0f, 30.0f}, 19.0f, 0.7f, WHITE
+    );
+}
+
 void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
     if (!world) {
         return;
@@ -292,6 +341,7 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
     if (inputEvent.inputType == RawInputEvent::InputType::RIGHT_MOUSE_CLICKED) {
         isShovelSelected = false;
         seedBank.clearSelection();
+        conveyorBelt.clearSelection();
         return;
     }
 
@@ -302,6 +352,10 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
         }
 
         if (world -> isChoosingPlants()) {
+            if(aiPvZMode) {
+                world -> finishChoosingPlants();
+                return;
+            }
             if (choosePlants.handleMouseClick(inputEvent.position) && choosePlants.isDone()) {
                 seedBank.setSlots(choosePlants.choosePlants());
                 if (world) seedBank.setSunCosts(world->getAllSunCosts());
@@ -314,6 +368,17 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
             return;
         }
 
+        if(aiPvZMode) {
+            if(conveyorBelt.handleMouseClick(inputEvent.position)) return;
+
+            const ZombieType selectedZombie = conveyorBelt.selectedZombieType();
+            if(selectedZombie != ZOMBIE_COUNT &&
+               world -> trySpawnPlayerZombie(inputEvent.position, selectedZombie)) {
+                conveyorBelt.consumeSelectedPacket();
+            }
+            return;
+        }
+
         if (world -> handleParticleClick(inputEvent.position)) {
             return;
         }
@@ -321,7 +386,10 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
         // Shovel Bank click
         if (CheckCollisionPointRec(inputEvent.position, getShovelBounds())) {
             isShovelSelected = !isShovelSelected;
-            if (isShovelSelected) seedBank.clearSelection();
+            if (isShovelSelected) {
+                seedBank.clearSelection();
+                conveyorBelt.clearSelection();
+            }
             return;
         }
 
@@ -346,7 +414,9 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
         int selectedPlantId = seedBank.selectedPlantId();
         if (selectedPlantId >= 0) {
             PlantType selectedPlant = static_cast<PlantType>(selectedPlantId);
-            if(world -> tryPlacePlant(inputEvent.position, selectedPlant)) seedBank.startCooldown(selectedPlant);
+            if(world -> tryPlacePlant(inputEvent.position, selectedPlant)) {
+                seedBank.startCooldown(selectedPlant);
+            }
         }
     }
 }

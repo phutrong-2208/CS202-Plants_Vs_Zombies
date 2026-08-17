@@ -24,6 +24,7 @@ public:
     Zombie* getZombieWithArmor(Rectangle area);
     bool hasZombieInArea(Rectangle area, Zombie* exclude = nullptr) const;
     std::vector<std::unique_ptr<Zombie>>& getZombies();
+    const std::vector<std::unique_ptr<Zombie>>& getZombies() const;
     bool empty(void) const;
     bool hasZombieReachedHouse(float houseBoundX) const;
 };

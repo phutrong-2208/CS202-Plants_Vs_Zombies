@@ -109,6 +109,10 @@ std :: vector<std :: unique_ptr<Zombie>>& ZombieManager :: getZombies() {
     return zombies;
 }
 
+const std :: vector<std :: unique_ptr<Zombie>>& ZombieManager :: getZombies() const {
+    return zombies;
+}
+
 bool ZombieManager :: empty(void) const{
     return zombies.empty();
 }

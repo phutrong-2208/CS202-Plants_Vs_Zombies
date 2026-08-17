@@ -6,21 +6,26 @@
 #include <Worlds/World.hpp>
 #include <UI/ChoosePlants.hpp>
 #include <UI/SeedBank.hpp>
+#include <UI/ConveyorBelt.hpp>
 #include <UI/WaveHUD.hpp>
 #include <UI/EndlessHUD.hpp>
 #include <Gameplay/Endless/EndlessController.hpp>
+#include <Gameplay/AI/PlantAIController.hpp>
 
 class GameplayScreen : public Screen {
 private:
     std::unique_ptr<World> world = nullptr;
     ChoosePlants choosePlants;
     SeedBank seedBank;
+    ConveyorBelt conveyorBelt;
+    PlantAIController plantAI;
     WaveHUD waveHUD;
     EndlessHUD endlessHUD;
     std::unique_ptr<EndlessController> endlessController;
     GameMode gameMode = GameMode::ADVENTURE;
     TextManager* textManager = nullptr;
     bool resultRequested = false;
+    bool aiPvZMode = false;
 
     // Tracks previous phase to detect WAVE_RUNNING transitions (reset world result once)
     EndlessController :: Phase prevEndlessPhase = EndlessController :: Phase :: BETWEEN_WAVES;
@@ -31,6 +36,7 @@ private:
     bool isShovelSelected = false;
 
     void drawSunHUD() const;
+    void drawAIPvZCurrencyHUD() const;
     void drawShovel() const;
     Rectangle getShovelBounds() const;
     void drawPauseButton() const;

@@ -49,7 +49,7 @@ private:
     float skySunIntervalMin = 7.0f;
     float skySunIntervalMax = 12.0f;
     int skySunValue = 25;
-    int seedSlots = 6;
+    int seedSlots = 10;
     bool allowPlantChooser = true;
     bool useSodRollIntro = false;
 

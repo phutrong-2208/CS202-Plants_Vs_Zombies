@@ -60,6 +60,7 @@ private:
     int sunAmount = 50;
     float skySunTimer = 0.0f;
     WorldResult wResult = WorldResult :: RUNNING;
+    bool playerControlsZombies = false;
     
     // Sky Sun properties for textures
     TexturePackage* sunPackage = nullptr;
@@ -104,8 +105,13 @@ public:
     void initLawnMowers();
     void update(float dt);
     void draw();
+    void drawBeforeZombies();
+    void drawZombiesAndParticles();
     void drawPlacementPreview(int selectedPlantId, bool isShovelActive = false) const;
-    bool tryPlacePlant(Vector2 position, PlantType plantType);
+    void drawZombiePlacementPreview(bool hasSelectedZombie) const;
+    bool tryPlacePlant(Vector2 position, PlantType plantType, bool ignoreSunCost = false);
+    bool tryPlacePlantAtCell(int row, int col, PlantType plantType, bool ignoreSunCost = false);
+    bool trySpawnPlayerZombie(Vector2 position, ZombieType zombieType);
     void removePlant(int row, int col);
     const Grid& getGrid() const { return grid; }
     bool handleParticleClick(Vector2 position);
@@ -121,6 +127,12 @@ public:
     bool isReady() const;
     bool isChoosingPlants() const;
     void finishChoosingPlants();    
+
+    void setPlayerControlsZombies(bool enabled);
+    int getZombieCountInLane(int lane) const;
+    int getZombieCountNearCell(int row, int col, int rowRadius, int colRadius) const;
+    float getZombieThreatInLane(int lane) const;
+    int getNearestZombieColumnInLane(int lane) const;
 
     void setUserProfileManager(UserProfileManager* user); 
 

@@ -210,6 +210,7 @@ void Level :: loadFromFile() {
     skySunIntervalMax = std :: max(0.0f, skySunIntervalMax);
     if(skySunIntervalMin > skySunIntervalMax) std :: swap(skySunIntervalMin, skySunIntervalMax);
     skySunValue = std :: max(1, skySunValue);
+    seedSlots = std :: clamp(seedSlots, 1, 10);
 }
 
 void Level :: parseLanes(const std :: string& value) {

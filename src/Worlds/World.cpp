@@ -458,7 +458,8 @@ void World :: update(float dt) {
         lm.update(dt, this);
     }
     particleManager.update(dt);
-    waveManager.update(dt, *this);
+    if(playerControlsZombies) sunAmount += particleManager.collectAll();
+    if(!playerControlsZombies) waveManager.update(dt, *this);
 
     grid.sendPlantActions();
     projectileManager.toggleProjectiles();
@@ -466,6 +467,11 @@ void World :: update(float dt) {
 }
 
 void World ::draw() {
+    drawBeforeZombies();
+    drawZombiesAndParticles();
+}
+
+void World :: drawBeforeZombies() {
     if (!map)
         return;
 
@@ -478,6 +484,10 @@ void World ::draw() {
     }
     grid.draw();
     projectileManager.simulate();
+}
+
+void World :: drawZombiesAndParticles() {
+    if (!map || !isReady()) return;
     zombieManager.draw();
     particleManager.draw();
 }
@@ -514,11 +524,28 @@ void World :: drawPlacementPreview(int selectedPlantId, bool isShovelActive) con
     DrawRectangleLinesEx(cellRect, 2.0f, Color{255, 255, 255, 220});
 }
 
+void World :: drawZombiePlacementPreview(bool hasSelectedZombie) const {
+    if (!map || !isReady() || !hasSelectedZombie) return;
+
+    const Vector2 mouse = GetMousePosition();
+    int row, column;
+    std :: tie(row, column) = grid.getCellID(mouse);
+    if (row < 0 || column < 0) return;
+    if (currentLevel && (
+        row >= static_cast<int>(currentLevel -> getLanes().size()) ||
+        currentLevel -> getLanes()[row] == LaneType :: INACTIVE
+    )) return;
+
+    const Rectangle cell = grid.getCellRect(row, 8);
+    DrawRectangleRec(cell, Color{175, 75, 255, 45});
+    DrawRectangleLinesEx(cell, 2.0f, Color{220, 155, 255, 190});
+}
+
 void World::removePlant(int row, int col) {
     grid.removePlant(row, col);
 }
 
-bool World :: tryPlacePlant(Vector2 position, PlantType plantType) {
+bool World :: tryPlacePlant(Vector2 position, PlantType plantType, bool ignoreSunCost) {
     if (!map || isReady() == false)
         return false;
 
@@ -527,17 +554,45 @@ bool World :: tryPlacePlant(Vector2 position, PlantType plantType) {
     if (r < 0 || c < 0)
         return false;
 
-    if(currentLevel -> getLanes()[r] == LaneType :: INACTIVE){
-        return false;
-    }
+    return tryPlacePlantAtCell(r, c, plantType, ignoreSunCost);
+}
 
+bool World :: tryPlacePlantAtCell(int row, int col, PlantType plantType, bool ignoreSunCost) {
+    if (!map || !isReady() || !currentLevel) return false;
+    if (row < 0 || row >= static_cast<int>(currentLevel -> getLanes().size())) return false;
+    if (col < 0 || col >= 9 || currentLevel -> getLanes()[row] == LaneType :: INACTIVE) return false;
+    if (plantType < 0 || plantType >= PLANT_COUNT) return false;
+    if (!ignoreSunCost && !canAfford(plantType)) return false;
 
-    if (!canAfford(plantType))
-        return false;
-
-    bool placed = grid.placePlant(r, c, plantFactory.createPlant(plantType));
-    if (placed) spendSun(plantFactory.getSunCost(plantType));
+    const bool placed = grid.placePlant(row, col, plantFactory.createPlant(plantType));
+    if (placed && !ignoreSunCost) spendSun(plantFactory.getSunCost(plantType));
     return placed;
+}
+
+bool World :: trySpawnPlayerZombie(Vector2 position, ZombieType zombieType) {
+    if (!playerControlsZombies || !map || !isReady() || !currentLevel) return false;
+    if (zombieType < 0 || zombieType >= ZOMBIE_COUNT ||
+        zombieType == ZOMBOSS_ZOMBIE || zombieType == ZOMBIE_CHARRED) return false;
+
+    int row, column;
+    std :: tie(row, column) = grid.getCellID(position);
+    if (row < 0 || column < 0 ||
+        row >= static_cast<int>(currentLevel -> getLanes().size()) ||
+        currentLevel -> getLanes()[row] == LaneType :: INACTIVE) return false;
+
+    const Rectangle spawnRect = grid.getCellRect(row, 8);
+    std :: unique_ptr<Zombie> zombie = zombieFactory.createZombie(
+        zombieType,
+        Rectangle{
+            spawnRect.x + spawnRect.width * 0.5f,
+            spawnRect.y - 40.0f,
+            50.0f,
+            100.0f
+        }
+    );
+    if (!zombie) return false;
+    zombieManager.addZombie(std :: move(zombie));
+    return true;
 }
 
 bool World :: handleParticleClick(Vector2 position) {
@@ -586,6 +641,96 @@ void World :: finishChoosingPlants() {
     }
 }
 
+void World :: setPlayerControlsZombies(bool enabled) {
+    playerControlsZombies = enabled;
+}
+
+int World :: getZombieCountInLane(int lane) const {
+    if (lane < 0 || lane >= 5) return 0;
+
+    int count = 0;
+    for (const auto& zombie : zombieManager.getZombies()) {
+        if (!zombie || zombie -> isDead()) continue;
+        const Rectangle hitbox = zombie -> getHitbox();
+        const Vector2 center = {
+            hitbox.x + hitbox.width * 0.5f,
+            hitbox.y + hitbox.height * 0.5f
+        };
+        if (grid.getCellID(center).first == lane) count++;
+    }
+    return count;
+}
+
+int World :: getZombieCountNearCell(int row, int col, int rowRadius, int colRadius) const {
+    if (row < 0 || row >= 5 || col < 0 || col >= 9) return 0;
+
+    int count = 0;
+    for (const auto& zombie : zombieManager.getZombies()) {
+        if (!zombie || zombie -> isDead()) continue;
+        const Rectangle hitbox = zombie -> getHitbox();
+        const Vector2 center = {
+            hitbox.x + hitbox.width * 0.5f,
+            hitbox.y + hitbox.height * 0.5f
+        };
+        auto [zombieRow, zombieCol] = grid.getCellID(center);
+        if (zombieRow < 0) continue;
+        if (zombieCol < 0) zombieCol = center.x < grid.getCellRect(zombieRow, 0).x ? 0 : 8;
+        if (std::abs(zombieRow - row) <= std::max(0, rowRadius) &&
+            std::abs(zombieCol - col) <= std::max(0, colRadius)) count++;
+    }
+    return count;
+}
+
+float World :: getZombieThreatInLane(int lane) const {
+    if (lane < 0 || lane >= 5) return 0.0f;
+
+    const Rectangle laneBounds = grid.getCellRect(lane, 0);
+    const Rectangle lawnStart = grid.getCellRect(lane, 0);
+    const Rectangle lawnEnd = grid.getCellRect(lane, 8);
+    const float lawnWidth = lawnEnd.x + lawnEnd.width - lawnStart.x;
+    float threat = 0.0f;
+
+    for (const auto& zombie : zombieManager.getZombies()) {
+        if (!zombie || zombie -> isDead()) continue;
+        const Rectangle hitbox = zombie -> getHitbox();
+        const float centerY = hitbox.y + hitbox.height * 0.5f;
+        if (centerY < laneBounds.y || centerY > laneBounds.y + laneBounds.height) continue;
+
+        const float proximity = std::clamp(
+            (lawnEnd.x + lawnEnd.width - hitbox.x) / std::max(1.0f, lawnWidth),
+            0.0f,
+            1.5f
+        );
+        const float durability = (zombie -> getHealth() + zombie -> getArmorHealth()) / 500.0f;
+        const float speedFactor = zombie -> getSpeed() / 20.0f;
+        threat += 1.0f + durability + speedFactor + proximity * 3.0f;
+    }
+    return threat;
+}
+
+int World :: getNearestZombieColumnInLane(int lane) const {
+    if (lane < 0 || lane >= 5) return -1;
+
+    int nearestColumn = 9;
+    bool foundZombie = false;
+    const Rectangle laneBounds = grid.getCellRect(lane, 0);
+    for (const auto& zombie : zombieManager.getZombies()) {
+        if (!zombie || zombie -> isDead()) continue;
+        const Rectangle hitbox = zombie -> getHitbox();
+        const Vector2 center = {
+            hitbox.x + hitbox.width * 0.5f,
+            hitbox.y + hitbox.height * 0.5f
+        };
+        if (center.y < laneBounds.y || center.y > laneBounds.y + laneBounds.height) continue;
+
+        int column = grid.getCellID(center).second;
+        if (column < 0) column = center.x < laneBounds.x ? 0 : 8;
+        nearestColumn = std::min(nearestColumn, column);
+        foundZombie = true;
+    }
+    return foundZombie ? nearestColumn : -1;
+}
+
 void World :: setResult(WorldResult result) {
     wResult = result;
 }
@@ -607,9 +752,9 @@ void World :: updateWorldState() {
     if(wResult != WorldResult :: RUNNING) return;
 
     if(zombieManager.hasZombieReachedHouse(-45.0f)){
-        wResult = WorldResult :: LOST;
+        wResult = playerControlsZombies ? WorldResult :: WON : WorldResult :: LOST;
     }
-    else if(waveManager.hasSpawnAll() and zombieManager.empty()){
+    else if(!playerControlsZombies && waveManager.hasSpawnAll() and zombieManager.empty()){
         wResult = WorldResult :: WON;
     }
 }

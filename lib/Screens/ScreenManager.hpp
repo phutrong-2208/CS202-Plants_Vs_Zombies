@@ -11,6 +11,7 @@ private:
     int screenHeight = 0;
     AssetManager* assetManager = nullptr;
     UserProfileManager* userProfileManager = nullptr;
+    bool quitRequested = false;
 
     std::unique_ptr<Screen> createScreen(ScreenID id, const ScreenData& data);
     void processTransition();
@@ -36,6 +37,7 @@ public:
     Screen* top();
     const Screen* top() const;
     bool empty() const;
+    bool isQuitRequested() const;
 };
 
 #endif

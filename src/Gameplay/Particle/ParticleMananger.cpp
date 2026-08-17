@@ -34,5 +34,18 @@ int ParticleManager :: handleClick(Vector2 mousePosition){
     return 0;
 }
 
+int ParticleManager :: collectAll(){
+    int collectedValue = 0;
+    for(auto& item : particles){
+        const Rectangle bounds = item -> getHitBox();
+        const Vector2 center = {
+            bounds.x + bounds.width * 0.5f,
+            bounds.y + bounds.height * 0.5f
+        };
+        collectedValue += item -> collect(center);
+    }
+    return collectedValue;
+}
+
 
 

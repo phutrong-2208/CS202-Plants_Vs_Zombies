@@ -17,7 +17,8 @@ enum class ScreenAction {
     PUSH,
     POP,
     REPLACE,
-    CLEAR_AND_PUSH
+    CLEAR_AND_PUSH,
+    QUIT
 };
 
 struct ScreenTransition {

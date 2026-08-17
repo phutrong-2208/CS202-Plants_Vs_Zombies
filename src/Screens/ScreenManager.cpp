@@ -116,6 +116,10 @@ void ScreenManager :: processTransition() {
             clearAndPush(transition.target, transition.data);
             break;
 
+        case ScreenAction :: QUIT:
+            quitRequested = true;
+            break;
+
         case ScreenAction :: NONE:
         default:
             break;
@@ -152,4 +156,8 @@ const Screen* ScreenManager :: top() const {
 
 bool ScreenManager :: empty() const {
     return screenStorage.empty();
+}
+
+bool ScreenManager :: isQuitRequested() const {
+    return quitRequested;
 }

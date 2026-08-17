@@ -129,22 +129,22 @@ void MainMenuScreen :: loadHoverButtons(TexturePackage* package) {
 void MainMenuScreen :: loadFlowerLabels(TexturePackage* package) {
     flowerLabels = {{
         {
-            {558.0f, 481.0f, 81.0f, 31.0f},
-            {558.0f, 481.0f},
+            {558.0f, 491.0f, 81.0f, 31.0f},
+            {558.0f, 491.0f},
             package -> GetTexture("SELECTORSCREEN_OPTIONS1"),
             package -> GetTexture("SELECTORSCREEN_OPTIONS2"), 
             MainMenuAction :: OPTION
         },
         {
-            {654.0f, 501.0f, 48.0f, 22.0f},
-            {654.0f, 501.0f},
+            {654.0f, 509.0f, 48.0f, 22.0f},
+            {654.0f, 509.0f},
             package -> GetTexture("SELECTORSCREEN_HELP1"),
             package -> GetTexture("SELECTORSCREEN_HELP2"),
             MainMenuAction :: HELP 
         },
         {
-            {725.0f, 489.0f, 47.0f, 27.0f},
-            {725.0f, 489.0f},
+            {725.0f, 502.0f, 47.0f, 27.0f},
+            {725.0f, 502.0f},
             package -> GetTexture("SELECTORSCREEN_QUIT1"),
             package -> GetTexture("SELECTORSCREEN_QUIT2"),
             MainMenuAction :: QUIT
@@ -393,9 +393,22 @@ void MainMenuScreen :: executeAction(MainMenuAction target){
         }
         case MainMenuAction :: OPTION:
             requestTransition(ScreenAction :: PUSH, ScreenID :: PAUSE_MENU); break;
+        case MainMenuAction :: QUIT:
+            requestTransition(ScreenAction :: QUIT); break;
         case MainMenuAction :: SURVIVAL: {
             ScreenData gameplayData;
             gameplayData.gameMode = GameMode :: SURVIVAL_ENDLESS;
+            gameplayData.levelID = {1, 5};
+            requestTransition(
+                ScreenAction :: REPLACE,
+                ScreenID :: GAME_PLAY,
+                gameplayData
+            );
+            break;
+        }
+        case MainMenuAction :: MINI_GAMES: {
+            ScreenData gameplayData;
+            gameplayData.gameMode = GameMode :: AI_PVZ;
             gameplayData.levelID = {1, 5};
             requestTransition(
                 ScreenAction :: REPLACE,

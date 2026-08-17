@@ -63,7 +63,7 @@ void ChoosePlants :: setSunCosts(const std::map<PlantType, int>& costs) {
 }
 
 void ChoosePlants :: setMaxSlots(int maxPlants) {
-    maxSlots = std::max(1, maxPlants);
+    maxSlots = std::clamp(maxPlants, 1, 10);
     if ((int)selectedPlants.size() > maxSlots) {
         selectedPlants.resize(maxSlots);
     }

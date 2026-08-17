@@ -8,6 +8,7 @@
 
 class SeedBank {
 private:
+    static constexpr int MAX_SLOTS = 10;
     TexturePackage* chooserPackage = nullptr;
     TexturePackage* packetPackage  = nullptr;
     TextManager*    textManager    = nullptr;

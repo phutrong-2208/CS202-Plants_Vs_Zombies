@@ -142,7 +142,9 @@ void GameResultScreen :: drawAwardScreen() const {
     }
 
     const bool hasPlantReward = data.rewardPlant != PLANT_COUNT;
-    const char* title = hasPlantReward ? "YOU GOT A NEW PLANT!" : "LEVEL COMPLETE!";
+    const char* title = data.gameMode == GameMode :: AI_PVZ
+        ? "ZOMBIES WIN!"
+        : (hasPlantReward ? "YOU GOT A NEW PLANT!" : "LEVEL COMPLETE!");
 
     if(textManager) {
         const Rectangle titleBounds = toScreenBounds(TITLE_BOUNDS);
