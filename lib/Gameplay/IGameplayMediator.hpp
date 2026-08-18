@@ -15,7 +15,6 @@ static const std::map <PlantType, ProjectileType> projectileConvert = {
     {CACTUS,     PROJECTILE_CACTUS},
     {THREEPEATER, PROJECTILE_PEA},
     {GATLINGPEA, PROJECTILE_PEA},
-    {SPLITPEA,   PROJECTILE_PEA},
     {STARFRUIT,  PROJECTILE_STAR},
     {PUFFSHROOM, PROJECTILE_PUFF},
     {FUMESHROOM, PROJECTILE_PUFF},
@@ -63,6 +62,9 @@ public:
     // Wave spawning
     virtual void spawnZombie(ZombieType type, int lane) = 0;
     virtual void spawnZombieAt(ZombieType type, Vector2 pos) = 0;
+
+    // Audio effects
+    virtual void playSound(const std::string& key, float volume = 1.0f) = 0;
 };
 
 #endif

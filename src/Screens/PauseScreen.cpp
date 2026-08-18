@@ -6,6 +6,7 @@ namespace {
     constexpr float VIRTUAL_HEIGHT = 600.0f;
 
     constexpr Rectangle PANEL_BOUNDS = {188.5f, 51.0f, 423.0f, 498.0f};
+    constexpr Rectangle SOUND_TOGGLE_BOUNDS = {270.0f, 325.0f, 260.0f, 45.0f};
     constexpr Rectangle MAIN_MENU_BOUNDS = {270.0f, 380.0f, 260.0f, 45.0f};
     constexpr Rectangle RESUME_BOUNDS = {220.0f, 430.0f, 360.0f, 100.0f};
     constexpr Color MENU_TEXT_COLOR = {55, 52, 78, 255};
@@ -65,6 +66,10 @@ Rectangle PauseScreen::toScreenBounds(Rectangle virtualBounds) const {
 
 void PauseScreen::update(float) {
     const Vector2 mousePosition = GetMousePosition();
+    soundToggleHovered = CheckCollisionPointRec(
+        mousePosition,
+        toScreenBounds(SOUND_TOGGLE_BOUNDS)
+    );
     resumeHovered = CheckCollisionPointRec(
         mousePosition,
         toScreenBounds(RESUME_BOUNDS)
@@ -106,6 +111,10 @@ void PauseScreen::draw() {
         );
     }
 
+    const bool isMuted = assetManager && assetManager->getSoundManager() && assetManager->getSoundManager()->isMuted();
+    const char* soundLabel = isMuted ? "SOUND: OFF" : "SOUND: ON";
+
+    drawButton(SOUND_TOGGLE_BOUNDS, soundLabel, soundToggleHovered);
     drawButton(MAIN_MENU_BOUNDS, "MAIN MENU", mainMenuHovered);
     drawButton(RESUME_BOUNDS, "BACK TO GAME", resumeHovered);
 }
@@ -115,12 +124,37 @@ void PauseScreen :: handleInput(const RawInputEvent& inputEvent) {
         return;
     }
 
+    if (CheckCollisionPointRec(inputEvent.position, toScreenBounds(SOUND_TOGGLE_BOUNDS))) {
+        if (assetManager) {
+            SoundManager* sm = assetManager->getSoundManager();
+            MusicManager* mm = assetManager->getMusicManager();
+            bool newMuted = true;
+            if (sm) {
+                newMuted = !sm->isMuted();
+                sm->setMuted(newMuted);
+            }
+            if (mm) {
+                mm->setMuted(newMuted);
+            }
+            if (sm && !newMuted) {
+                sm->play("BUTTONCLICK", 1.0f);
+            }
+        }
+        return;
+    }
+
     if (CheckCollisionPointRec(inputEvent.position, toScreenBounds(RESUME_BOUNDS))) {
+        if (assetManager && assetManager->getSoundManager()) {
+            assetManager->getSoundManager()->play("BUTTONCLICK", 1.0f);
+        }
         requestTransition(ScreenAction :: POP);
         return;
     }
 
     if (CheckCollisionPointRec(inputEvent.position, toScreenBounds(MAIN_MENU_BOUNDS))) {
+        if (assetManager && assetManager->getSoundManager()) {
+            assetManager->getSoundManager()->play("BUTTONCLICK", 1.0f);
+        }
         requestTransition(ScreenAction :: CLEAR_AND_PUSH, ScreenID :: MAIN_MENU);
     }
 }

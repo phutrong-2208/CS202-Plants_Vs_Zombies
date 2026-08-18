@@ -39,6 +39,8 @@ public:
     int getTotalWaves(void) const;
     bool isFinished(void) const;
     bool hasSpawnAll(void) const;
+    bool isCurrentWaveHuge(void) const;
+    bool isCurrentWaveFinal(void) const;
 };
 
 #endif

@@ -57,6 +57,10 @@ MainMenuScreen :: MainMenuScreen(
     loadHoverButtons(package);
     loadFlowerLabels(package);
     animationReady = true;
+
+    if (assetManager && assetManager -> getMusicManager()) {
+        assetManager -> getMusicManager() -> play("ZOMBIESONYOURLAWN", true);
+    }
 }
 
 float MainMenuScreen :: getMenuScale() const {
@@ -375,9 +379,19 @@ void MainMenuScreen :: update(float dt){
             toScreenBounds(label.bounds)
         );
     }
+
+    if (assetManager && assetManager -> getMusicManager()) {
+        if (!assetManager -> getMusicManager() -> isPlaying()) {
+            assetManager -> getMusicManager() -> play("ZOMBIESONYOURLAWN", true);
+        }
+    }
 }
 
 void MainMenuScreen :: executeAction(MainMenuAction target){
+    if (assetManager && assetManager->getSoundManager()) {
+        assetManager->getSoundManager()->play("BUTTONCLICK", 1.0f);
+    }
+
     switch(target){
         case MainMenuAction :: CHANGE_PROFILE:
             requestTransition(ScreenAction :: PUSH, ScreenID :: USER_PROFILE); break;

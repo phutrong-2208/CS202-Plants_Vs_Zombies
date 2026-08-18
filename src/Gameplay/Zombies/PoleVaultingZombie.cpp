@@ -105,6 +105,7 @@ void PoleVaultingZombie::onCustomCombat(float dt, IGameplayMediator& mediator) {
             animation.setSpeed(2.7f); // Synchronize 42-frame jump to 1.3s vault duration
             animation.playClip("anim_jump");
             animation.setLoopToggle(false);
+            mediator.playSound("POLEVAULT", 1.0f);
         }
     }
 }

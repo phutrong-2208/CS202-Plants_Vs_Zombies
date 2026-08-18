@@ -45,6 +45,7 @@ void ShooterPlant::performAction(IGameplayMediator* mediator) {
     if (plantData && plantData->getCooldown() > 0.0f && getProjectileSpawnPosition().x != 0.0f) {
         if (readyToFire) {
             mediator->addProjectile(getType(), getProjectileSpawnPosition(), getDamage());
+            mediator->playSound("THROW", 0.6f);
 
             if (getType() == CABBAGEPULT) {
                 animation.hideTrack("Cabbagepult_cabbage");

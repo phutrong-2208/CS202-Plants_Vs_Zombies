@@ -6,9 +6,12 @@ void GargantuarZombie::zombieSetup() {
     hasThrownImp = false;
     isThrowing = false;
     throwTimer = 0.0f;
+    impSpawned = false;
     isSmashing = false;
     smashTimer = 0.0f;
     smashCooldown = 0.0f;
+    smashDealt = false;
+    lastMediator = nullptr;
     speed = 12.0f; // Giant heavy walk speed
 }
 
@@ -18,9 +21,19 @@ void GargantuarZombie::updateTime(float dt) {
     }
 
     if (isThrowing) {
-        throwTimer -= dt;
+        throwTimer += dt;
         animation.updateTime(dt);
-        if (throwTimer <= 0.0f || animation.isFinished()) {
+
+        if (!impSpawned && throwTimer >= 1.2f) {
+            impSpawned = true;
+            if (lastMediator) {
+                lastMediator->playSound("IMP", 1.0f);
+                float targetImpX = std::max(180.0f, hitbox.x - 260.0f);
+                lastMediator->spawnZombieAt(IMP_ZOMBIE, Vector2{ targetImpX, hitbox.y });
+            }
+        }
+
+        if (throwTimer >= 2.6f || animation.isFinished()) {
             isThrowing = false;
             animation.playClip("anim_walk");
             animation.setLoopToggle(true);
@@ -29,10 +42,21 @@ void GargantuarZombie::updateTime(float dt) {
     }
 
     if (isSmashing) {
-        smashTimer -= dt;
+        smashTimer += dt;
         animation.updateTime(dt);
-        if (smashTimer <= 0.0f || animation.isFinished()) {
+
+        // Frame 21 (at ~1.75s) is when the telephone pole slams down onto the ground
+        if (!smashDealt && smashTimer >= 1.75f) {
+            smashDealt = true;
+            if (lastMediator) {
+                lastMediator->killPlantsInArea(getAttackHitbox());
+                lastMediator->playSound("GARGANTUAR_THUMP", 1.0f);
+            }
+        }
+
+        if (smashTimer >= 2.75f || animation.isFinished()) {
             isSmashing = false;
+            smashCooldown = 1.0f;
             animation.playClip("anim_walk");
             animation.setLoopToggle(true);
         }
@@ -43,28 +67,29 @@ void GargantuarZombie::updateTime(float dt) {
 }
 
 void GargantuarZombie::onCustomCombat(float dt, IGameplayMediator& mediator) {
+    lastMediator = &mediator;
     if (isThrowing || isSmashing || state != ZombieState::WALKING) return;
 
     // Check if a plant is right in front to smash
     if (smashCooldown <= 0.0f && mediator.hasPlantInArea(getAttackHitbox())) {
         isSmashing = true;
-        smashTimer = 0.7f;
-        smashCooldown = 1.5f;
+        smashTimer = 0.0f;
+        smashDealt = false;
         animation.playClip("anim_smash");
         animation.setLoopToggle(false);
-        // Instant lethal smash damage (telephone pole crush)
-        mediator.killPlantsInArea(getAttackHitbox());
     }
 }
 
 void GargantuarZombie::receiveDamage(float damage, IGameplayMediator* mediator) {
+    if (mediator) lastMediator = mediator;
     Zombie::receiveDamage(damage, mediator);
 
     // Throw baby zombie (Imp) when HP drops below 50% (1500 HP)
     if (!hasThrownImp && health > 0.0f && health <= 1500.0f && mediator) {
         hasThrownImp = true;
         isThrowing = true;
-        throwTimer = 0.6f;
+        throwTimer = 0.0f;
+        impSpawned = false;
         animation.playClip("anim_throw");
         animation.setLoopToggle(false);
 
@@ -85,9 +110,5 @@ void GargantuarZombie::receiveDamage(float damage, IGameplayMediator* mediator) 
         animation.hideTrack("Zombie_imp_outerarm_lower");
         animation.hideTrack("Zombie_gargantuar_whiterope");
         animation.hideTrack("Zombie_gargantuar_rope");
-
-        // Launch baby zombie (Imp) forward into column 2–3 in same row
-        float targetImpX = std::max(180.0f, hitbox.x - 260.0f);
-        mediator->spawnZombieAt(IMP_ZOMBIE, Vector2{ targetImpX, hitbox.y });
     }
 }

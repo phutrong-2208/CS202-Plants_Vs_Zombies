@@ -199,7 +199,6 @@ void PlantFactory::loadPlantMechanics() {
     creatorMap[SUNSHROOM] = []() { return std::make_unique<SunShroom>(); };
     creatorMap[FUMESHROOM] = []() { return std::make_unique<FumeShroom>(); };
     creatorMap[GRAVEBUSTER] = []() { return std::make_unique<GraveBuster>(); };
-    creatorMap[HYPNOSHROOM] = []() { return std::make_unique<HypnoShroom>(); };
     creatorMap[SCAREDYSHROOM] = []() { return std::make_unique<ScaredyShroom>(); };
     creatorMap[ICESHROOM] = []() { return std::make_unique<IceShroom>(); };
     creatorMap[DOOMSHROOM] = []() { return std::make_unique<DoomShroom>(); };
@@ -214,7 +213,6 @@ void PlantFactory::loadPlantMechanics() {
     creatorMap[SEASHROOM] = []() { return std::make_unique<SeaShroom>(); };
     creatorMap[PLANTERN] = []() { return std::make_unique<Plantern>(); };
     creatorMap[BLOVER] = []() { return std::make_unique<Blover>(); };
-    creatorMap[SPLITPEA] = []() { return std::make_unique<SplitPea>(); };
     creatorMap[STARFRUIT] = []() { return std::make_unique<Starfruit>(); };
     creatorMap[PUMPKIN] = []() { return std::make_unique<Pumpkin>(); };
     creatorMap[MAGNETSHROOM] = []() { return std::make_unique<MagnetShroom>(); };

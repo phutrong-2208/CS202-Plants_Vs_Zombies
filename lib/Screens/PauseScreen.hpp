@@ -15,6 +15,7 @@ private:
 
     bool resumeHovered = false;
     bool mainMenuHovered = false;
+    bool soundToggleHovered = false;
 
     float getScale() const;
     Vector2 getOffset() const;

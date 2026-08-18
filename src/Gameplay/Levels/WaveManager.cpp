@@ -158,3 +158,13 @@ bool WaveManager :: isFinished() const {
 bool WaveManager :: hasSpawnAll(void) const{
     return totalZombies > 0 and spawnedZombies >= totalZombies;
 }
+
+bool WaveManager :: isCurrentWaveHuge(void) const {
+    if(!waves || currentWave < 0 || currentWave >= static_cast<int>(waves -> size())) return false;
+    return (*waves)[currentWave].isHugeWave;
+}
+
+bool WaveManager :: isCurrentWaveFinal(void) const {
+    if(!waves || waves -> empty() || currentWave < 0) return false;
+    return currentWave == static_cast<int>(waves -> size()) - 1;
+}

@@ -37,6 +37,7 @@ void DancingZombie::onCustomCombat(float dt, IGameplayMediator& mediator) {
         summonCooldown = 15.0f;
         animation.playClip("anim_armraise");
         animation.setLoopToggle(false);
+        mediator.playSound("DANCER", 0.9f);
 
         // Summon 4 backup dancers (North, South, East, West)
         // North (same column, higher row)

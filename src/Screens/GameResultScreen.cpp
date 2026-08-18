@@ -45,6 +45,15 @@ GameResultScreen :: GameResultScreen(int width, int height, AssetManager* manage
         loseAnimation.setTextureScalar(getScale());
         loseAnimation.setLoopToggle(false);
     }
+
+    if (assetManager && assetManager->getSoundManager()) {
+        if (data.wResult == WorldResult::WON) {
+            assetManager->getSoundManager()->play("WINMUSIC", 1.0f);
+        } else if (data.wResult == WorldResult::LOST) {
+            assetManager->getSoundManager()->play("LOSEMUSIC", 1.0f);
+            assetManager->getSoundManager()->play("SCREAM", 0.9f);
+        }
+    }
 }
 
 float GameResultScreen :: getScale() const {
@@ -287,6 +296,9 @@ void GameResultScreen :: handleInput(const RawInputEvent& inputEvent) {
     }
 
     if(CheckCollisionPointRec(inputEvent.position, getContinueButtonBounds())) {
+        if (assetManager && assetManager->getSoundManager()) {
+            assetManager->getSoundManager()->play("BUTTONCLICK", 1.0f);
+        }
         requestTransition(
             ScreenAction :: CLEAR_AND_PUSH,
             ScreenID :: MAIN_MENU

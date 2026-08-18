@@ -69,6 +69,7 @@ void Squash::updateTime(float deltaSeconds) {
                 
                 // isExplosion = false -> Normal zombie decapitation death particles
                 lastMediator->damageZombiesInArea(crushArea, plantData ? plantData->getDamage(false) : 1800.0f, nullptr, false);
+                lastMediator->playSound("GULP", 1.0f);
                 damageDealt = true;
             }
         }
@@ -97,6 +98,7 @@ void Squash::performAction(IGameplayMediator* mediator) {
         };
 
         if (mediator->hasZombieInArea(detectArea)) {
+            mediator->playSound("SQUASH_HMM", 1.0f);
             Zombie* target = mediator->getZombiePriority(detectArea);
             startX = bounds.x;
             if (target) {

@@ -38,6 +38,7 @@ void LawnMower::update(float dt, IGameplayMediator* mediator) {
             Rectangle trigBox = getTriggerHitbox();
             if (mediator->hasZombieInArea(trigBox)) {
                 trigger();
+                mediator->playSound("LAWNMOWER", 1.0f);
             }
         }
     } else if (state == LawnMowerState::ROLLING) {

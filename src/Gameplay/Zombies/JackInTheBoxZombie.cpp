@@ -38,6 +38,7 @@ void JackInTheBoxZombie::onCustomCombat(float dt, IGameplayMediator& mediator) {
 
             mediator.killPlantsInArea(blastArea);
             mediator.spawnExplosionParticles(Vector2{ hitbox.x, hitbox.y }, CHERRYBOMB);
+            mediator.playSound("EXPLOSION", 1.0f);
 
             // Self-destruct
             setState(ZombieState::DEAD);
@@ -52,5 +53,6 @@ void JackInTheBoxZombie::onCustomCombat(float dt, IGameplayMediator& mediator) {
         speed = 0.0f;
         animation.playClip("anim_pop");
         animation.setLoopToggle(false);
+        mediator.playSound("JACK_SURPRISE", 1.0f);
     }
 }

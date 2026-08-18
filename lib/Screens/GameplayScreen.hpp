@@ -35,6 +35,11 @@ private:
     TexturePackage* shovelPackage = nullptr;
     bool isShovelSelected = false;
 
+    std::string waveAnnouncementText = "";
+    float waveAnnouncementTimer = 0.0f;
+    int lastAnnouncedWave = -1;
+
+    void drawWaveAnnouncement() const;
     void drawSunHUD() const;
     void drawAIPvZCurrencyHUD() const;
     void drawShovel() const;

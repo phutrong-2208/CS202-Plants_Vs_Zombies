@@ -27,9 +27,11 @@ void PotatoMine::performAction(IGameplayMediator* mediator) {
     if (readyToExplode) {
         mediator->damageZombiesInArea(area, getDamage(), nullptr, true);
         mediator->spawnExplosionParticles({bounds.x + bounds.width * 0.5f, bounds.y + bounds.height * 0.5f}, POTATOMINE);
+        mediator->playSound("EXPLOSION", 1.0f);
         health = 0; // Die
     } else if (mediator->hasZombieInArea(area) && !animationStarted) {
         triggerAnimation("anim_mashed"); // Mashed is the explode animation for PotatoMine
+        mediator->playSound("POTATO_MINE", 0.9f);
         animationStarted = true;
     }
 }

@@ -88,6 +88,7 @@ private:
     void spawnSun(Vector2 position, float targetY, int value) override;
     void spawnZombie(ZombieType type, int lane) override;
     void spawnZombieAt(ZombieType type, Vector2 pos) override;
+    void playSound(const std::string& key, float volume = 1.0f) override;
 
     bool canAfford(PlantType type) const;
     void spendSun(int amount);
@@ -146,6 +147,8 @@ public:
     WorldResult getResult() const;
     const LevelID& getLevelID() const;
     PlantType getRewardPlant() const;
+    bool isCurrentWaveHuge() const;
+    bool isCurrentWaveFinal() const;
     
 };
 

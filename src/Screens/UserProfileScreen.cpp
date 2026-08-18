@@ -385,6 +385,10 @@ void UserProfileScreen :: handleInput(const RawInputEvent& inputEvent) {
     }
     if(inputEvent.inputType != RawInputEvent :: InputType :: LEFT_MOUSE_CLICKED) return;
 
+    if (assetManager && assetManager->getSoundManager()) {
+        assetManager->getSoundManager()->play("BUTTONCLICK", 1.0f);
+    }
+
     if(mode == ProfileDialogMode :: SELECT) {
         const int count = userProfileManager
             ? std :: min(userProfileManager -> getProfileCount(), MAX_VISIBLE_PROFILES)

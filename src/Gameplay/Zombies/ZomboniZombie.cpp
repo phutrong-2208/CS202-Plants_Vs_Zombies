@@ -11,5 +11,6 @@ void ZomboniZombie::onCustomCombat(float dt, IGameplayMediator& mediator) {
     // Instantly crush any plant in front of the vehicle
     if (mediator.hasPlantInArea(getAttackHitbox())) {
         mediator.killPlantsInArea(getAttackHitbox());
+        mediator.playSound("ZAMBONI", 0.6f);
     }
 }

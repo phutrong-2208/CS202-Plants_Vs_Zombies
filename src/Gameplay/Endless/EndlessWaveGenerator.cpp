@@ -17,7 +17,6 @@ const std::vector<ZombieEntry> EndlessWaveGenerator :: ZOMBIE_POOL = {
     {DANCING_ZOMBIE,              6,   10,    1.0f},
     {BACKUP_DANCER_ZOMBIE,        1,   10,    2.5f},
     {BALLOON_ZOMBIE,              3,   12,    1.4f},
-    {POGO_ZOMBIE,                 4,   12,    1.3f},
     {JACK_IN_THE_BOX_ZOMBIE,      5,   14,    1.1f},
     {ZOMBONI_ZOMBIE,              7,   15,    0.9f},
     {BUNGEE_ZOMBIE,               5,   17,    0.8f},

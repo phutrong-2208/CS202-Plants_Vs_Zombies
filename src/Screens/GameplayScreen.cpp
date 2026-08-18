@@ -46,6 +46,10 @@ GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager
         endlessController -> attachToWaveManager(&world->getWaveManager());
         endlessController -> launch();
     }
+
+    if (assetManager && assetManager->getMusicManager()) {
+        assetManager->getMusicManager()->play("ZOMBIESONYOURLAWN", true);
+    }
 }
 
 void GameplayScreen :: update(float dt) {
@@ -92,6 +96,29 @@ void GameplayScreen :: update(float dt) {
             world -> update(dt);
             if(aiPvZMode && world -> isChoosingPlants()) world -> finishChoosingPlants();
             if(world -> isReady()) {
+                if (waveAnnouncementTimer > 0.0f) {
+                    waveAnnouncementTimer -= dt;
+                }
+
+                int curWave = world -> getCurrentWave();
+                if (curWave != lastAnnouncedWave && curWave >= 0) {
+                    lastAnnouncedWave = curWave;
+                    if (world -> isCurrentWaveFinal()) {
+                        waveAnnouncementText = "THE FINAL WAVE ARRIVED";
+                        waveAnnouncementTimer = 3.5f;
+                        if (assetManager && assetManager -> getSoundManager()) {
+                            assetManager -> getSoundManager() -> play("FINALWAVE", 1.0f);
+                        }
+                    } else if (world -> isCurrentWaveHuge()) {
+                        waveAnnouncementText = "A BIGGER WAVE IS APPROACHING";
+                        waveAnnouncementTimer = 3.5f;
+                        if (assetManager && assetManager -> getSoundManager()) {
+                            assetManager -> getSoundManager() -> play("HUGEWAVE", 1.0f);
+                            assetManager -> getSoundManager() -> play("AWOOGA", 0.9f);
+                        }
+                    }
+                }
+
                 if(aiPvZMode) {
                     plantAI.update(dt);
                     conveyorBelt.update(dt);
@@ -101,6 +128,10 @@ void GameplayScreen :: update(float dt) {
 
             if(!resultRequested && world -> getResult() != WorldResult :: RUNNING) {
                 resultRequested = true;
+
+                if (assetManager && assetManager->getMusicManager()) {
+                    assetManager->getMusicManager()->stop();
+                }
 
                 ScreenData resultData;
                 resultData.wResult = world -> getResult();
@@ -222,9 +253,68 @@ void GameplayScreen :: draw() {
                 screenHeight
             );
         }
+
+        drawWaveAnnouncement();
     }
 
     drawPauseButton();
+}
+
+void GameplayScreen :: drawWaveAnnouncement() const {
+    if (waveAnnouncementTimer <= 0.0f || !textManager || waveAnnouncementText.empty()) return;
+
+    float alpha = 1.0f;
+    if (waveAnnouncementTimer < 0.6f) {
+        alpha = waveAnnouncementTimer / 0.6f;
+    } else if (waveAnnouncementTimer > 3.0f) {
+        alpha = (3.5f - waveAnnouncementTimer) / 0.5f;
+    }
+    alpha = std::clamp(alpha, 0.0f, 1.0f);
+
+    float pulse = 1.0f + 0.05f * sinf((3.5f - waveAnnouncementTimer) * 7.0f);
+    float fontSize = 48.0f * pulse;
+
+    Rectangle bannerRect = {
+        0.0f,
+        static_cast<float>(screenHeight) * 0.5f - 45.0f,
+        static_cast<float>(screenWidth),
+        90.0f
+    };
+
+    // Dark semi-transparent background bar for maximum readability
+    DrawRectangle(
+        0,
+        static_cast<int>(bannerRect.y - 10.0f),
+        screenWidth,
+        static_cast<int>(bannerRect.height + 20.0f),
+        ColorAlpha(BLACK, alpha * 0.5f)
+    );
+
+    // Deep black drop shadow
+    Rectangle shadowRect = {
+        bannerRect.x + 3.0f,
+        bannerRect.y + 3.0f,
+        bannerRect.width,
+        bannerRect.height
+    };
+    textManager -> drawCenteredText(
+        "Luckiest_Guy",
+        waveAnnouncementText.c_str(),
+        shadowRect,
+        fontSize,
+        1.5f,
+        ColorAlpha(BLACK, alpha * 0.9f)
+    );
+
+    // Main red announcement text in Luckiest Guy font
+    textManager -> drawCenteredText(
+        "Luckiest_Guy",
+        waveAnnouncementText.c_str(),
+        bannerRect,
+        fontSize,
+        1.5f,
+        ColorAlpha(RED, alpha)
+    );
 }
 
 Rectangle GameplayScreen :: getShovelBounds() const {
@@ -347,6 +437,9 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
 
     if (inputEvent.inputType == RawInputEvent::InputType::LEFT_MOUSE_CLICKED) {
         if (CheckCollisionPointRec(inputEvent.position, getPauseButtonBounds())) {
+            if (assetManager && assetManager->getSoundManager()) {
+                assetManager->getSoundManager()->play("PAUSE");
+            }
             requestTransition(ScreenAction::PUSH, ScreenID::PAUSE_MENU);
             return;
         }
@@ -386,6 +479,9 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
         // Shovel Bank click
         if (CheckCollisionPointRec(inputEvent.position, getShovelBounds())) {
             isShovelSelected = !isShovelSelected;
+            if (assetManager && assetManager->getSoundManager()) {
+                assetManager->getSoundManager()->play("SHOVEL");
+            }
             if (isShovelSelected) {
                 seedBank.clearSelection();
                 conveyorBelt.clearSelection();
@@ -394,6 +490,9 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
         }
 
         if (seedBank.handleMouseClick(inputEvent.position)) {
+            if (assetManager && assetManager->getSoundManager()) {
+                assetManager->getSoundManager()->play("SEEDLIFT");
+            }
             isShovelSelected = false;
             return;
         }
@@ -404,6 +503,9 @@ void GameplayScreen :: handleInput(const RawInputEvent& inputEvent) {
             std::tie(r, c) = world->getGrid().getCellID(inputEvent.position);
             if (r >= 0 && c >= 0) {
                 world->removePlant(r, c);
+                if (assetManager && assetManager->getSoundManager()) {
+                    assetManager->getSoundManager()->play("SHOVEL");
+                }
                 isShovelSelected = false;
             } else {
                 isShovelSelected = false;

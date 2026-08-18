@@ -6,9 +6,13 @@ private:
     bool hasThrownImp = false;
     bool isThrowing = false;
     float throwTimer = 0.0f;
+    bool impSpawned = false;
+
     bool isSmashing = false;
     float smashTimer = 0.0f;
     float smashCooldown = 0.0f;
+    bool smashDealt = false;
+    IGameplayMediator* lastMediator = nullptr;
 
 protected:
     void zombieSetup() override;

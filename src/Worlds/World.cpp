@@ -35,6 +35,16 @@ void World::addProjectile(PlantType pType, Vector2 spawnPos, float damage, bool 
             projectile->setTarget(targetPos);
         }
 
+        if (projType == PROJECTILE_PUFF) {
+            playSound("PUFF", 0.7f);
+        } else if (projType == PROJECTILE_CORN) {
+            playSound("KERNELPULT", 0.7f);
+        } else if (projType == PROJECTILE_FIREPEA) {
+            playSound("FIREPEA", 0.7f);
+        } else {
+            playSound(GetRandomValue(0, 1) ? "THROW" : "THROW2", 0.6f);
+        }
+
         projectileManager.addProjectile(std::move(projectile));
     }
 }
@@ -61,6 +71,7 @@ bool World::touchTarget(Projectile* projectile) {
         }
         
         zombie -> receiveDamage(projectile -> getDamage(), this);
+        playSound(GetRandomValue(0, 1) ? "SPLAT" : "SPLAT2", 0.6f);
 
         return true;
     }
@@ -160,6 +171,9 @@ bool World::hasZombieInArea(Rectangle area, Zombie* exclude) const {
 }
 
 void World::damageZombiesInArea(Rectangle area, float damage, Zombie* exclude, bool isExplosion) {
+    if (isExplosion) {
+        playSound("EXPLOSION", 1.0f);
+    }
     for (auto& zombie : zombieManager.getZombies()) {
         if (!zombie->isDead() && zombie.get() != exclude && CheckCollisionRecs(zombie->getHitbox(), area)) {
             if (isExplosion) {
@@ -190,6 +204,7 @@ bool World::stripArmorInArea(Rectangle area) {
 }
 
 void World::freezeZombiesInArea(Rectangle area, float duration) {
+    playSound("FROZEN", 1.0f);
     for (auto& zombie : zombieManager.getZombies()) {
         if (!zombie->isDead() && CheckCollisionRecs(zombie->getHitbox(), area)) {
             // Need to implement freeze in Zombie first!
@@ -580,7 +595,10 @@ bool World :: tryPlacePlantAtCell(int row, int col, PlantType plantType, bool ig
     if (!ignoreSunCost && !canAfford(plantType)) return false;
 
     const bool placed = grid.placePlant(row, col, plantFactory.createPlant(plantType));
-    if (placed && !ignoreSunCost) spendSun(plantFactory.getSunCost(plantType));
+    if (placed) {
+        if (!ignoreSunCost) spendSun(plantFactory.getSunCost(plantType));
+        playSound(GetRandomValue(0, 1) ? "PLANT" : "PLANT2", 0.9f);
+    }
     return placed;
 }
 
@@ -615,6 +633,7 @@ bool World :: handleParticleClick(Vector2 position) {
     if(collectedValue <= 0) return false;
 
     sunAmount += collectedValue;
+    playSound("POINTS", 0.8f);
     return true;
 }
 
@@ -632,13 +651,19 @@ std::map<PlantType, float> World :: getAllSeedRecharges() const {
 
 void World::spawnZombie(ZombieType type, int lane) {
     if (lane < 0 || lane > 4) return;
+    Rectangle rowBounds = grid.getCellRect(lane, 0);
     Rectangle spawnRect = grid.getCellRect(lane, 8);
     zombieManager.addZombie(
         zombieFactory.createZombie(
             type,
-            Rectangle{spawnRect.x + 100.0f, spawnRect.y - 70.0f, 50.0f, 100.0f}
+            Rectangle{spawnRect.x + 100.0f, rowBounds.y - 40.0f, 50.0f, 100.0f}
         )
     );
+
+    if (GetRandomValue(1, 6) == 1) {
+        const char* groans[] = {"GROAN", "GROAN2", "GROAN3", "GROAN4", "GROAN5", "GROAN6", "LOWGROAN"};
+        playSound(groans[GetRandomValue(0, 6)], 0.6f);
+    }
 }
 
 void World::spawnZombieAt(ZombieType type, Vector2 pos) {
@@ -648,6 +673,12 @@ void World::spawnZombieAt(ZombieType type, Vector2 pos) {
             Rectangle{pos.x, pos.y, 50.0f, 100.0f}
         )
     );
+}
+
+void World::playSound(const std::string& key, float volume) {
+    if (assetManager && assetManager->getSoundManager()) {
+        assetManager->getSoundManager()->play(key, volume);
+    }
 }
 
 float World :: getWaveProgress() const { return waveManager.getProgress(); }
@@ -770,6 +801,14 @@ const LevelID& World :: getLevelID() const {
 
 PlantType World :: getRewardPlant() const {
     return currentLevel ? currentLevel -> getRewardPlant() : PLANT_COUNT;
+}
+
+bool World :: isCurrentWaveHuge() const {
+    return waveManager.isCurrentWaveHuge();
+}
+
+bool World :: isCurrentWaveFinal() const {
+    return waveManager.isCurrentWaveFinal();
 }
 
 void World :: updateWorldState() {

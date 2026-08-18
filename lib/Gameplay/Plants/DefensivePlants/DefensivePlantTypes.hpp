@@ -1,6 +1,5 @@
 #pragma once
 #include "Gameplay/Plants/DefensivePlants/GraveBuster.hpp"
-#include "Gameplay/Plants/DefensivePlants/HypnoShroom.hpp"
 #include "Gameplay/Plants/DefensivePlants/LilyPad.hpp"
 #include "Gameplay/Plants/DefensivePlants/TorchWood.hpp"
 #include "Gameplay/Plants/DefensivePlants/TallNut.hpp"

@@ -12,7 +12,7 @@ private:
 
     std :: map<std :: string, MusicAsset> tracks;
     std :: string currentTrack;
-    float masterVolume = 1.0f;
+    float masterVolume = 0.30f;
     bool muted = false;
     bool paused = false;
 

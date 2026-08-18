@@ -6,7 +6,6 @@
 #include "Gameplay/Plants/ShooterPlants/ThreePeater.hpp"
 
 #include "Gameplay/Plants/ShooterPlants/SeaShroom.hpp"
-#include "Gameplay/Plants/ShooterPlants/SplitPea.hpp"
 #include "Gameplay/Plants/ShooterPlants/Starfruit.hpp"
 #include "Gameplay/Plants/ShooterPlants/CabbagePult.hpp"
 #include "Gameplay/Plants/ShooterPlants/CornPult.hpp"

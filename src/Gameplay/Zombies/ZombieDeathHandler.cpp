@@ -44,6 +44,8 @@ void ZombieDeathHandler::spawnDeathParticles(
     Texture2D* headTex = particlePack->GetTexture(assets.headKey);
     Texture2D* armTex  = particlePack->GetTexture(assets.armKey);
 
+    mediator->playSound("LIMBS_POP", 0.7f);
+
     const float groundY = hitbox.y + hitbox.height;
     
     // The visual center of the head/arm relative to the hitbox

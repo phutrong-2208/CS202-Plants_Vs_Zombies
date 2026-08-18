@@ -148,18 +148,6 @@ REANIM_PACKAGE=GraveBuster
 REANIM_ANIM=GraveBusterAnim
 REANIM_CLIP=idle
 
-[HYPNOSHROOM]
-HEALTH=300
-SUN_COST=75
-BASE_DAMAGE=0
-BUFF_DAMAGE=0
-COOLDOWN=0
-SEED_RECHARGE=30
-REANIM_SCALAR=1.5
-REANIM_PACKAGE=HypnoShroom
-REANIM_ANIM=HypnoShroomAnim
-REANIM_CLIP=idle
-
 [SCAREDYSHROOM]
 HEALTH=300
 SUN_COST=25
@@ -360,27 +348,6 @@ REANIM_SCALAR=1.5
 REANIM_PACKAGE=Blover
 REANIM_ANIM=BloverAnim
 REANIM_CLIP=idle
-
-[SPLITPEA]
-HEALTH=300
-SUN_COST=125
-BASE_DAMAGE=20
-BUFF_DAMAGE=40
-COOLDOWN=1.425
-SEED_RECHARGE=7.5
-REANIM_SCALAR=1.5
-REANIM_PACKAGE=SplitPea
-REANIM_ANIM=SplitPeaAnim
-REANIM_CLIP=idle
-REANIM_HIDE_TRACKS=anim_head_idle, anim_face, idle_mouth, idle_shoot_blink, anim_blink, anim_splitpea_idle, anim_splitpea_shooting, SplitPea_head, SplitPea_mouth, idle_SplitPea_shoot_blink, anim_SplitPea_blink, SplitPea_eyebrows
-REANIM_CLIP_LAYER=head_idle
-REANIM_CLIP_LAYER_SHOW_TRACKS=anim_head_idle, anim_face, idle_mouth, idle_shoot_blink, anim_blink
-REANIM_CLIP_LAYER=splitpea_idle
-REANIM_CLIP_LAYER_SHOW_TRACKS=anim_splitpea_idle, anim_splitpea_shooting, SplitPea_head, SplitPea_mouth, idle_SplitPea_shoot_blink, anim_SplitPea_blink, SplitPea_eyebrows
-ACTION_LAYER_CLIP=anim_shooting
-ACTION_LAYER_SHOW_TRACKS=anim_head_idle, anim_face, idle_mouth, idle_shoot_blink, anim_blink
-ACTION_LAYER_CLIP=anim_splitpea_shooting
-ACTION_LAYER_SHOW_TRACKS=anim_splitpea_idle, anim_splitpea_shooting, SplitPea_head, SplitPea_mouth, idle_SplitPea_shoot_blink, anim_SplitPea_blink, SplitPea_eyebrows
 
 [STARFRUIT]
 HEALTH=300

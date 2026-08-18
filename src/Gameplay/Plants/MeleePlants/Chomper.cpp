@@ -30,6 +30,7 @@ void Chomper::performAction(IGameplayMediator* mediator) {
         if (target) {
             target->setSwallowed(true);
             target->receiveDamage(10000.0f); // Instant kill
+            mediator->playSound("BIGCHOMP", 1.0f);
             
             // Start digesting
             resetCooldown(); 

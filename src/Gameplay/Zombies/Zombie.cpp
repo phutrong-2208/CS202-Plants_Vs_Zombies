@@ -125,7 +125,7 @@ void Zombie::draw() {
         tint = Color{200, 100, 255, 255}; // Purple tint
     }
     
-    animation.draw(getHitbox(), tint);
+    animation.draw(hitbox, tint);
 
     if (freezeTimer > 0.0f) {
         Rectangle zHitbox = getHitbox();
@@ -178,31 +178,24 @@ void Zombie::receiveDamage(float damage, IGameplayMediator* mediator) {
         damage -= appliedAlt;
     }
 
-    if(prevDamage > 0 && damage == 0) {
-        flashTimer = 0.15f;
-        return;
-    }
+    if(damage <= 0.0f) return;
 
-    health = std::max(0.0f, health - damage);
-    if(health == 0.0f) {
-        if (swallowed) {
-            setState(ZombieState::DEAD);
-        } else if (!isCharred) {
-            setState(ZombieState::DYING);
-            
+    health -= damage;
+    if (health <= 0.0f) {
+        health = 0.0f;
+        setState(ZombieState :: DYING);
+        if (zombieType != ZOMBIE_CHARRED) {
+            Color deathTint = WHITE;
+            if (freezeTimer > 0.0f) deathTint = Color{80, 180, 255, 255};
+            else if (chillTimer > 0.0f) deathTint = Color{120, 160, 255, 255};
+            else if (isHypnotized) deathTint = Color{200, 100, 255, 255};
+
             if (deathHandler) {
-                Color deathTint = WHITE;
-                if (chillTimer > 0.0f) {
-                    deathTint = Color{100, 150, 255, 255};
-                }
                 deathHandler->spawnDeathParticles(zombieType, hitbox, 1.0f, deathTint);
             }
-            
-            // Hide the head/helmet tracks on the body since they just flew off as particles
-            animation.hideTrack("anim_head1");
-            animation.hideTrack("anim_head2");
-            animation.hideTrack("anim_tongue");
+            animation.hideTrack("anim_head");
             animation.hideTrack("anim_hair");
+            animation.hideTrack("anim_jaw");
             animation.hideTrack("anim_cone");
             animation.hideTrack("anim_bucket");
             animation.hideTrack("anim_football");
@@ -236,11 +229,19 @@ float Zombie::getArmorHealth() const { return armorHealth; }
 void Zombie::setArmorHealth(float armor) { armorHealth = armor; }
 int Zombie::getAttackDamage() const { return attackDamage; }
 Rectangle Zombie::getHitbox() const { 
-    return{
+    if (zombieType == BACKUP_DANCER_ZOMBIE) {
+        return {
+            hitbox.x + 10.0f,
+            hitbox.y + 15.0f,
+            30.0f,
+            60.0f
+        };
+    }
+    return {
         hitbox.x + 10.0f,
-        hitbox.y + 35.0f,
-        35.0f,
-        85.0f
+        hitbox.y + 60.0f,
+        30.0f,
+        60.0f
     };
 }
 Rectangle Zombie::getAttackHitbox() const {
@@ -249,14 +250,14 @@ Rectangle Zombie::getAttackHitbox() const {
         return {
             bodyHitbox.x + bodyHitbox.width * 0.8f,
             bodyHitbox.y,
-            bodyHitbox.width * 0.5f,
+            bodyHitbox.width * 0.4f,
             bodyHitbox.height
         };
     }
     return {
-        bodyHitbox.x - bodyHitbox.width * 0.3f,
+        bodyHitbox.x - bodyHitbox.width * 0.2f,
         bodyHitbox.y,
-        bodyHitbox.width * 0.5f,
+        bodyHitbox.width * 0.4f,
         bodyHitbox.height
     };
 }
@@ -277,7 +278,10 @@ void Zombie :: setAttacking(bool isAttacking) {
 
 void Zombie :: performAttack(IGameplayMediator& mediator){
     if (isHypnotized) mediator.damageZombiesInArea(getAttackHitbox(), attackDamage, this);
-    else mediator.damagePlantInArea(getAttackHitbox(), attackDamage, this);
+    else {
+        mediator.damagePlantInArea(getAttackHitbox(), attackDamage, this);
+        mediator.playSound(GetRandomValue(0, 1) ? "CHOMP" : "CHOMP2", 0.7f);
+    }
 }
 
 void Zombie :: updateCombat(float dt, IGameplayMediator& mediator){
@@ -305,7 +309,10 @@ void Zombie :: updateCombat(float dt, IGameplayMediator& mediator){
     attackTimer += effectiveDt;
     if (zombieData != nullptr && attackTimer >= zombieData -> getAttackInterval()){
         if (isHypnotized) mediator.damageZombiesInArea(getAttackHitbox(), attackDamage, this);
-        else mediator.damagePlantInArea(getAttackHitbox(), attackDamage, this);
+        else {
+            mediator.damagePlantInArea(getAttackHitbox(), attackDamage, this);
+            mediator.playSound(GetRandomValue(0, 1) ? "CHOMP" : "CHOMP2", 0.7f);
+        }
         attackTimer = 0.0f;
     }
 }

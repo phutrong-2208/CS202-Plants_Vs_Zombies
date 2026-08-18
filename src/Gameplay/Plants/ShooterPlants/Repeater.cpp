@@ -20,6 +20,7 @@ void Repeater::performAction(IGameplayMediator* mediator) {
         secondPos.x -= 30.0f; 
         
         mediator->addProjectile(getType(), secondPos, getDamage());
+        mediator->playSound("THROW", 0.6f);
         
         resetCooldown();
     }
