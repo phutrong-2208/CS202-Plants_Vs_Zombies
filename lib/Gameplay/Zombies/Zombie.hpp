@@ -65,6 +65,10 @@ public:
 class Zombie {
 protected:
     float health = 0;
+    float maxHealth = 0;
+    float armorHealth = 0.0f;
+    float maxArmorHealth = 0.0f;
+    float alternateHealth = 0.0f;
     float speed = 0.0f;
     int attackDamage = 0;
 
@@ -85,8 +89,10 @@ protected:
     bool isHypnotized = false;
     bool isCharred = false;
 
-    void zombieSetup();
+    virtual void zombieSetup();
     virtual void onStateChanged(ZombieState newState);
+    virtual void onArmorBroken();
+    virtual void onCustomCombat(float dt, IGameplayMediator& mediator);
 
 public:
     Zombie() = default;
@@ -97,23 +103,28 @@ public:
     void setDeathHandler(ZombieDeathHandler* handler);
     void setZombieData(ZombieData* data);
     void setReanimInstance(ReanimInstance anim);
+    ReanimInstance& getReanimInstance() { return animation; }
+    const ReanimInstance& getReanimInstance() const { return animation; }
     
     void setSwallowed(bool isSwallowed);
     void setHypnotized(bool hypnotized);
+    bool getIsHypnotized() const { return isHypnotized; }
     void triggerCharred(ReanimInstance charredAnim);
     bool getIsCharred() const { return isCharred; }
-    void draw();
+    virtual void draw();
 
-    void receiveDamage(float damage, IGameplayMediator* mediator = nullptr);
+    virtual void receiveDamage(float damage, IGameplayMediator* mediator = nullptr);
     bool isDead() const;
     bool isFullyDead() const;
     bool isDying() const;
     float getHealth() const;
+    float getMaxHealth() const;
     float getArmorHealth() const;
     void setArmorHealth(float armor);
     float getSpeed() const;
+    void setSpeed(float newSpeed);
     int getAttackDamage() const;
-    Rectangle getHitbox() const;
+    virtual Rectangle getHitbox() const;
     virtual Rectangle getAttackHitbox() const;
     ZombieState getState() const;
     ZombieType getType() const;
@@ -123,8 +134,8 @@ public:
     void setAttacking(bool isAttacking);
     bool isAttacking() const;
     
-    void performAttack(IGameplayMediator& mediator);
-    void updateCombat(float dt, IGameplayMediator& mediator);
+    virtual void performAttack(IGameplayMediator& mediator);
+    virtual void updateCombat(float dt, IGameplayMediator& mediator);
 
     void freeze(float duration);
     void chill(float duration);

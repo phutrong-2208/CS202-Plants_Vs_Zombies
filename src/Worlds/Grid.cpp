@@ -152,9 +152,52 @@ bool Grid::hasPlantInArea(Rectangle area) const {
 }
 
 bool Grid::damagePlantInArea(Rectangle area, float damage, Zombie* attacker) {
-    Plant* plant = getPlantInArea(area);
-    if (plant == nullptr) return false;
+    if (damage <= 200.0f) {
+        // Single-target eating attack from a standard zombie
+        Plant* plant = getPlantInArea(area);
+        if (plant == nullptr) return false;
+        plant->receiveDamage(static_cast<int>(damage), attacker, gameplayMediator);
+        return true;
+    }
 
-    plant -> receiveDamage(static_cast<int>(damage), attacker, gameplayMediator);
-    return true;
+    // Area explosion / smash attack (e.g. Jack-in-the-Box 3x3 blast, Gargantuar smash)
+    bool hitAny = false;
+    for (int row = 0; row < NUM_ROWS; ++row) {
+        for (int col = 0; col < NUM_COLS; ++col) {
+            Cell& cell = garden[row][col];
+            Plant* pumpkin = cell.getPumpkin();
+            Plant* plant = cell.getPlant();
+
+            if (pumpkin && !pumpkin->isDead() && CheckCollisionRecs(area, pumpkin->getHitbox())) {
+                pumpkin->receiveDamage(static_cast<int>(damage), attacker, gameplayMediator);
+                hitAny = true;
+            }
+            if (plant && !plant->isDead() && CheckCollisionRecs(area, plant->getHitbox())) {
+                plant->receiveDamage(static_cast<int>(damage), attacker, gameplayMediator);
+                hitAny = true;
+            }
+        }
+    }
+    return hitAny;
+}
+
+bool Grid::killPlantsInArea(Rectangle area) {
+    bool hitAny = false;
+    for (int row = 0; row < NUM_ROWS; ++row) {
+        for (int col = 0; col < NUM_COLS; ++col) {
+            Cell& cell = garden[row][col];
+            Plant* pumpkin = cell.getPumpkin();
+            Plant* plant = cell.getPlant();
+
+            if (pumpkin && !pumpkin->isDead() && CheckCollisionRecs(area, pumpkin->getHitbox())) {
+                pumpkin->receiveDamage(99999, nullptr, gameplayMediator);
+                hitAny = true;
+            }
+            if (plant && !plant->isDead() && CheckCollisionRecs(area, plant->getHitbox())) {
+                plant->receiveDamage(99999, nullptr, gameplayMediator);
+                hitAny = true;
+            }
+        }
+    }
+    return hitAny;
 }

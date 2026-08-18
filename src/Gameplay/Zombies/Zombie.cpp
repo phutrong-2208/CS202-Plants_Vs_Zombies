@@ -34,12 +34,15 @@ void ZombieData :: setHiddenTracks(std :: vector<std :: string> tracks) { hidden
 
 void Zombie::zombieSetup() {
     if(!zombieData) {
-        health = attackDamage = 0;
+        health = maxHealth = attackDamage = 0;
         speed = 0.0f;
+        armorHealth = maxArmorHealth = alternateHealth = 0.0f;
         return;
     }
 
-    health = zombieData->getBaseHealth();
+    health = maxHealth = zombieData->getBaseHealth();
+    armorHealth = maxArmorHealth = zombieData->getArmorHealth();
+    alternateHealth = zombieData->getAlternateHealth();
     speed = zombieData->getMoveSpeed();
     attackDamage = zombieData->getAttackDamage();
 }
@@ -109,6 +112,8 @@ void Zombie::updateTime(float dt) {
 
 void Zombie::setReanimInstance(ReanimInstance anim) { animation = anim; }
 void Zombie::draw() {
+    if (isFullyDead()) return;
+
     Color tint = WHITE;
     if (flashTimer > 0.0f) {
         tint = Color{200, 200, 200, 255}; // Light grey / white flash effect
@@ -120,7 +125,7 @@ void Zombie::draw() {
         tint = Color{200, 100, 255, 255}; // Purple tint
     }
     
-    animation.draw(hitbox, tint);
+    animation.draw(getHitbox(), tint);
 
     if (freezeTimer > 0.0f) {
         Rectangle zHitbox = getHitbox();
@@ -132,26 +137,51 @@ void Zombie::draw() {
     DrawRectangleLinesEx(getAttackHitbox(), 2.0f, YELLOW);
 }
 
+void Zombie::onArmorBroken() {
+    animation.hideTrack("anim_cone");
+    animation.hideTrack("anim_bucket");
+    animation.hideTrack("anim_football");
+    animation.hideTrack("anim_screendoor");
+    animation.hideTrack("anim_paper");
+    animation.hideTrack("Zombie_cone");
+    animation.hideTrack("Zombie_bucket");
+    animation.hideTrack("Zombie_footballhelmet");
+    animation.hideTrack("Zombie_screendoor");
+    animation.hideTrack("Zombie_paper");
+}
+
+void Zombie::onCustomCombat(float dt, IGameplayMediator& mediator) {
+    // Default base zombie has no custom combat skills
+}
+
 void Zombie::receiveDamage(float damage, IGameplayMediator* mediator) {
     if(state == ZombieState :: DYING || state == ZombieState :: DEAD) return;
     
-    // Shield logic ...
     float prevDamage = damage;
-    if(zombieData -> getArmorHealth() > 0) {
-        float armorHealth = zombieData -> getArmorHealth();
-        zombieData -> setArmorHealth(std::max(0.0f, armorHealth - damage));
-        damage = std::max(0.0f, damage - armorHealth);
+    if(armorHealth > 0.0f) {
+        float appliedArmor = std::min(armorHealth, damage);
+        armorHealth -= appliedArmor;
+        damage -= appliedArmor;
+        if (armorHealth <= 0.0f) {
+            onArmorBroken();
+        }
     }
 
-    if(prevDamage > 0 && damage == 0) return;
-
-    if(zombieData -> getAlternateHealth() > 0) {
-        float altHealth = zombieData -> getAlternateHealth();
-        zombieData -> setAlternateHealth(std::max(0.0f, altHealth - damage));
-        damage = std::max(0.0f, damage - altHealth);
+    if(prevDamage > 0 && damage == 0) {
+        flashTimer = 0.15f;
+        return;
     }
 
-    if(prevDamage > 0 && damage == 0) return;
+    if(alternateHealth > 0.0f) {
+        float appliedAlt = std::min(alternateHealth, damage);
+        alternateHealth -= appliedAlt;
+        damage -= appliedAlt;
+    }
+
+    if(prevDamage > 0 && damage == 0) {
+        flashTimer = 0.15f;
+        return;
+    }
 
     health = std::max(0.0f, health - damage);
     if(health == 0.0f) {
@@ -171,10 +201,20 @@ void Zombie::receiveDamage(float damage, IGameplayMediator* mediator) {
             // Hide the head/helmet tracks on the body since they just flew off as particles
             animation.hideTrack("anim_head1");
             animation.hideTrack("anim_head2");
+            animation.hideTrack("anim_tongue");
+            animation.hideTrack("anim_hair");
             animation.hideTrack("anim_cone");
             animation.hideTrack("anim_bucket");
-            animation.hideTrack("anim_hair");
             animation.hideTrack("anim_football");
+            animation.hideTrack("anim_screendoor");
+            animation.hideTrack("anim_paper");
+            animation.hideTrack("Zombie_head");
+            animation.hideTrack("Zombie_jaw");
+            animation.hideTrack("Zombie_cone");
+            animation.hideTrack("Zombie_bucket");
+            animation.hideTrack("Zombie_footballhelmet");
+            animation.hideTrack("Zombie_screendoor");
+            animation.hideTrack("Zombie_paper");
         }
     } else {
         flashTimer = 0.15f; // 150ms flash on hit
@@ -189,20 +229,18 @@ void Zombie::setSwallowed(bool isSwallowed) { swallowed = isSwallowed; }
 bool Zombie::isSwallowed() const { return swallowed; }
 void Zombie::setHypnotized(bool hypnotized) { isHypnotized = hypnotized; }
 float Zombie::getHealth() const { return health; }
+float Zombie::getMaxHealth() const { return maxHealth; }
 float Zombie::getSpeed() const { return speed; }
-float Zombie::getArmorHealth() const { 
-    return zombieData ? zombieData->getArmorHealth() : 0.0f; 
-}
-void Zombie::setArmorHealth(float armor) { 
-    if (zombieData) zombieData->setArmorHealth(armor); 
-}
+void Zombie::setSpeed(float newSpeed) { speed = newSpeed; }
+float Zombie::getArmorHealth() const { return armorHealth; }
+void Zombie::setArmorHealth(float armor) { armorHealth = armor; }
 int Zombie::getAttackDamage() const { return attackDamage; }
 Rectangle Zombie::getHitbox() const { 
     return{
         hitbox.x + 10.0f,
-        hitbox.y + 60.0f,
-        30.0f,
-        60.0f
+        hitbox.y + 35.0f,
+        35.0f,
+        85.0f
     };
 }
 Rectangle Zombie::getAttackHitbox() const {
@@ -211,14 +249,14 @@ Rectangle Zombie::getAttackHitbox() const {
         return {
             bodyHitbox.x + bodyHitbox.width * 0.8f,
             bodyHitbox.y,
-            bodyHitbox.width * 0.4f,
+            bodyHitbox.width * 0.5f,
             bodyHitbox.height
         };
     }
     return {
-        bodyHitbox.x - bodyHitbox.width * 0.2f,
+        bodyHitbox.x - bodyHitbox.width * 0.3f,
         bodyHitbox.y,
-        bodyHitbox.width * 0.4f,
+        bodyHitbox.width * 0.5f,
         bodyHitbox.height
     };
 }
@@ -243,6 +281,9 @@ void Zombie :: performAttack(IGameplayMediator& mediator){
 }
 
 void Zombie :: updateCombat(float dt, IGameplayMediator& mediator){
+    if (state == ZombieState::DYING || state == ZombieState::DEAD) return;
+    onCustomCombat(dt, mediator);
+
     bool hasTarget = false;
     if (isHypnotized) {
         hasTarget = mediator.hasZombieInArea(getAttackHitbox(), this);
@@ -284,16 +325,25 @@ bool Zombie :: isAttacking() const { return state == ZombieState :: EATING; }
 void Zombie :: onStateChanged(ZombieState newState) {
     switch(newState){
         case ZombieState :: WALKING:
-            animation.playClip("walk");
+            if (animation.hasClip("walk")) animation.playClip("walk");
+            else if (animation.hasClip("anim_walk")) animation.playClip("anim_walk");
             animation.setLoopToggle(true);
             break;
         case ZombieState :: EATING:
-            animation.playClip("eat");
+            if (animation.hasClip("eat")) animation.playClip("eat");
+            else if (animation.hasClip("anim_eat")) animation.playClip("anim_eat");
             animation.setLoopToggle(true);
             break;
         case ZombieState :: DYING:
-            animation.playClip("death");
-            animation.setLoopToggle(false);
+            if (animation.hasClip("death")) {
+                animation.playClip("death");
+                animation.setLoopToggle(false);
+            } else if (animation.hasClip("anim_death")) {
+                animation.playClip("anim_death");
+                animation.setLoopToggle(false);
+            } else {
+                setState(ZombieState::DEAD);
+            }
             break;
         case ZombieState :: DEAD:
             break;

@@ -11,7 +11,7 @@ REANIM_SCALAR=1.25
 REANIM_PACKAGE=NormalZombie
 REANIM_ANIM=NormalZombieAnim
 REANIM_CLIP=walk
-HIDDEN_TRACKS=Zombie_mustache
+HIDDEN_TRACKS=Zombie_flaghand,Zombie_innerarm_screendoor,Zombie_innerarm_screendoor_hand,Zombie_outerarm_screendoor,anim_screendoor,Zombie_duckytube,Zombie_whitewater,Zombie_whitewater2,Zombie_mustache,anim_cone,anim_bucket
 
 [FLAG_ZOMBIE]
 HEALTH=270
@@ -23,6 +23,7 @@ REANIM_SCALAR=1.25
 REANIM_PACKAGE=FlagZombie
 REANIM_ANIM=FlagZombieAnim
 REANIM_CLIP=walk
+HIDDEN_TRACKS=Zombie_flaghand,Zombie_innerarm_screendoor,Zombie_innerarm_screendoor_hand,Zombie_outerarm_screendoor,anim_screendoor,Zombie_duckytube,Zombie_whitewater,Zombie_whitewater2,Zombie_mustache,anim_cone,anim_bucket
 
 [CONEHEAD_ZOMBIE]
 HEALTH=640
@@ -34,6 +35,7 @@ REANIM_SCALAR=1.25
 REANIM_PACKAGE=ConeheadZombie
 REANIM_ANIM=ConeheadZombieAnim
 REANIM_CLIP=walk
+HIDDEN_TRACKS=Zombie_flaghand,Zombie_innerarm_screendoor,Zombie_innerarm_screendoor_hand,Zombie_outerarm_screendoor,anim_screendoor,Zombie_duckytube,Zombie_whitewater,Zombie_whitewater2,Zombie_mustache,anim_bucket
 
 [POLE_VAULTING_ZOMBIE]
 HEALTH=500
@@ -56,6 +58,7 @@ REANIM_SCALAR=1.25
 REANIM_PACKAGE=BucketheadZombie
 REANIM_ANIM=BucketheadZombieAnim
 REANIM_CLIP=walk
+HIDDEN_TRACKS=Zombie_flaghand,Zombie_innerarm_screendoor,Zombie_innerarm_screendoor_hand,Zombie_outerarm_screendoor,anim_screendoor,Zombie_duckytube,Zombie_whitewater,Zombie_whitewater2,Zombie_mustache,anim_cone
 
 [NEWSPAPER_ZOMBIE]
 HEALTH=420
@@ -78,6 +81,7 @@ REANIM_SCALAR=1.25
 REANIM_PACKAGE=ScreenDoorZombie
 REANIM_ANIM=ScreenDoorZombieAnim
 REANIM_CLIP=walk
+HIDDEN_TRACKS=Zombie_flaghand,Zombie_duckytube,Zombie_whitewater,Zombie_whitewater2,Zombie_mustache,anim_cone,anim_bucket,anim_innerarm1,anim_innerarm2,anim_innerarm3,Zombie_outerarm_hand,Zombie_outerarm_lower,Zombie_outerarm_upper
 
 [FOOTBALL_ZOMBIE]
 HEALTH=1670
@@ -107,7 +111,7 @@ ARMOR_HEALTH=0
 SPEED=18
 ATTACK_DAMAGE=100
 ATTACK_INTERVAL=1.0
-REANIM_SCALAR=1.25
+REANIM_SCALAR=0.85
 REANIM_PACKAGE=BackupDancerZombie
 REANIM_ANIM=ZombieBackupAnim
 REANIM_CLIP=walk
@@ -122,7 +126,7 @@ REANIM_SCALAR=1.25
 REANIM_PACKAGE=DuckyTubeZombie
 REANIM_ANIM=DuckyTubeZombieAnim
 REANIM_CLIP=swim
-HIDDEN_TRACKS=anim_cone,anim_bucket
+HIDDEN_TRACKS=Zombie_flaghand,Zombie_innerarm_screendoor,Zombie_innerarm_screendoor_hand,Zombie_outerarm_screendoor,anim_screendoor,Zombie_mustache,anim_cone,anim_bucket
 
 [DUCKY_TUBE_CONEHEAD_ZOMBIE]
 HEALTH=640
@@ -134,7 +138,7 @@ REANIM_SCALAR=1.25
 REANIM_PACKAGE=DuckyTubeZombie
 REANIM_ANIM=DuckyTubeZombieAnim
 REANIM_CLIP=swim
-HIDDEN_TRACKS=anim_bucket
+HIDDEN_TRACKS=Zombie_flaghand,Zombie_innerarm_screendoor,Zombie_innerarm_screendoor_hand,Zombie_outerarm_screendoor,anim_screendoor,Zombie_mustache,anim_bucket
 
 [DUCKY_TUBE_BUCKETHEAD_ZOMBIE]
 HEALTH=1370
@@ -146,7 +150,7 @@ REANIM_SCALAR=1.25
 REANIM_PACKAGE=DuckyTubeZombie
 REANIM_ANIM=DuckyTubeZombieAnim
 REANIM_CLIP=swim
-HIDDEN_TRACKS=anim_cone
+HIDDEN_TRACKS=Zombie_flaghand,Zombie_innerarm_screendoor,Zombie_innerarm_screendoor_hand,Zombie_outerarm_screendoor,anim_screendoor,Zombie_mustache,anim_cone
 
 [SNORKEL_ZOMBIE]
 HEALTH=270

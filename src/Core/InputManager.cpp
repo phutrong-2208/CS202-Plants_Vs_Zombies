@@ -1,51 +1,5 @@
 #include <Core/InputManager.hpp>
 
-///////////////////////////////////
-///     MOUSE CONSTRUCTION      ///
-///////////////////////////////////
-
-/// @brief This updates that the mouse button is being pressed.
-///        After sufficient time, it pushes a HOLD event.
-void MouseState::pressUpdate(std::queue <RawInputEvent>& inputQueue, bool isLeft) {
-    if (!pressed) {
-        pressed = true;
-        timePassed = 0.0f;
-        position = GetMousePosition();
-    } else {
-        timePassed += GetFrameTime();
-    }
-
-    if (timePassed >= HOLD_TIME) {
-        RawInputEvent holdInput;
-        holdInput.inputType = isLeft ? RawInputEvent::InputType::LEFT_MOUSE_HOLD : RawInputEvent::InputType::RIGHT_MOUSE_HOLD;
-        holdInput.position = GetMousePosition();
-
-        inputQueue.push(holdInput);
-    }
-}
-
-/// @brief This updates that the mouse button has been released.
-///        Processing cases where it's a CLICKED event or a RELEASED event
-void MouseState::releaseUpdate(std::queue <RawInputEvent>& inputQueue, bool isLeft) {
-    if (!pressed) return;
-
-    pressed = false;
-            
-    if (timePassed < HOLD_TIME) {
-        RawInputEvent clickedInput;
-        clickedInput.inputType = isLeft ? RawInputEvent::InputType::LEFT_MOUSE_CLICKED : RawInputEvent::InputType::RIGHT_MOUSE_CLICKED;
-        clickedInput.position = position;
-        inputQueue.push(clickedInput);
-    } else {
-        RawInputEvent releasedInput;
-        releasedInput.inputType = isLeft ? RawInputEvent::InputType::LEFT_MOUSE_RELEASED : RawInputEvent::InputType::RIGHT_MOUSE_RELEASED;
-        releasedInput.position = GetMousePosition();
-        inputQueue.push(releasedInput);
-    }
-
-    timePassed = 0.0f;
-}
-
 /// @brief The function handles the doubling backspace with a considerable delay between
 void InputManager::handleBackspace() {
     RawInputEvent newInput;
@@ -83,24 +37,37 @@ void InputManager::update() {
 
     handleBackspace();
 
-    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-        LeftMouse.pressUpdate(inputQueue, true);
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        RawInputEvent leftClick;
+        leftClick.inputType = RawInputEvent::InputType::LEFT_MOUSE_CLICKED;
+        leftClick.position = GetMousePosition();
+        inputQueue.push(leftClick);
     }
     if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-        LeftMouse.releaseUpdate(inputQueue, true);
+        RawInputEvent leftRelease;
+        leftRelease.inputType = RawInputEvent::InputType::LEFT_MOUSE_RELEASED;
+        leftRelease.position = GetMousePosition();
+        inputQueue.push(leftRelease);
     }
 
-    if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
-        RightMouse.pressUpdate(inputQueue, false);
+    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+        RawInputEvent rightClick;
+        rightClick.inputType = RawInputEvent::InputType::RIGHT_MOUSE_CLICKED;
+        rightClick.position = GetMousePosition();
+        inputQueue.push(rightClick);
     }
     if (IsMouseButtonReleased(MOUSE_RIGHT_BUTTON)) {
-        RightMouse.releaseUpdate(inputQueue, false);
+        RawInputEvent rightRelease;
+        rightRelease.inputType = RawInputEvent::InputType::RIGHT_MOUSE_RELEASED;
+        rightRelease.position = GetMousePosition();
+        inputQueue.push(rightRelease);
     }
 }
 
 bool InputManager::hasEvents() {
     return !inputQueue.empty();
 }
+
 RawInputEvent InputManager::pollEvent() {
     if (inputQueue.empty()) {
         return RawInputEvent();

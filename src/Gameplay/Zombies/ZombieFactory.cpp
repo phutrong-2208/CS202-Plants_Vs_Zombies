@@ -1,4 +1,10 @@
 #include "Gameplay/Zombies/ZombieFactory.hpp"
+#include "Gameplay/Zombies/NewspaperZombie.hpp"
+#include "Gameplay/Zombies/PoleVaultingZombie.hpp"
+#include "Gameplay/Zombies/GargantuarZombie.hpp"
+#include "Gameplay/Zombies/JackInTheBoxZombie.hpp"
+#include "Gameplay/Zombies/DancingZombie.hpp"
+#include "Gameplay/Zombies/ZomboniZombie.hpp"
 
 namespace {
     const std::map<std::string, ZombieType> zombieTypeNameMap = {
@@ -137,6 +143,13 @@ void ZombieFactory::loadZombieMechanics() {
             return std::make_unique<Zombie>();
         };
     }
+
+    creatorMap[NEWSPAPER_ZOMBIE] = []() { return std::make_unique<NewspaperZombie>(); };
+    creatorMap[POLE_VAULTING_ZOMBIE] = []() { return std::make_unique<PoleVaultingZombie>(); };
+    creatorMap[GARGANTUAR_ZOMBIE] = []() { return std::make_unique<GargantuarZombie>(); };
+    creatorMap[JACK_IN_THE_BOX_ZOMBIE] = []() { return std::make_unique<JackInTheBoxZombie>(); };
+    creatorMap[DANCING_ZOMBIE] = []() { return std::make_unique<DancingZombie>(); };
+    creatorMap[ZOMBONI_ZOMBIE] = []() { return std::make_unique<ZomboniZombie>(); };
 }
 
 ReanimInstance ZombieFactory::createReanim(

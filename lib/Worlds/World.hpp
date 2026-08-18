@@ -76,8 +76,10 @@ private:
     virtual void killZombiesOfType(ZombieType type) override;
     virtual bool hasPlantInArea(Rectangle area) const override;
     virtual bool damagePlantInArea(Rectangle area, float damage, Zombie* attacker = nullptr) override;
+    virtual void killPlantsInArea(Rectangle area) override;
     virtual bool hasZombieInArea(Rectangle area, Zombie* exclude = nullptr) const override;
     virtual void damageZombiesInArea(Rectangle area, float damage, Zombie* exclude = nullptr, bool isExplosion = false) override;
+    virtual void killZombiesInArea(Rectangle area, bool isExplosion = true) override;
     virtual Zombie* getZombiePriority(Rectangle area) override;
     virtual bool stripArmorInArea(Rectangle area) override;
     virtual void freezeZombiesInArea(Rectangle area, float duration) override;
@@ -85,6 +87,7 @@ private:
     void spawnExplosionParticles(Vector2 position, PlantType type) override;
     void spawnSun(Vector2 position, float targetY, int value) override;
     void spawnZombie(ZombieType type, int lane) override;
+    void spawnZombieAt(ZombieType type, Vector2 pos) override;
 
     bool canAfford(PlantType type) const;
     void spendSun(int amount);

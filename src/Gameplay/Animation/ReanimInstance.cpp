@@ -33,7 +33,11 @@ void ReanimInstance::showOnlyTracks(const std::vector<std::string>& trackNames) 
 void ReanimInstance::setTextureOverrides(const std::map<std::string, std::string>& overrides) {
     textureOverrides.clear();
     for (const auto& kv : overrides) {
-        textureOverrides[kv.first] = kv.second;
+        std::string k = kv.first;
+        std::string v = kv.second;
+        if (k.rfind("IMAGE_REANIM_", 0) == 0) k = k.substr(13);
+        if (v.rfind("IMAGE_REANIM_", 0) == 0) v = v.substr(13);
+        textureOverrides[k] = v;
     }
 }
 
@@ -57,7 +61,11 @@ Texture2D* ReanimInstance::getTrackTexture(const std::string& trackName) const {
     const float loopStart = (clipLoopStart >= 0.0f) ? clipLoopStart : rawAnim->getLoopStartTime();
     const float timelineEnd = (clipLoopStart >= 0.0f) ? clipEnd : rawAnim->getDuration();
     Frame frame = track->getInterpolatedFrame(currentTime, loopStart, timelineEnd);
-    return rawTexPack->GetTexture(frame.getTextureKey());
+    std::string texKey = frame.getTextureKey();
+    if (textureOverrides.find(texKey) != textureOverrides.end()) {
+        texKey = textureOverrides.at(texKey);
+    }
+    return rawTexPack->GetTexture(texKey);
 }
 
 bool ReanimInstance::setDefaultClip(const std::string& clipName) {
@@ -75,7 +83,6 @@ bool ReanimInstance::playClip(const std::string& clipName) {
     if (rawAnim == nullptr) return false;
     const AnimClip* clip = rawAnim->getClip(clipName);
     if (clip == nullptr) {
-        TraceLog(LOG_WARNING, "ReanimInstance: clip '%s' not found", clipName.c_str());
         return false;
     }
 
@@ -92,7 +99,6 @@ bool ReanimInstance::playClipLayer(const std::string& clipName, int layerIndex, 
     
     const AnimClip* clip = rawAnim->getClip(clipName);
     if (clip == nullptr) {
-        TraceLog(LOG_WARNING, "ReanimInstance::playClipLayer: clip '%s' not found", clipName.c_str());
         return false;
     }
     

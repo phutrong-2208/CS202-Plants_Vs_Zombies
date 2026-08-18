@@ -47,8 +47,10 @@ public:
     virtual void killZombiesOfType(ZombieType type) = 0;
     virtual bool hasPlantInArea(Rectangle area) const = 0;
     virtual bool damagePlantInArea(Rectangle area, float damage, Zombie* attacker = nullptr) = 0;
+    virtual void killPlantsInArea(Rectangle area) = 0;
     virtual bool hasZombieInArea(Rectangle area, Zombie* exclude = nullptr) const = 0;
     virtual void damageZombiesInArea(Rectangle area, float damage, Zombie* exclude = nullptr, bool isExplosion = false) = 0;
+    virtual void killZombiesInArea(Rectangle area, bool isExplosion = true) = 0;
     virtual Zombie* getZombiePriority(Rectangle area) = 0;
     virtual bool stripArmorInArea(Rectangle area) = 0;
     virtual void freezeZombiesInArea(Rectangle area, float duration) = 0;
@@ -60,6 +62,7 @@ public:
 
     // Wave spawning
     virtual void spawnZombie(ZombieType type, int lane) = 0;
+    virtual void spawnZombieAt(ZombieType type, Vector2 pos) = 0;
 };
 
 #endif

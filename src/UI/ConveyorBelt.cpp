@@ -38,9 +38,11 @@ const std::vector<ZombieType>& getAllZombiePacketTypes() {
     static const std::vector<ZombieType> zombies = {
         NORMAL_ZOMBIE,
         CONEHEAD_ZOMBIE,
+        POLE_VAULTING_ZOMBIE,
         BUCKETHEAD_ZOMBIE,
         NEWSPAPER_ZOMBIE,
         FOOTBALL_ZOMBIE,
+        JACK_IN_THE_BOX_ZOMBIE,
         YETI_ZOMBIE,
         GARGANTUAR_ZOMBIE
     };

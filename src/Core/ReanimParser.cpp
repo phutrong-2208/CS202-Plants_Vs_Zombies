@@ -47,11 +47,19 @@ Frame ReanimTrack::getInterpolatedFrame(float time, float startTime, float endTi
     const std::vector<Frame>& frames = transforms;
     if (frames.empty() || startTime > endTime) return {};
 
-    // --- find the bracketing frame indices for [startTime, endTime - 1/fps] ---
+    // --- find the bracketing frame indices for [startTime, endTime] ---
     int startSegment = 0, endSegment = (int)frames.size() - 1;
     for (int k = 0; k < (int)frames.size(); ++k) {
-        if (frames[k].snap <= startTime) startSegment = k;
-        if (frames[k].snap <= endTime)   endSegment   = k;
+        if (frames[k].snap >= startTime - 0.0001f) {
+            startSegment = k;
+            break;
+        }
+    }
+    for (int k = (int)frames.size() - 1; k >= startSegment; --k) {
+        if (frames[k].snap <= endTime + 0.0001f) {
+            endSegment = k;
+            break;
+        }
     }
 
     if (time <= startTime) return frames[startSegment];
@@ -247,7 +255,7 @@ void ReanimParser :: buildClips() {
         if (tname.rfind(PREFIX, 0) != 0) continue;
 
         const std::vector<Frame>& frames = track.getFullTrack();
-        if (frames.empty()) continue;
+        if (frames.empty() || !frames[0].imageName.empty()) continue;
 
         std::string clipName = tname.substr(PREFIX.size());
 

@@ -116,6 +116,10 @@ bool World::damagePlantInArea(Rectangle area, float damage, Zombie* attacker) {
     return grid.damagePlantInArea(area, damage, attacker);
 }
 
+void World::killPlantsInArea(Rectangle area) {
+    grid.killPlantsInArea(area);
+}
+
 void World::hypnotizeZombie(Zombie* zombie) {
     if (zombie) zombie->setHypnotized(true);
 }
@@ -166,6 +170,10 @@ void World::damageZombiesInArea(Rectangle area, float damage, Zombie* exclude, b
             }
         }
     }
+}
+
+void World::killZombiesInArea(Rectangle area, bool isExplosion) {
+    damageZombiesInArea(area, 99999.0f, nullptr, isExplosion);
 }
 
 Zombie* World::getZombiePriority(Rectangle area) {
@@ -288,8 +296,15 @@ void World::spawnExplosionParticles(Vector2 position, PlantType type) {
                 Rectangle cellRect = grid.getCellRect(row, col);
                 float fireX = cellRect.x + cellRect.width * 0.5f;
                 float fireY = cellRect.y + cellRect.height * 0.5f;
-                ReanimInstance fireInstance(1.8f, pack, fireAnim);
-                Rectangle fireBounds = {cellRect.x - 20.0f, cellRect.y - 45.0f, cellRect.width + 40.0f, cellRect.height + 55.0f};
+                const float scalar = 1.3f;
+                ReanimInstance fireInstance(scalar, pack, fireAnim);
+                // Offset fireBounds so internal track offsets (x=-45, y=30) center the flame in the cell
+                Rectangle fireBounds = {
+                    cellRect.x + cellRect.width * 0.5f + (45.0f * scalar),
+                    cellRect.y + cellRect.height * 0.5f - (30.0f * scalar) - 10.0f,
+                    cellRect.width,
+                    cellRect.height
+                };
                 float delay = 0.0f; // All ignite across the whole line immediately!
                 float duration = 0.65f + col * 0.08f; // Extinguish sequentially from left to right!
                 auto fireP = std::make_unique<ReanimParticle>(std::move(fireInstance), Vector2{fireX, fireY}, fireBounds, duration, "anim_flame", delay, 1.0f, WHITE, true);
@@ -585,7 +600,7 @@ bool World :: trySpawnPlayerZombie(Vector2 position, ZombieType zombieType) {
         zombieType,
         Rectangle{
             spawnRect.x + spawnRect.width * 0.5f,
-            spawnRect.y - 40.0f,
+            spawnRect.y - 70.0f,
             50.0f,
             100.0f
         }
@@ -621,7 +636,16 @@ void World::spawnZombie(ZombieType type, int lane) {
     zombieManager.addZombie(
         zombieFactory.createZombie(
             type,
-            Rectangle{spawnRect.x + 100.0f, spawnRect.y - 40.0f, 50.0f, 100.0f}
+            Rectangle{spawnRect.x + 100.0f, spawnRect.y - 70.0f, 50.0f, 100.0f}
+        )
+    );
+}
+
+void World::spawnZombieAt(ZombieType type, Vector2 pos) {
+    zombieManager.addZombie(
+        zombieFactory.createZombie(
+            type,
+            Rectangle{pos.x, pos.y, 50.0f, 100.0f}
         )
     );
 }

@@ -145,6 +145,9 @@ void PlantDataset::loadFromFile(const std::string& filepath) {
                     end = texName.find_last_not_of(" \t\r\n");
                     if (end != std::string::npos) texName = texName.substr(0, end + 1);
                     
+                    if (trackName.rfind("IMAGE_REANIM_", 0) == 0) trackName = trackName.substr(13);
+                    if (texName.rfind("IMAGE_REANIM_", 0) == 0) texName = texName.substr(13);
+
                     if (key == "CRACKED1_OVERRIDE") currentData->addCracked1Override(trackName, texName);
                     else if (key == "CRACKED2_OVERRIDE") currentData->addCracked2Override(trackName, texName);
                 }

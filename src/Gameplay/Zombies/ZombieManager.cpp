@@ -11,19 +11,39 @@ ZombieDeathHandler& ZombieManager::getDeathHandler() {
 void ZombieManager :: addZombie(std::unique_ptr<Zombie> zombie) {
     if(zombie) {
         zombie->setDeathHandler(&deathHandler);
-        zombies.emplace_back(std::move(zombie));
+        pendingZombies.emplace_back(std::move(zombie));
     }
 }
 
 void ZombieManager :: update(float dt) {
-    for(auto& zombie : zombies) {
-        if(zombie -> isFullyDead()) continue;
+    // Flush any zombies added prior to this frame's update
+    if (!pendingZombies.empty()) {
+        for (auto& z : pendingZombies) {
+            zombies.emplace_back(std::move(z));
+        }
+        pendingZombies.clear();
+    }
+
+    const size_t count = zombies.size();
+    for(size_t i = 0; i < count; ++i) {
+        auto& zombie = zombies[i];
+        if(!zombie || zombie -> isFullyDead()) continue;
 
         if(gameplayMediator && !zombie->isDying()){
             zombie -> updateCombat(dt, *gameplayMediator);
         }
 
-        zombie -> updateTime(dt);
+        if (zombie && !zombie->isFullyDead()) {
+            zombie -> updateTime(dt);
+        }
+    }
+
+    // Flush any zombies spawned during combat updates (e.g. Thrown Imps, Backup Dancers)
+    if (!pendingZombies.empty()) {
+        for (auto& z : pendingZombies) {
+            zombies.emplace_back(std::move(z));
+        }
+        pendingZombies.clear();
     }
 
     zombies.erase(
@@ -31,7 +51,7 @@ void ZombieManager :: update(float dt) {
             zombies.begin(),
             zombies.end(),
             [](const std::unique_ptr<Zombie>& zombie) {
-                return zombie->isFullyDead();
+                return !zombie || zombie->isFullyDead();
             }
         ),
         zombies.end()
@@ -117,12 +137,11 @@ bool ZombieManager :: empty(void) const{
     return zombies.empty();
 }
 bool ZombieManager :: hasZombieReachedHouse(float houseBoundX) const{
-    for(const auto&zombie : zombies){
+    for(const auto& zombie : zombies){
         if(!zombie) continue;
 
-
-        const ZombieState state = zombie -> getState();
-        if(state == ZombieState :: DEAD || state == ZombieState :: DYING) continue;
+        if(zombie->isDead() || zombie->isDying() || zombie->isFullyDead() || zombie->getHealth() <= 0.0f) continue;
+        if(zombie->getIsHypnotized() || zombie->isSwallowed()) continue;
 
         const Rectangle hitbox = zombie -> getHitbox();
         if(hitbox.x <= houseBoundX) return true;

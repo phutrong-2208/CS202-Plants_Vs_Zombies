@@ -37,6 +37,7 @@ public:
     Plant* getPlantInArea(Rectangle area) const;
     bool hasPlantInArea(Rectangle area) const;
     bool damagePlantInArea(Rectangle area, float damage, Zombie* attacker = nullptr);
+    bool killPlantsInArea(Rectangle area);
 };
 
 #endif

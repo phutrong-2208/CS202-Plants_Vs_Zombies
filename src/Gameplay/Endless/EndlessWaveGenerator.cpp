@@ -38,12 +38,13 @@ int EndlessWaveGenerator :: calcBudget(int waveIndex) const {
 
     if (isHuge) budget = static_cast<int>(budget * 2.0f);
 
-    return std :: min(budget, 300);
+    return std :: min(budget, MAX_BUDGET);
 }
 
 // Zombie filtering has been unlocked.
 std :: vector<ZombieEntry> EndlessWaveGenerator :: buildEligiblePool(int waveIndex) const {
-    std :: vector<ZombieEntry> pool(ZOMBIE_POOL.size());
+    std :: vector<ZombieEntry> pool;
+    pool.reserve(ZOMBIE_POOL.size());
     for (const ZombieEntry& entry : ZOMBIE_POOL) {
         if (entry.unlockAtWave <= waveIndex) {
             pool.push_back(entry);

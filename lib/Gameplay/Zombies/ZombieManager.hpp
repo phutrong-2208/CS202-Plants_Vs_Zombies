@@ -10,6 +10,7 @@
 class ZombieManager {
 private:
     std::vector<std::unique_ptr<Zombie>> zombies;
+    std::vector<std::unique_ptr<Zombie>> pendingZombies;
     IGameplayMediator* gameplayMediator = nullptr;
     ZombieDeathHandler deathHandler;
 public:
