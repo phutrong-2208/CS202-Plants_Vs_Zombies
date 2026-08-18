@@ -94,7 +94,7 @@ void Zombie::updateTime(float dt) {
     }
 
     animation.updateTime(dt * timeMultiplier);
-    if(state == ZombieState::WALKING) hitbox.x -= effectiveSpeed * dt * (isHypnotized ? -1.0f : 1.0f);
+    if(state == ZombieState::WALKING) hitbox.x -= effectiveSpeed * dt;
     
     const float ZOMBIE_DEATH_COUNTDOWN = 3.0f;
     if (state == ZombieState::DYING) {
@@ -121,8 +121,6 @@ void Zombie::draw() {
         tint = Color{80, 180, 255, 255}; // Deep frozen ice tint
     } else if (chillTimer > 0.0f) {
         tint = Color{120, 160, 255, 255}; // Chilled blue tint
-    } else if (isHypnotized) {
-        tint = Color{200, 100, 255, 255}; // Purple tint
     }
     
     animation.draw(hitbox, tint);
@@ -188,7 +186,6 @@ void Zombie::receiveDamage(float damage, IGameplayMediator* mediator) {
             Color deathTint = WHITE;
             if (freezeTimer > 0.0f) deathTint = Color{80, 180, 255, 255};
             else if (chillTimer > 0.0f) deathTint = Color{120, 160, 255, 255};
-            else if (isHypnotized) deathTint = Color{200, 100, 255, 255};
 
             if (deathHandler) {
                 deathHandler->spawnDeathParticles(zombieType, hitbox, 1.0f, deathTint);
@@ -220,7 +217,6 @@ bool Zombie::isDying() const { return state == ZombieState::DYING; }
 
 void Zombie::setSwallowed(bool isSwallowed) { swallowed = isSwallowed; }
 bool Zombie::isSwallowed() const { return swallowed; }
-void Zombie::setHypnotized(bool hypnotized) { isHypnotized = hypnotized; }
 float Zombie::getHealth() const { return health; }
 float Zombie::getMaxHealth() const { return maxHealth; }
 float Zombie::getSpeed() const { return speed; }
@@ -246,14 +242,6 @@ Rectangle Zombie::getHitbox() const {
 }
 Rectangle Zombie::getAttackHitbox() const {
     const Rectangle bodyHitbox = getHitbox();
-    if (isHypnotized) {
-        return {
-            bodyHitbox.x + bodyHitbox.width * 0.8f,
-            bodyHitbox.y,
-            bodyHitbox.width * 0.4f,
-            bodyHitbox.height
-        };
-    }
     return {
         bodyHitbox.x - bodyHitbox.width * 0.2f,
         bodyHitbox.y,
@@ -277,24 +265,15 @@ void Zombie :: setAttacking(bool isAttacking) {
 }
 
 void Zombie :: performAttack(IGameplayMediator& mediator){
-    if (isHypnotized) mediator.damageZombiesInArea(getAttackHitbox(), attackDamage, this);
-    else {
-        mediator.damagePlantInArea(getAttackHitbox(), attackDamage, this);
-        mediator.playSound(GetRandomValue(0, 1) ? "CHOMP" : "CHOMP2", 0.7f);
-    }
+    mediator.damagePlantInArea(getAttackHitbox(), attackDamage, this);
+    mediator.playSound(GetRandomValue(0, 1) ? "CHOMP" : "CHOMP2", 0.7f);
 }
 
 void Zombie :: updateCombat(float dt, IGameplayMediator& mediator){
     if (state == ZombieState::DYING || state == ZombieState::DEAD) return;
     onCustomCombat(dt, mediator);
 
-    bool hasTarget = false;
-    if (isHypnotized) {
-        hasTarget = mediator.hasZombieInArea(getAttackHitbox(), this);
-    } else {
-        hasTarget = mediator.hasPlantInArea(getAttackHitbox());
-    }
-
+    bool hasTarget = mediator.hasPlantInArea(getAttackHitbox());
     setAttacking(hasTarget);
     
     if(!hasTarget){
@@ -308,11 +287,8 @@ void Zombie :: updateCombat(float dt, IGameplayMediator& mediator){
 
     attackTimer += effectiveDt;
     if (zombieData != nullptr && attackTimer >= zombieData -> getAttackInterval()){
-        if (isHypnotized) mediator.damageZombiesInArea(getAttackHitbox(), attackDamage, this);
-        else {
-            mediator.damagePlantInArea(getAttackHitbox(), attackDamage, this);
-            mediator.playSound(GetRandomValue(0, 1) ? "CHOMP" : "CHOMP2", 0.7f);
-        }
+        mediator.damagePlantInArea(getAttackHitbox(), attackDamage, this);
+        mediator.playSound(GetRandomValue(0, 1) ? "CHOMP" : "CHOMP2", 0.7f);
         attackTimer = 0.0f;
     }
 }

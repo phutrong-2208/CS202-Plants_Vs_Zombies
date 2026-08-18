@@ -41,14 +41,13 @@ public:
     virtual void tryIgniteProjectile(Rectangle area) = 0;
 
     // Zombie killing signals
-    virtual void hypnotizeZombie(Zombie* zombie) = 0;
     virtual void changeZombieLane(Zombie* zombie) = 0;
     virtual void killZombiesOfType(ZombieType type) = 0;
     virtual bool hasPlantInArea(Rectangle area) const = 0;
     virtual bool damagePlantInArea(Rectangle area, float damage, Zombie* attacker = nullptr) = 0;
     virtual void killPlantsInArea(Rectangle area) = 0;
-    virtual bool hasZombieInArea(Rectangle area, Zombie* exclude = nullptr) const = 0;
-    virtual void damageZombiesInArea(Rectangle area, float damage, Zombie* exclude = nullptr, bool isExplosion = false) = 0;
+    virtual bool hasZombieInArea(Rectangle area) const = 0;
+    virtual void damageZombiesInArea(Rectangle area, float damage, bool isExplosion = false) = 0;
     virtual void killZombiesInArea(Rectangle area, bool isExplosion = true) = 0;
     virtual Zombie* getZombiePriority(Rectangle area) = 0;
     virtual bool stripArmorInArea(Rectangle area) = 0;

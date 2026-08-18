@@ -36,7 +36,7 @@ void PoleVaultingZombie::updateTime(float dt) {
         vaultProgress += dt / vaultDuration;
         animation.updateTime(dt);
 
-        const float dir = (isHypnotized ? -1.0f : 1.0f);
+        const float dir = 1.0f;
 
         // Phase 1 (0.0 to 0.22): Sticking pole straight down in front of plant
         if (vaultProgress < 0.22f) {

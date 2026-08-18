@@ -114,9 +114,9 @@ Zombie* ZombieManager::getZombieWithArmor(Rectangle area) {
     }
     return target;
 }
-bool ZombieManager::hasZombieInArea(Rectangle area, Zombie* exclude) const {
+bool ZombieManager::hasZombieInArea(Rectangle area) const {
     for (auto& zombie : zombies) {
-        if (!zombie->isDead() && zombie.get() != exclude) {
+        if (!zombie->isDead()) {
             Rectangle hitbox = zombie->getHitbox();
             if (CheckCollisionRecs(area, hitbox)) return true;
         }
@@ -141,7 +141,7 @@ bool ZombieManager :: hasZombieReachedHouse(float houseBoundX) const{
         if(!zombie) continue;
 
         if(zombie->isDead() || zombie->isDying() || zombie->isFullyDead() || zombie->getHealth() <= 0.0f) continue;
-        if(zombie->getIsHypnotized() || zombie->isSwallowed()) continue;
+        if(zombie->isSwallowed()) continue;
 
         const Rectangle hitbox = zombie -> getHitbox();
         if(hitbox.x <= houseBoundX) return true;

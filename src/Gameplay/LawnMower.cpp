@@ -47,7 +47,7 @@ void LawnMower::update(float dt, IGameplayMediator* mediator) {
 
         if (mediator) {
             Rectangle mowerHit = getHitbox();
-            mediator->damageZombiesInArea(mowerHit, 10000.0f, nullptr);
+            mediator->damageZombiesInArea(mowerHit, 10000.0f);
         }
 
         if (position.x > GetScreenWidth() + 60.0f) {

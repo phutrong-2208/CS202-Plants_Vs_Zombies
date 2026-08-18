@@ -68,7 +68,7 @@ void Squash::updateTime(float deltaSeconds) {
                 };
                 
                 // isExplosion = false -> Normal zombie decapitation death particles
-                lastMediator->damageZombiesInArea(crushArea, plantData ? plantData->getDamage(false) : 1800.0f, nullptr, false);
+                lastMediator->damageZombiesInArea(crushArea, plantData ? plantData->getDamage(false) : 1800.0f, false);
                 lastMediator->playSound("GULP", 1.0f);
                 damageDealt = true;
             }

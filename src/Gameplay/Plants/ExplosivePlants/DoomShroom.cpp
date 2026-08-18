@@ -13,7 +13,7 @@ void DoomShroom::performAction(IGameplayMediator* mediator) {
             bounds.height * 3.0f
         };
         
-        mediator->damageZombiesInArea(area, getDamage(), nullptr, true);
+        mediator->damageZombiesInArea(area, getDamage(), true);
         mediator->spawnExplosionParticles({bounds.x + bounds.width * 0.5f, bounds.y + bounds.height * 0.5f}, DOOMSHROOM);
         mediator->playSound("DOOMSHROOM", 1.0f);
         mediator->playSound("EXPLOSION", 1.0f);

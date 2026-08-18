@@ -71,14 +71,13 @@ private:
     bool touchTarget(Projectile* projectile) override;
     void explodeProjectile(Projectile* projectile) override;
     void tryIgniteProjectile(Rectangle area) override;
-    virtual void hypnotizeZombie(Zombie* zombie) override;
     virtual void changeZombieLane(Zombie* zombie) override;
     virtual void killZombiesOfType(ZombieType type) override;
     virtual bool hasPlantInArea(Rectangle area) const override;
     virtual bool damagePlantInArea(Rectangle area, float damage, Zombie* attacker = nullptr) override;
     virtual void killPlantsInArea(Rectangle area) override;
-    virtual bool hasZombieInArea(Rectangle area, Zombie* exclude = nullptr) const override;
-    virtual void damageZombiesInArea(Rectangle area, float damage, Zombie* exclude = nullptr, bool isExplosion = false) override;
+    virtual bool hasZombieInArea(Rectangle area) const override;
+    virtual void damageZombiesInArea(Rectangle area, float damage, bool isExplosion = false) override;
     virtual void killZombiesInArea(Rectangle area, bool isExplosion = true) override;
     virtual Zombie* getZombiePriority(Rectangle area) override;
     virtual bool stripArmorInArea(Rectangle area) override;

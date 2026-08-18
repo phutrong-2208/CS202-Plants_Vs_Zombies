@@ -131,10 +131,6 @@ void World::killPlantsInArea(Rectangle area) {
     grid.killPlantsInArea(area);
 }
 
-void World::hypnotizeZombie(Zombie* zombie) {
-    if (zombie) zombie->setHypnotized(true);
-}
-
 void World::changeZombieLane(Zombie* zombie) {
     if (!zombie) return;
     
@@ -166,16 +162,16 @@ void World::killZombiesOfType(ZombieType type) {
     }
 }
 
-bool World::hasZombieInArea(Rectangle area, Zombie* exclude) const {
-    return zombieManager.hasZombieInArea(area, exclude);
+bool World::hasZombieInArea(Rectangle area) const {
+    return zombieManager.hasZombieInArea(area);
 }
 
-void World::damageZombiesInArea(Rectangle area, float damage, Zombie* exclude, bool isExplosion) {
+void World::damageZombiesInArea(Rectangle area, float damage, bool isExplosion) {
     if (isExplosion) {
         playSound("EXPLOSION", 1.0f);
     }
     for (auto& zombie : zombieManager.getZombies()) {
-        if (!zombie->isDead() && zombie.get() != exclude && CheckCollisionRecs(zombie->getHitbox(), area)) {
+        if (!zombie->isDead() && CheckCollisionRecs(zombie->getHitbox(), area)) {
             if (isExplosion) {
                 ReanimInstance charredAnim = zombieFactory.createCharredReanim();
                 zombie->triggerCharred(std::move(charredAnim));
@@ -187,7 +183,7 @@ void World::damageZombiesInArea(Rectangle area, float damage, Zombie* exclude, b
 }
 
 void World::killZombiesInArea(Rectangle area, bool isExplosion) {
-    damageZombiesInArea(area, 99999.0f, nullptr, isExplosion);
+    damageZombiesInArea(area, 99999.0f, isExplosion);
 }
 
 Zombie* World::getZombiePriority(Rectangle area) {

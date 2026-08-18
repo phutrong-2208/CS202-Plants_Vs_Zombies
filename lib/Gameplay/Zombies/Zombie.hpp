@@ -86,7 +86,6 @@ protected:
     ZombieType zombieType = ZOMBIE_COUNT;
     ZombieDeathHandler* deathHandler = nullptr;
 
-    bool isHypnotized = false;
     bool isCharred = false;
 
     virtual void zombieSetup();
@@ -107,8 +106,6 @@ public:
     const ReanimInstance& getReanimInstance() const { return animation; }
     
     void setSwallowed(bool isSwallowed);
-    void setHypnotized(bool hypnotized);
-    bool getIsHypnotized() const { return isHypnotized; }
     void triggerCharred(ReanimInstance charredAnim);
     bool getIsCharred() const { return isCharred; }
     virtual void draw();

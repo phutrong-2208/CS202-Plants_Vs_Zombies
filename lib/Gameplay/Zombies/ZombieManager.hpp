@@ -23,7 +23,7 @@ public:
 
     Zombie* getZombiePriority(Rectangle area);
     Zombie* getZombieWithArmor(Rectangle area);
-    bool hasZombieInArea(Rectangle area, Zombie* exclude = nullptr) const;
+    bool hasZombieInArea(Rectangle area) const;
     std::vector<std::unique_ptr<Zombie>>& getZombies();
     const std::vector<std::unique_ptr<Zombie>>& getZombies() const;
     bool empty(void) const;
