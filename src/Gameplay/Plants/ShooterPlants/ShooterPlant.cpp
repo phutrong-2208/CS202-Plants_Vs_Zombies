@@ -45,7 +45,19 @@ void ShooterPlant::performAction(IGameplayMediator* mediator) {
     if (plantData && plantData->getCooldown() > 0.0f && getProjectileSpawnPosition().x != 0.0f) {
         if (readyToFire) {
             mediator->addProjectile(getType(), getProjectileSpawnPosition(), getDamage());
-            mediator->playSound("THROW", 0.6f);
+            
+            PlantType pType = getType();
+            if (pType == PUFFSHROOM || pType == SEASHROOM || pType == SCAREDYSHROOM) {
+                mediator->playSound("PUFF", 0.65f);
+            } else if (pType == FUMESHROOM || pType == GLOOMSHROOM) {
+                mediator->playSound("FUME", 0.65f);
+            } else if (pType == CORNPULT) {
+                mediator->playSound(GetRandomValue(0, 1) ? "KERNELPULT" : "KERNELPULT2", 0.65f);
+            } else if (pType == COBCANNON) {
+                mediator->playSound("COBLAUNCH", 0.8f);
+            } else {
+                mediator->playSound(GetRandomValue(0, 1) ? "THROW" : "THROW2", 0.6f);
+            }
 
             if (getType() == CABBAGEPULT) {
                 animation.hideTrack("Cabbagepult_cabbage");

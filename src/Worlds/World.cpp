@@ -71,7 +71,15 @@ bool World::touchTarget(Projectile* projectile) {
         }
         
         zombie -> receiveDamage(projectile -> getDamage(), this);
-        playSound(GetRandomValue(0, 1) ? "SPLAT" : "SPLAT2", 0.6f);
+
+        if (projectile->getType() == PROJECTILE_FIREPEA) {
+            playSound(GetRandomValue(0, 1) ? "IGNITE" : "IGNITE2", 0.7f);
+        } else if (projectile->getType() == PROJECTILE_SNOWPEA) {
+            playSound(GetRandomValue(0, 1) ? "SPLAT" : "SPLAT2", 0.6f);
+            playSound("SNOW_PEA_SPARKLES", 0.45f);
+        } else {
+            playSound(GetRandomValue(0, 1) ? "SPLAT" : "SPLAT2", 0.6f);
+        }
 
         return true;
     }
@@ -96,6 +104,12 @@ void World::explodeProjectile(Projectile* projectile) {
         freezeZombiesInArea(splashArea, projectile->getChillDuration());
     }
     damageZombiesInArea(splashArea, projectile -> getDamage());
+
+    if (projectile->getType() == PROJECTILE_MELON || projectile->getType() == PROJECTILE_WINTERMELON) {
+        playSound(GetRandomValue(0, 1) ? "MELONIMPACT" : "MELONIMPACT2", 0.7f);
+    } else {
+        playSound(GetRandomValue(0, 1) ? "SPLAT" : "SPLAT2", 0.6f);
+    }
 }
 
 void World::tryIgniteProjectile(Rectangle area) {
@@ -115,12 +129,17 @@ void World::tryIgniteProjectile(Rectangle area) {
                 fireInstance.setLoopToggle(true);
                 projectile->setReanimInstance(std::move(fireInstance));
             }
+            playSound("FIREPEA", 0.65f);
         }
     }
 }
 
 bool World::hasPlantInArea(Rectangle area) const {
     return grid.hasPlantInArea(area);
+}
+
+Plant* World::getPlantInArea(Rectangle area) const {
+    return grid.getPlantInArea(area);
 }
 
 bool World::damagePlantInArea(Rectangle area, float damage, Zombie* attacker) {

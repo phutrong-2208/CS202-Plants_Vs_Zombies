@@ -34,7 +34,7 @@ void ThreePeater::performAction(IGameplayMediator* mediator) {
                 animation.playClipLayer("shooting3", 2);
             }
             
-            mediator->playSound("THROW", 0.6f);
+            mediator->playSound(GetRandomValue(0, 1) ? "THROW" : "THROW2", 0.6f);
             resetCooldown();
         }
     }

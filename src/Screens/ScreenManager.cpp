@@ -51,7 +51,7 @@ std :: unique_ptr<Screen> ScreenManager :: createScreen(ScreenID id, const Scree
 
         case ScreenID :: PAUSE_MENU:
             screen = std :: make_unique<PauseScreen>(
-                screenWidth, screenHeight, assetManager
+                screenWidth, screenHeight, assetManager, data
             );
             break;
 

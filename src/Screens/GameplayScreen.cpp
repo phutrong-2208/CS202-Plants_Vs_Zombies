@@ -48,7 +48,7 @@ GameplayScreen :: GameplayScreen(int screenWidth, int screenHeight, AssetManager
     }
 
     if (assetManager && assetManager->getMusicManager()) {
-        assetManager->getMusicManager()->play("ZOMBIESONYOURLAWN", true);
+        assetManager->getMusicManager()->play("MAINMENUPVZ1", true);
     }
 }
 

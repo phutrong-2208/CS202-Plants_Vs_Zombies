@@ -114,12 +114,12 @@ Rectangle LoadScreen :: toScreenBounds(Rectangle virtualBounds) const {
 void LoadScreen :: update(float dt) {
     if (assetManager == nullptr) return;
 
-    assetManager->updateLoading(6.0);
+    assetManager->updateLoading(100.0f);
 
     const float realProgress = assetManager->getLoadingProgress();
     displayedProgress = std::min(
         realProgress,
-        displayedProgress + dt * 0.45f
+        displayedProgress + std::max(dt * 1.5f, (realProgress - displayedProgress) * 0.25f)
     );
 
     if (sproutAnimationReady) {

@@ -59,7 +59,7 @@ MainMenuScreen :: MainMenuScreen(
     animationReady = true;
 
     if (assetManager && assetManager -> getMusicManager()) {
-        assetManager -> getMusicManager() -> play("ZOMBIESONYOURLAWN", true);
+        assetManager -> getMusicManager() -> play("MAINMENUPVZ1", true);
     }
 }
 
@@ -381,8 +381,8 @@ void MainMenuScreen :: update(float dt){
     }
 
     if (assetManager && assetManager -> getMusicManager()) {
-        if (!assetManager -> getMusicManager() -> isPlaying()) {
-            assetManager -> getMusicManager() -> play("ZOMBIESONYOURLAWN", true);
+        if (!assetManager -> getMusicManager() -> isPlaying() || assetManager -> getMusicManager() -> getCurrentTrack() != "MAINMENUPVZ1") {
+            assetManager -> getMusicManager() -> play("MAINMENUPVZ1", true);
         }
     }
 }
@@ -405,8 +405,12 @@ void MainMenuScreen :: executeAction(MainMenuAction target){
             );
             break;
         }
-        case MainMenuAction :: OPTION:
-            requestTransition(ScreenAction :: PUSH, ScreenID :: PAUSE_MENU); break;
+        case MainMenuAction :: OPTION: {
+            ScreenData optData;
+            optData.isSettingsMenu = true;
+            requestTransition(ScreenAction :: PUSH, ScreenID :: PAUSE_MENU, optData);
+            break;
+        }
         case MainMenuAction :: QUIT:
             requestTransition(ScreenAction :: QUIT); break;
         case MainMenuAction :: SURVIVAL: {

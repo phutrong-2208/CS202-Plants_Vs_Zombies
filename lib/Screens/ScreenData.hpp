@@ -15,6 +15,7 @@ struct ScreenData{
     GameMode gameMode = GameMode::ADVENTURE;
     int survivalScore = 0;
     int flagsCleared  = 0;
+    bool isSettingsMenu = false;
 };
 
 

@@ -74,6 +74,7 @@ private:
     virtual void changeZombieLane(Zombie* zombie) override;
     virtual void killZombiesOfType(ZombieType type) override;
     virtual bool hasPlantInArea(Rectangle area) const override;
+    virtual Plant* getPlantInArea(Rectangle area) const override;
     virtual bool damagePlantInArea(Rectangle area, float damage, Zombie* attacker = nullptr) override;
     virtual void killPlantsInArea(Rectangle area) override;
     virtual bool hasZombieInArea(Rectangle area) const override;

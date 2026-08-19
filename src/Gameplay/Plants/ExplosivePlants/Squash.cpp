@@ -61,10 +61,10 @@ void Squash::updateTime(float deltaSeconds) {
             if (lastMediator && !damageDealt) {
                 float landingX = bounds.x + jumpOffsetX;
                 Rectangle crushArea = {
-                    landingX - bounds.width * 0.75f,
-                    bounds.y - 40.0f,
-                    bounds.width * 2.5f,
-                    bounds.height + 80.0f
+                    landingX - bounds.width * 0.5f,
+                    bounds.y + 5.0f,
+                    bounds.width * 2.0f,
+                    bounds.height - 10.0f
                 };
                 
                 // isExplosion = false -> Normal zombie decapitation death particles
@@ -92,9 +92,9 @@ void Squash::performAction(IGameplayMediator* mediator) {
         // Detect zombies up to 1.5 tiles ahead or behind in same row
         Rectangle detectArea = {
             bounds.x - bounds.width * 1.5f,
-            bounds.y - 40.0f,
+            bounds.y + 5.0f,
             bounds.width * 4.0f,
-            bounds.height + 80.0f
+            bounds.height - 10.0f
         };
 
         if (mediator->hasZombieInArea(detectArea)) {

@@ -112,7 +112,7 @@ void Zombie::updateTime(float dt) {
 
 void Zombie::setReanimInstance(ReanimInstance anim) { animation = anim; }
 void Zombie::draw() {
-    if (isFullyDead()) return;
+    if (isFullyDead() || swallowed) return;
 
     Color tint = WHITE;
     if (flashTimer > 0.0f) {
@@ -181,6 +181,10 @@ void Zombie::receiveDamage(float damage, IGameplayMediator* mediator) {
     health -= damage;
     if (health <= 0.0f) {
         health = 0.0f;
+        if (swallowed) {
+            setState(ZombieState :: DEAD);
+            return;
+        }
         setState(ZombieState :: DYING);
         if (zombieType != ZOMBIE_CHARRED) {
             Color deathTint = WHITE;

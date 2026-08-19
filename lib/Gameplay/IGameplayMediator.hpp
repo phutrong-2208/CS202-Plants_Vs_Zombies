@@ -7,6 +7,7 @@
 #include <Gameplay/Zombies/ZombieType.hpp>
 
 class Zombie;
+class Plant;
 
 static const std::map <PlantType, ProjectileType> projectileConvert = {
     {PEASHOOTER, PROJECTILE_PEA},
@@ -44,6 +45,7 @@ public:
     virtual void changeZombieLane(Zombie* zombie) = 0;
     virtual void killZombiesOfType(ZombieType type) = 0;
     virtual bool hasPlantInArea(Rectangle area) const = 0;
+    virtual Plant* getPlantInArea(Rectangle area) const = 0;
     virtual bool damagePlantInArea(Rectangle area, float damage, Zombie* attacker = nullptr) = 0;
     virtual void killPlantsInArea(Rectangle area) = 0;
     virtual bool hasZombieInArea(Rectangle area) const = 0;
