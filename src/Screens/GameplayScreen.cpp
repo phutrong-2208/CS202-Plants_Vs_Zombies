@@ -63,8 +63,18 @@ void GameplayScreen :: update(float dt) {
             if (currentEndlessPhase == EndlessController :: Phase :: WAVE_RUNNING
                 && prevEndlessPhase != EndlessController :: Phase :: WAVE_RUNNING) {
                 world -> setResult(WorldResult :: RUNNING);
+                waveAnnouncementText = "THE ZOMBIE WAVE STARTS NOW";
+                waveAnnouncementTimer = 3.5f;
+                if (assetManager && assetManager -> getSoundManager()) {
+                    assetManager -> getSoundManager() -> play("HUGEWAVE", 1.0f);
+                    assetManager -> getSoundManager() -> play("AWOOGA", 0.9f);
+                }
             }
             prevEndlessPhase = currentEndlessPhase;
+
+            if (waveAnnouncementTimer > 0.0f) {
+                waveAnnouncementTimer -= dt;
+            }
 
             endlessController -> update(
                 dt,
@@ -114,6 +124,12 @@ void GameplayScreen :: update(float dt) {
                         waveAnnouncementTimer = 3.5f;
                         if (assetManager && assetManager -> getSoundManager()) {
                             assetManager -> getSoundManager() -> play("HUGEWAVE", 1.0f);
+                            assetManager -> getSoundManager() -> play("AWOOGA", 0.9f);
+                        }
+                    } else if (curWave == 0) {
+                        waveAnnouncementText = "THE ZOMBIE WAVE STARTS NOW";
+                        waveAnnouncementTimer = 3.5f;
+                        if (assetManager && assetManager -> getSoundManager()) {
                             assetManager -> getSoundManager() -> play("AWOOGA", 0.9f);
                         }
                     }
@@ -271,8 +287,8 @@ void GameplayScreen :: drawWaveAnnouncement() const {
     }
     alpha = std::clamp(alpha, 0.0f, 1.0f);
 
-    float pulse = 1.0f + 0.05f * sinf((3.5f - waveAnnouncementTimer) * 7.0f);
-    float fontSize = 48.0f * pulse;
+    float pulse = 1.0f + 0.06f * sinf((3.5f - waveAnnouncementTimer) * 8.0f);
+    float fontSize = 38.0f * pulse;
 
     Rectangle bannerRect = {
         0.0f,
@@ -281,13 +297,13 @@ void GameplayScreen :: drawWaveAnnouncement() const {
         90.0f
     };
 
-    // Dark semi-transparent background bar for maximum readability
+    // Dark semi-transparent cinematic backdrop band for maximum readability & dramatic effect
     DrawRectangle(
         0,
-        static_cast<int>(bannerRect.y - 10.0f),
+        static_cast<int>(bannerRect.y - 12.0f),
         screenWidth,
-        static_cast<int>(bannerRect.height + 20.0f),
-        ColorAlpha(BLACK, alpha * 0.5f)
+        static_cast<int>(bannerRect.height + 24.0f),
+        ColorAlpha(Color{15, 10, 15, 255}, alpha * 0.65f)
     );
 
     // Deep black drop shadow
@@ -298,22 +314,22 @@ void GameplayScreen :: drawWaveAnnouncement() const {
         bannerRect.height
     };
     textManager -> drawCenteredText(
-        "Luckiest_Guy",
+        "LUCKIESTGUY-REGULAR",
         waveAnnouncementText.c_str(),
         shadowRect,
         fontSize,
         1.5f,
-        ColorAlpha(BLACK, alpha * 0.9f)
+        ColorAlpha(BLACK, alpha * 0.95f)
     );
 
-    // Main red announcement text in Luckiest Guy font
+    // Main vibrant RED title text centered at the app screen
     textManager -> drawCenteredText(
-        "Luckiest_Guy",
+        "LUCKIESTGUY-REGULAR",
         waveAnnouncementText.c_str(),
         bannerRect,
         fontSize,
         1.5f,
-        ColorAlpha(RED, alpha)
+        ColorAlpha(Color{235, 30, 30, 255}, alpha)
     );
 }
 

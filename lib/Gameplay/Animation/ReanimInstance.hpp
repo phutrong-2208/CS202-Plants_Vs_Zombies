@@ -90,6 +90,7 @@ public:
     void setTextureOverrides(const std::map<std::string, std::string>& overrides);
     void clearTextureOverrides();
     Texture2D* getTrackTexture(const std::string& trackName) const;
+    TexturePackage* getTexturePackage() const { return rawTexPack; }
 
     // Sets the default looping clip and plays it
     bool setDefaultClip(const std::string& clipName);

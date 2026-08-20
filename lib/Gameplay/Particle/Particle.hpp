@@ -35,6 +35,8 @@ public:
 
     virtual Rectangle getHitBox() const;
     bool isExpired(void) const;
+    void setRotation(float rot) { rotation = rot; }
+    void setAngularVelocity(float angVel) { angularVeclocity = angVel; }
 };
 
 #endif
