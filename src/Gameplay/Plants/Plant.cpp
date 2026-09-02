@@ -235,7 +235,6 @@ PlantType Plant::getType() {
 
 void Plant::draw(Rectangle hitbox) {
     animation.draw(hitbox);
-    DrawRectangleLinesEx(getHitbox(), 2.0f, GREEN);
 }
 void Plant::setReanimInstance(ReanimInstance anim) {
     animation = std::move(anim);

@@ -130,9 +130,6 @@ void Zombie::draw() {
         DrawRectangleRec(zHitbox, Color{100, 200, 255, 70});
         DrawRectangleLinesEx(zHitbox, 2.0f, Color{160, 230, 255, 200});
     }
-
-    DrawRectangleLinesEx(getHitbox(), 2.0f, RED);
-    DrawRectangleLinesEx(getAttackHitbox(), 2.0f, YELLOW);
 }
 
 void Zombie::onArmorBroken() {

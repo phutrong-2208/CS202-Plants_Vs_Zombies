@@ -17,5 +17,4 @@ void SunPlant::draw(Rectangle hitbox) {
         tint = {255, 180, 180, 255}; // Pinkish blush
     }
     animation.draw(hitbox, tint);
-    DrawRectangleLinesEx(getHitbox(), 2.0f, GREEN);
 }

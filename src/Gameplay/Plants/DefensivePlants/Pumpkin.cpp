@@ -23,7 +23,6 @@ void Pumpkin::drawFront(Rectangle hitbox) {
     animation.hideTrack("Pumpkin_back");
     animation.unhideTrack("Pumpkin_front");
     animation.draw(pBox);
-    DrawRectangleLinesEx(getHitbox(), 2.0f, ORANGE);
 }
 
 void Pumpkin::draw(Rectangle hitbox) {
